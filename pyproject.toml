@@ -1,0 +1,35 @@
+[project]
+name = "prompting-mammalps"
+version = "0.1.0"
+description = "Code for the development of the text to video retrieval benchmark on MammAlps"
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+    "tqdm>=4.67.1",
+]
+
+[tool.setuptools]
+packages = ["benchmark"]
+
+[project.optional-dependencies]
+dev = [
+    "black>=24.3",
+    "isort>=5.13",
+    "pre-commit>=3.7"
+]
+
+[tool.black]
+line-length = 88
+
+[tool.isort]
+profile = "black"
+line_length = 88
+
+[build-system]
+requires = ["setuptools>=61"]
+build-backend = "setuptools.build_meta"
+
+[dependency-groups]
+dev = [
+    "ipykernel>=6.29.5",
+]
