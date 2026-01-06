@@ -1,0 +1,237 @@
+[   
+    {
+        "type": "function",
+        "function": {
+            "name": "get_tracks_from_species",
+            "description": "Retrieve tracks corresponding to a given species name.",
+            "parameters": {
+                "type": "object",
+                "properties": {
+                    "individual_tracks": {
+                        "type": "array",
+                        "description": "List of individual tracks."
+                    },
+                    "species_name": {
+                        "type": "string",
+                        "description": "The species name to match."
+                    }
+                },
+                "required": ["individual_tracks", "species_name"]
+            }
+        }
+    },
+    {
+        "type": "function",
+        "function": {
+            "name": "get_tracks_from_action",
+            "description": "Retrieve tracks corresponding to a given action.",
+            "parameters": {
+                "type": "object",
+                "properties": {
+                    "individual_tracks": {
+                        "type": "array",
+                        "description": "List of individual tracks."
+                    },
+                    "action_name": {
+                        "type": "string",
+                        "description": "The action name to match."
+                    }
+                },
+                "required": ["individual_tracks", "action_name"]
+            }
+        }
+    },
+    {
+        "type": "function",
+        "function": {
+            "name": "get_tracks_from_activity",
+            "description": "Retrieve tracks corresponding to a given activity.",
+            "parameters": {
+                "type": "object",
+                "properties": {
+                    "individual_tracks": {
+                        "type": "array",
+                        "description": "List of individual tracks."
+                    },
+                    "activity_name": {
+                        "type": "string",
+                        "description": "The activity name to match."
+                    }
+                },
+                "required": ["individual_tracks", "activity_name"]
+            }
+        }
+    },
+    {
+        "type": "function",
+        "function": {
+            "name": "get_deer_tracks_from_age",
+            "description": "Retrieve deer tracks corresponding to a given age.",
+            "parameters": {
+                "type": "object",
+                "properties": {
+                    "individual_tracks": {
+                        "type": "array",
+                        "description": "List of individual tracks."
+                    },
+                    "age": {
+                        "type": "string",
+                        "description": "The age of the deer to match."
+                    }
+                },
+                "required": ["individual_tracks", "age"]
+            }
+        }
+    },
+    {
+        "type": "function",
+        "function": {
+            "name": "get_adult_deer_tracks_from_sex",
+            "description": "Retrieve adult deer tracks corresponding to a given sex.",
+            "parameters": {
+                "type": "object",
+                "properties": {
+                    "individual_tracks": {
+                        "type": "array",
+                        "description": "List of individual tracks."
+                    },
+                    "sex": {
+                        "type": "string",
+                        "description": "The sex of the adult deer to match."
+                    }
+                },
+                "required": ["individual_tracks", "sex"]
+            }
+        }
+    },
+    {
+        "type": "function",
+        "function": {
+            "name": "video_contains_species",
+            "description": "Returns True if the video contains tracks with the given species.",
+            "parameters": {
+                "type": "object",
+                "properties": {
+                    "individual_tracks": {
+                        "type": "array",
+                        "description": "List of individual tracks."
+                    },
+                    "species_name": {
+                        "type": "string",
+                        "description": "The species name to check."
+                    },
+                    "min_occurences": {
+                        "type": "integer",
+                        "description": "Minimum number of occurrences required.",
+                        "default": 1
+                    }
+                },
+                "required": ["individual_tracks", "species_name"]
+            }
+        }
+    },
+    {
+        "type": "function",
+        "function": {
+            "name": "video_contains_action",
+            "description": "Returns True if the video contains tracks with the given action.",
+            "parameters": {
+                "type": "object",
+                "properties": {
+                    "individual_tracks": {
+                        "type": "array",
+                        "description": "List of individual tracks."
+                    },
+                    "action_name": {
+                        "type": "string",
+                        "description": "The action name to check."
+                    },
+                    "min_occurences": {
+                        "type": "integer",
+                        "description": "Minimum number of occurrences required.",
+                        "default": 1
+                    }
+                },
+                "required": ["individual_tracks", "action_name"]
+            }
+        }
+    },
+    {
+        "type": "function",
+        "function": {
+            "name": "video_contains_activity",
+            "description": "Returns True if the video contains tracks with the given activity.",
+            "parameters": {
+                "type": "object",
+                "properties": {
+                    "individual_tracks": {
+                        "type": "array",
+                        "description": "List of individual tracks."
+                    },
+                    "activity_name": {
+                        "type": "string",
+                        "description": "The activity name to check."
+                    },
+                    "min_occurences": {
+                        "type": "integer",
+                        "description": "Minimum number of occurrences required.",
+                        "default": 1
+                    }
+                },
+                "required": ["individual_tracks", "activity_name"]
+            }
+        }
+    },
+    {
+        "type": "function",
+        "function": {
+            "name": "video_contains_deer_age",
+            "description": "Returns True if the video contains deer tracks with the given age.",
+            "parameters": {
+                "type": "object",
+                "properties": {
+                    "individual_tracks": {
+                        "type": "array",
+                        "description": "List of individual tracks."
+                    },
+                    "age": {
+                        "type": "string",
+                        "description": "The age of the deer to check."
+                    },
+                    "min_occurences": {
+                        "type": "integer",
+                        "description": "Minimum number of occurrences required.",
+                        "default": 1
+                    }
+                },
+                "required": ["individual_tracks", "age"]
+            }
+        }
+    },
+    {
+        "type": "function",
+        "function": {
+            "name": "video_contains_adult_deer_sex",
+            "description": "Returns True if the video contains adult deer tracks with the given sex.",
+            "parameters": {
+                "type": "object",
+                "properties": {
+                    "individual_tracks": {
+                        "type": "array",
+                        "description": "List of individual tracks."
+                    },
+                    "sex": {
+                        "type": "string",
+                        "description": "The sex of the adult deer to check."
+                    },
+                    "min_occurences": {
+                        "type": "integer",
+                        "description": "Minimum number of occurrences required.",
+                        "default": 1
+                    }
+                },
+                "required": ["individual_tracks", "sex"]
+            }
+        }
+    }
+]

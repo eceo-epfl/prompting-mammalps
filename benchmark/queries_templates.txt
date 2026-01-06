@@ -1,0 +1,98 @@
+# Basic templates (single attribute)
+A video of a [Spe].
+A video of an animal [ActY].
+A video of an animal [ActN].
+A video of an animal at [Loc].
+A video with [NbInd] animals.
+
+# Two attributes
+A video of a [Spe] at [Loc].
+A video of a [Spe] [ActY].
+A video of a [Spe] [ActN].
+A video of [NbInd] [Spe].
+A video of an animal [ActN] while [ActY].
+A video of an animal at [Loc] [ActY].
+A video of an animal at [Loc] [ActN].
+A video with [NbInd] animals at [Loc]. #Not sure about this one
+
+# Three attributes
+A video of a [Spe] [ActN] while [ActY].
+A video of a [Spe] [ActY] at [Loc].
+A video of a [Spe] [ActN] at [Loc].
+A video of [NbInd] [Spe] at [Loc].
+A video of [NbInd] animals [ActY] at [Loc].
+A video of [NbInd] animals [ActN] at [Loc].
+A video of [NbInd] [Spe] [ActY].
+A video of [NbInd] [Spe] [ActN].
+
+# Four attributes
+A video of [NbInd] [Spe] [ActY] at [Loc].
+A video of [NbInd] [Spe] [ActN] at [Loc].
+A video of [NbInd] [Spe] [ActN] while [ActY].
+A video of a [Spe] [ActN] while [ActY] at [Loc].
+
+# Red deer specific templates
+A video of a [DAge] red deer [ActY].
+A video of a [DAge] red deer [ActN].
+A video of a [DAge] red deer at [Loc].
+A video of a [DAge] red deer [ActY] at [Loc].
+A video of a [DAge] red deer [ActN] at [Loc].
+A video of a [DAge] red deer [ActN] while [ActY].
+A video of a [DAge] red deer [ActN] while [ActY] at [Loc].
+A video of a [DSex] adult red deer [ActY].
+A video of a [DSex] adult red deer [ActN].
+A video of a [DSex] adult red deer [ActY] at [Loc].
+A video of [NbInd] [DAge] red deer [ActY] at [Loc].
+A video of [NbInd] [DAge] red deer [ActN] at [Loc].
+A video of [NbInd] [DSex] adult red deer [ActY] at [Loc].
+A video of [NbInd] [DSex] adult red deer [ActN] at [Loc].
+A video of [NbInd] [DAge] red deer [ActN] while [ActY].
+A video of [NbInd] [DAge] red deer [ActN] while [ActY] at [Loc].
+A video of [NbInd] [DSex] adult red deer [ActN] while [ActY].
+A video of [NbInd] [DSex] adult red deer [ActN] while [ActY] at [Loc].
+A video of [NbInd] [DAge] red deer at [Loc].
+A video of [NbInd] [DSex] adult red deer at [Loc].
+
+# Roe deer specific templates
+A video of a [DAge] roe deer [ActY].
+A video of a [DAge] roe deer [ActN].
+A video of a [DAge] roe deer at [Loc].
+A video of a [DAge] roe deer [ActY] at [Loc].
+A video of a [DAge] roe deer [ActN] at [Loc].
+A video of a [DAge] roe deer [ActN] while [ActY].
+A video of a [DAge] roe deer [ActN] while [ActY] at [Loc].
+A video of a [DSex] adult roe deer [ActY].
+A video of a [DSex] adult roe deer [ActN].
+A video of a [DSex] adult roe deer [ActY] at [Loc].
+A video of [NbInd] [DAge] roe deer [ActY] at [Loc].
+A video of [NbInd] [DAge] roe deer [ActN] at [Loc].
+A video of [NbInd] [DSex] adult roe deer [ActY] at [Loc].
+A video of [NbInd] [DSex] adult roe deer [ActN] at [Loc].
+A video of [NbInd] [DAge] roe deer [ActN] while [ActY].
+A video of [NbInd] [DAge] roe deer [ActN] while [ActY] at [Loc].
+A video of [NbInd] [DSex] adult roe deer [ActN] while [ActY].
+A video of [NbInd] [DSex] adult roe deer [ActN] while [ActY] at [Loc].
+A video of [NbInd] [DAge] roe deer at [Loc].
+A video of [NbInd] [DSex] adult roe deer at [Loc].
+
+# Reference-based templates (single attribute)
+A video containing the same set of activities as in [Vid].
+A video containing the same set of species as in [Vid].
+A video containing the same [NbInd] of animals as in [Vid].
+
+# Reference-based templates (two attributes)
+A video containing the same sets of [Spe] and [ActY] as in [Vid].
+A video containing the same sets of [Spe] and [ActN] as in [Vid].
+A video showing [NbInd] animals performing the same [ActY] as in [Vid].
+A video showing the same [ActY] at the same [Loc] as in [Vid].
+
+# Reference-based templates (complex)
+A video containing [NbInd] [Spe] performing the same [ActY] as in [Vid].
+A video containing [NbInd] [Spe] performing the same [ActN] as in [Vid].
+A video showing the same [Spe] performing the same [ActY] at the same [Loc] as in [Vid].
+A video showing [NbInd] animals performing the same [ActN] while [ActY] as in [Vid].
+A video containing at least [NbInd] showing the same sequence of activities of any individual in [Vid].
+
+# Comparative templates
+A video showing more [Spe] than in [Vid] at [Loc].
+A video showing more animals [ActY] than in [Vid].
