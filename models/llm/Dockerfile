@@ -14,4 +14,6 @@ RUN useradd -m -U -s /bin/bash -G ${LDAP_GROUPNAME} -u ${LDAP_UID} ${LDAP_USERNA
 RUN mkdir -p /home/${LDAP_USERNAME}
 RUN chown ${LDAP_USERNAME}:${LDAP_GROUPNAME} /home/${LDAP_USERNAME}/
 WORKDIR /home/${LDAP_USERNAME}
+RUN pip uninstall transformers -y
 RUN pip install smolagents
+RUN pip install transformers
