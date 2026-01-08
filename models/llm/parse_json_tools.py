@@ -322,7 +322,7 @@ def get_adult_deer_tracks_from_sex(
 
 @tool
 def get_nb_tracks_species_in_video(
-    individual_tracks: List[IndividualTrack], species_name
+    individual_tracks: List[IndividualTrack], species_name: str
 ) -> int:
     """
     Returns the number of tracks for a given species in the video
@@ -342,6 +342,7 @@ def tracks_contain_species(
     individual_tracks: List[IndividualTrack], species_name: str
 ) -> bool:
     """
+    Checks if any of the individual tracks contain the species of interest.
     Args:
         individual_tracks (List[IndividualTrack]): a list of individual tracks
         species_name (str): the species to count the number of tracks of
@@ -374,6 +375,7 @@ def tracks_contain_action(
     individual_tracks: List[IndividualTrack], action_name: str
 ) -> bool:
     """
+    Checks if any of the individual tracks contain the action of interest.
     Args:
         individual_tracks (List[IndividualTrack]): a list of individual tracks
         action_name (str): the action to count the number of tracks of
@@ -406,6 +408,7 @@ def tracks_contain_activity(
     activity_name: str,
 ) -> bool:
     """
+    Checks if any of the individual tracks contain the activity of interest.
     Args:
         individual_tracks (List[IndividualTrack]): a list of individual tracks
         activity_name (str): the activity to count the number of tracks of
@@ -444,6 +447,7 @@ def tracks_contain_deer_age(
     deer_species: Optional[str] = None,
 ) -> bool:
     """
+    Checks if any of the individual tracks contain a deer of the given age group.
     Args:
         individual_tracks (List[IndividualTrack]): a list of individual tracks
         age (str): deer age group to retrieve
@@ -490,6 +494,7 @@ def tracks_contain_adult_deer_sex(
     deer_species: Optional[str] = None,
 ) -> bool:
     """
+    Checks if any of the individual tracks contain an adult deer of the given sex group.
     Args:
         individual_tracks (List[IndividualTrack]): a list of individual tracks
         sex (str): adult deer sex group to retrieve
