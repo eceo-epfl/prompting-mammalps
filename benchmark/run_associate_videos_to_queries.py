@@ -1,8 +1,16 @@
 import argparse
 import json
 
-from benchmark.generate_random_queries import Action, Activity, DAge, DSex, Meteo, Species
 from parse_json import *
+
+from benchmark.generate_random_queries import (
+    Action,
+    Activity,
+    DAge,
+    DSex,
+    Meteo,
+    Species,
+)
 
 
 def get_tracks_from_json(json_file):
@@ -19,7 +27,7 @@ def get_parsing_function(prompt):
         def check_file(json_file):
             individual_tracks = get_tracks_from_json(json_file)
             return tracks_contain_action(
-                individual_tracks, action_name=Action.RUNNING.name.lower()
+                individual_tracks, action_name=Action.TROTTING_OR_RUNNING.name.lower()
             )
 
         return check_file
@@ -83,12 +91,12 @@ def get_parsing_function(prompt):
             )
             return tracks_contain_action(
                 juvenile_red_deer_tracks,
-                action_name=Action.SCRATCHING_BODY.name.lower(),
+                action_name=Action.SCRATCHING_OWN_HEAD_OR_BODY.name.lower(),
             )
 
         return check_file
 
-    elif prompt == "A video of a juvenile roe deer pushing its mother's udder.":
+    elif prompt == "A video of a juvenile roe deer preparing to suckle.":
 
         def check_file(json_file):
             individual_tracks = get_tracks_from_json(json_file)
@@ -99,7 +107,7 @@ def get_parsing_function(prompt):
             )
             return tracks_contain_action(
                 juvenile_roe_deer_tracks,
-                action_name=Action.PUSHING_MOTHERS_UDDER.name.lower(),
+                action_name=Action.PREPARING_TO_SUCKLE.name.lower(),
             )
 
         return check_file
@@ -158,7 +166,8 @@ def get_parsing_function(prompt):
                 deer_species=Species.RED_DEER.name.lower(),
             )
             return tracks_contain_action(
-                male_red_deer_tracks, action_name=Action.MARKING_ANTLERS.name.lower()
+                male_red_deer_tracks,
+                action_name=Action.RUBBING_ANTLERS_ON_GROUND.name.lower(),
             )
 
         return check_file
@@ -202,7 +211,8 @@ def get_parsing_function(prompt):
             )
             return (
                 get_nb_tracks_action_in_video(
-                    male_deer_courtship, action_name=Action.MARKING_ANTLERS.name.lower()
+                    male_deer_courtship,
+                    action_name=Action.RUBBING_ANTLERS_ON_GROUND.name.lower(),
                 )
                 >= 3
             )
@@ -269,7 +279,7 @@ def get_parsing_function(prompt):
                 deer_species=Species.RED_DEER.name.lower(),
             )
             return tracks_contain_action(
-                adult_deer_courtship, action_name=Action.LAYING.name.lower()
+                adult_deer_courtship, action_name=Action.LAYING_DOWN.name.lower()
             )
 
         return check_file
@@ -525,7 +535,8 @@ def get_parsing_function(prompt):
                 male_red_deer_tracks, activity_name=Activity.COURTSHIP.name.lower()
             )
             return tracks_contain_action(
-                male_courtship_tracks, action_name=Action.RUNNING.name.lower()
+                male_courtship_tracks,
+                action_name=Action.TROTTING_OR_RUNNING.name.lower(),
             )
 
         return check_file
@@ -546,7 +557,8 @@ def get_parsing_function(prompt):
                 female_red_deer_tracks, activity_name=Activity.COURTSHIP.name.lower()
             )
             return tracks_contain_action(
-                female_courtship_tracks, action_name=Action.RUNNING.name.lower()
+                female_courtship_tracks,
+                action_name=Action.TROTTING_OR_RUNNING.name.lower(),
             )
 
         return check_file
@@ -577,9 +589,11 @@ def get_parsing_function(prompt):
             )
 
             return tracks_contain_action(
-                male_courtship_tracks, action_name=Action.RUNNING.name.lower()
+                male_courtship_tracks,
+                action_name=Action.TROTTING_OR_RUNNING.name.lower(),
             ) and tracks_contain_action(
-                female_courtship_tracks, action_name=Action.RUNNING.name.lower()
+                female_courtship_tracks,
+                action_name=Action.TROTTING_OR_RUNNING.name.lower(),
             )
 
         return check_file
@@ -599,7 +613,8 @@ def get_parsing_function(prompt):
                 male_roe_deer_tracks, activity_name=Activity.COURTSHIP.name.lower()
             )
             return tracks_contain_action(
-                male_courtship_tracks, action_name=Action.RUNNING.name.lower()
+                male_courtship_tracks,
+                action_name=Action.TROTTING_OR_RUNNING.name.lower(),
             )
 
         return check_file
@@ -620,7 +635,8 @@ def get_parsing_function(prompt):
                 female_roe_deer_tracks, activity_name=Activity.COURTSHIP.name.lower()
             )
             return tracks_contain_action(
-                female_courtship_tracks, action_name=Action.RUNNING.name.lower()
+                female_courtship_tracks,
+                action_name=Action.TROTTING_OR_RUNNING.name.lower(),
             )
 
         return check_file
@@ -651,9 +667,11 @@ def get_parsing_function(prompt):
             )
 
             return tracks_contain_action(
-                male_courtship_tracks, action_name=Action.RUNNING.name.lower()
+                male_courtship_tracks,
+                action_name=Action.TROTTING_OR_RUNNING.name.lower(),
             ) and tracks_contain_action(
-                female_courtship_tracks, action_name=Action.RUNNING.name.lower()
+                female_courtship_tracks,
+                action_name=Action.TROTTING_OR_RUNNING.name.lower(),
             )
 
         return check_file
@@ -675,7 +693,7 @@ def get_parsing_function(prompt):
 
         return check_file
 
-    elif prompt == "A video of a fox hunting.":
+    elif prompt == "A video of a fox chasing.":
 
         def check_file(json_file):
             individual_tracks = get_tracks_from_json(json_file)
@@ -684,12 +702,12 @@ def get_parsing_function(prompt):
             )
 
             return tracks_contain_activity(
-                fox_tracks, activity_name=Activity.HUNTING.name.lower()
+                fox_tracks, activity_name=Activity.CHASING.name.lower()
             )
 
         return check_file
 
-    elif prompt == "A video of a wolf hunting.":
+    elif prompt == "A video of a wolf chasing.":
 
         def check_file(json_file):
             individual_tracks = get_tracks_from_json(json_file)
@@ -698,7 +716,7 @@ def get_parsing_function(prompt):
             )
 
             return tracks_contain_activity(
-                wolf_tracks, activity_name=Activity.HUNTING.name.lower()
+                wolf_tracks, activity_name=Activity.CHASING.name.lower()
             )
 
         return check_file
@@ -709,7 +727,7 @@ def get_parsing_function(prompt):
             individual_tracks = get_tracks_from_json(json_file)
 
             return tracks_contain_species(
-                individual_tracks, species_name=Species.MOUNTAIN_HARE.name.lower()
+                individual_tracks, species_name=Species.HARE.name.lower()
             )
 
         return check_file
@@ -766,7 +784,7 @@ def get_parsing_function(prompt):
             )
 
             return tracks_contain_action(
-                cam_reaction_tracks, action_name=Action.RUNNING.name.lower()
+                cam_reaction_tracks, action_name=Action.TROTTING_OR_RUNNING.name.lower()
             )
 
         return check_file

@@ -7,11 +7,10 @@ class Species(Enum):
     RED_DEER = "red deer"
     ROE_DEER = "roe deer"
     FOX = "fox"
-    MOUNTAIN_HARE = "mountain hare"
+    HARE = "mountain hare"
     MARTEN = "marten"
     WOLF = "wolf"
     CHAMOIS = "chamois"
-    LYNX = "lynx"
 
 
 species = [s.value for s in Species]
@@ -25,28 +24,22 @@ class Action(Enum):
     GRAZING = "grazing"
     SNIFFING = "sniffing"
     LOOKING_AT_CAMERA = "looking at a camera"
-    RUNNING = "running"
-    SCRATCHING_BODY = "scratching body"
-    MARKING_ANTLERS = "marking with its antlers"
-    MARKING_HOOF = "marking with its hoof"
-    SHAKING_BODY_OR_HEAD = "shaking its body or its head"
+    TROTTING_OR_RUNNING = "trotting or running"
+    SCRATCHING_OWN_HEAD_OR_BODY = "scratching its own head or body"
+    RUBBING_ANTLERS_ON_GROUND = "rubbing its antlers on the ground"
+    PAWING_GROUND = "pawing the ground"
+    SHAKING_HEAD_OR_BODY = "shaking its head or body"
     VOCALIZING = "vocalizing"
     BATHING = "bathing"
     JUMPING = "jumping"
-    GAMBOLLING = "gambolling"
     DRINKING = "drinking"
-    FIGHTING = "fighting"
-    LAYING = "laying"
+    LAYING_DOWN = "laying down"
     DEFECATING = "defecating"
     URINATING = "urinating"
     BROWSING = "browsing"
-    STRETCHING = "stretching"
-    FALLING = "falling"
-    LEAVING_THE_GROUND = "leaving the ground"
-    SENSING_OTHER_INDIVIDUAL = "sensing another individual"
+    STRETCHING_BODY = "stretching its body"
     SUCKLING = "suckling"
-    PUSHING_MOTHERS_UDDER = "pushing its mother's udder"
-    CARRYING_PREY = "carrying a prey"
+    PREPARING_TO_SUCKLE = "preparing to suckle"
 
 
 actions = [a.value for a in Action]
@@ -58,15 +51,12 @@ class Activity(Enum):
     COURTSHIP = "participating in courtship"
     CAMERA_REACTION = "reacting to the camera"
     ESCAPING = "escaping"
-    HUNTING = "hunting"
-    BEING_AGONISTIC_SOCIAL = "being agonistic to another individual"
-    AFFILIATIVE_SOCIAL = "being affiliative to another individual"
+    CHASING = "chasing"
     NURSING = "nursing"
-    FOLLOWING_MOTHER = "following its mother"
     GROOMING = "grooming itself"
     PLAYING = "playing"
     RESTING = "resting"
-    MARKING = "marking"
+    MARKING_OR_WALLOWING = "marking or wallowing"
 
 
 activities = [a.value for a in Activity]
@@ -80,10 +70,7 @@ social_activities = [
     in [
         Activity.VIGILANCE,
         Activity.FORAGING,
-        Activity.BEING_AGONISTIC_SOCIAL,
-        Activity.AFFILIATIVE_SOCIAL,
         Activity.NURSING,
-        Activity.FOLLOWING_MOTHER,
     ]
 ]
 
@@ -92,17 +79,15 @@ courtship_actn = [
     Action.STANDING_HEAD_UP.value,
     Action.STANDING_HEAD_DOWN.value,
     Action.SNIFFING.value,
-    Action.SCRATCHING_BODY.value,
-    Action.MARKING_ANTLERS.value,
-    Action.MARKING_HOOF.value,
-    Action.SHAKING_BODY_OR_HEAD.value,
+    Action.SCRATCHING_OWN_HEAD_OR_BODY.value,
+    Action.RUBBING_ANTLERS_ON_GROUND.value,
+    Action.PAWING_GROUND.value,
+    Action.SHAKING_HEAD_OR_BODY.value,
     Action.VOCALIZING.value,
     Action.BATHING.value,
     Action.JUMPING.value,
-    Action.FIGHTING.value,
-    Action.LAYING.value,
+    Action.LAYING_DOWN.value,
     Action.URINATING.value,
-    Action.SENSING_OTHER_INDIVIDUAL.value,
 ]
 
 rare_actions = [
@@ -125,8 +110,6 @@ social_actions = [
     in [
         Action.WALKING,
         Action.STANDING_HEAD_UP,
-        Action.FIGHTING,
-        Action.SENSING_OTHER_INDIVIDUAL,
     ]
 ]
 
