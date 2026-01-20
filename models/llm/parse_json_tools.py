@@ -322,7 +322,7 @@ def get_adult_deer_tracks_from_sex(
 
 @tool
 def get_nb_tracks_species_in_video(
-    individual_tracks: List[IndividualTrack], species_name
+    individual_tracks: List[IndividualTrack], species_name: str
 ) -> int:
     """
     Returns the number of tracks for a given species in the video
