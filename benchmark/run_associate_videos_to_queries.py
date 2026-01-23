@@ -1262,6 +1262,31 @@ def get_parsing_function(prompt):
 
         return check_file
 
+    elif prompt == "A single adult red deer only grazing.":
+
+        def check_file(json_file):
+            individual_tracks = get_tracks_from_json(json_file)
+            if len(individual_tracks) != 1:
+                return False
+            else:
+                adult_deer_tracks = get_deer_tracks_from_age(
+                    individual_tracks,
+                    age=DAge.ADULT.name.lower(),
+                    deer_species=Species.RED_DEER.name.lower(),
+                )
+                actions = get_unique_actions_from_tracks(adult_deer_tracks)
+                return ("grazing" in actions) and (len(actions) == 1)
+
+        return check_file
+
+    elif prompt == "An empty video.":
+
+        def check_file(json_file):
+            individual_tracks = get_tracks_from_json(json_file)
+            return len(individual_tracks) == 0
+
+        return check_file
+
     else:
         print(f"No parsing function implemented yet for prompt '{prompt}'")
         return lambda x: False
@@ -1286,13 +1311,14 @@ if __name__ == "__main__":
 
     for q_cat in queries_dict:
         for q in queries_dict[q_cat]:
-            corresponding_files = [
-                f.stem
-                for f in json_folder.rglob("*/*.json")
-                if get_parsing_function(q)(f)
-            ]
-            print(q, ":", len(corresponding_files), "videos")
-            queries_dict[q_cat][q] = corresponding_files
+            if q == "A single adult red deer only grazing.":
+                corresponding_files = [
+                    f.stem
+                    for f in json_folder.rglob("*/*.json")
+                    if get_parsing_function(q)(f)
+                ]
+                print(q, ":", len(corresponding_files), "videos")
+                queries_dict[q_cat][q] = corresponding_files
 
-            with open("queries_and_videos.json", "w") as f:
-                json.dump(queries_dict, f, indent=2)
+                with open("queries_and_videos.json", "w") as f:
+                    json.dump(queries_dict, f, indent=2)

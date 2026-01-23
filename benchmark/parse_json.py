@@ -403,6 +403,33 @@ def get_unique_species_from_tracks(
     )
 
 
+def get_unique_actions_from_tracks(
+    individual_tracks: List[IndividualTrack],
+) -> set:
+    """
+    Returns the list of actions present in the individual tracks
+
+    Args:
+        individual_tracks (List[IndividualTrack]): List of individual tracks, each organized by segments.
+
+    Returns:
+        set: the unique actions present in the individual tracks
+    """
+    actions = []
+    for track in individual_tracks:
+        for segment in track:
+            if "attributes" in segment[0]:
+                if "Action" in segment[0]["attributes"]:
+                    actions.append(segment[0]["attributes"]["Action"])
+                if (
+                    "Action2" in segment[0]["attributes"]
+                    and segment[0]["attributes"]["Action2"] != "none"
+                ):
+                    actions.append(segment[0]["attributes"]["Action2"])
+
+    return set(actions)
+
+
 ## Attributes and location
 def get_tracks_overlapping_point(
     individual_tracks: List[IndividualTrack], point: Point
