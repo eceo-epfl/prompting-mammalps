@@ -1,6 +1,7 @@
 import json
 from argparse import ArgumentParser
 from pathlib import Path
+import yaml
 
 from parse_json_tools import (
     get_adult_deer_tracks_from_sex,
@@ -19,7 +20,7 @@ from parse_json_tools import (
     tracks_contain_adult_deer_sex,
     tracks_contain_deer_age,
 )
-from smolagents import CodeAgent, TransformersModel
+from smolagents import CodeAgent, TransformersModel, PromptTemplates
 
 
 def main(args):
@@ -41,24 +42,14 @@ def main(args):
         get_nb_tracks_species_in_video,
     ]
 
+    with open("prompt.yaml", "r") as f:
+        prompts = yaml.load(f, Loader=yaml.SafeLoader)
+    
+    prompt_templates = PromptTemplates(prompts)
+
     # Load model and code agent
-    instructions = ("Task: Verify if the content of the file matches the prompt."
-            "To achieve this, proceed in two steps. First step: define a function named check_file to check if the file contains elements that fully matches the prompt or not. "
-            "Only use the provided tools to use in your check_file function. Never 'print' the content of any variable." \
-            "Second step: call the newly defined check_file function with the json_file passed as a variable and output the boolean answer."
-            "Here are two examples of check_file function definitions."
-            "1) 'A video of a roe deer grazing.':  "
-            "def check_file(json_file):"
-            "   individual_tracks = get_tracks_from_json(json_file)"
-            "   roe_deer_tracks = get_tracks_from_species(individual_tracks, species_name='roe deer')"
-            "   return tracks_contain_action(roe_deer_tracks, action_name='grazing')"
-            "2) 'A video of an animal bathing.':  "
-            "def check_file(json_file):"
-            "   individual_tracks = get_tracks_from_json(json_file)"
-            "   return tracks_contain_action(individual_tracks, action_name='bathing')"
-        )
     model = TransformersModel("meta-llama/Meta-Llama-3.1-8B-Instruct", device_map="cuda")
-    agent = CodeAgent(tools=tools, model=model, instructions=instructions, max_print_outputs_length=500)
+    agent = CodeAgent(tools=tools, model=model, prompt_templates=prompt_templates, max_print_outputs_length=500)
     
     # Load queries
     with open(args.input_queries_videos, "r") as f:
