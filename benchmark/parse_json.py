@@ -385,7 +385,7 @@ def get_unique_species_from_tracks(
     individual_tracks: List[IndividualTrack],
 ) -> set:
     """
-    Returns the list of species present in the individual tracks
+    Returns the set of species present in the individual tracks
 
     Args:
         individual_tracks (List[IndividualTrack]): List of individual tracks, each organized by segments.
@@ -396,10 +396,9 @@ def get_unique_species_from_tracks(
 
     # Since species are not mutable attributes, it is consistent in a track and we can retrieve first elements only
     return set(
-        segment[0]["attributes"]["Species"]
+        track[0][0]["attributes"]["Species"]
         for track in individual_tracks
-        for segment in track
-        if ("attributes" in segment[0] and "Species" in segment[0]["attributes"])
+        if ("attributes" in track[0][0] and "Species" in track[0][0]["attributes"])
     )
 
 
@@ -407,7 +406,7 @@ def get_unique_actions_from_tracks(
     individual_tracks: List[IndividualTrack],
 ) -> set:
     """
-    Returns the list of actions present in the individual tracks
+    Returns the set of actions present in the individual tracks
 
     Args:
         individual_tracks (List[IndividualTrack]): List of individual tracks, each organized by segments.
@@ -428,6 +427,27 @@ def get_unique_actions_from_tracks(
                     actions.append(segment[0]["attributes"]["Action2"])
 
     return set(actions)
+
+
+def get_unique_activities_from_tracks(
+    individual_tracks: List[IndividualTrack],
+) -> set:
+    """
+    Returns the set of activities present in the individual tracks
+
+    Args:
+        individual_tracks (List[IndividualTrack]): List of individual tracks, each organized by segments.
+
+    Returns:
+        set: the unique activities present in the individual tracks
+    """
+
+    return set(
+        segment[0]["attributes"]["Activity"]
+        for track in individual_tracks
+        for segment in track
+        if ("attributes" in segment[0] and "Activity" in segment[0]["attributes"])
+    )
 
 
 ## Attributes and location

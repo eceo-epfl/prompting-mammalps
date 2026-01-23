@@ -1262,7 +1262,7 @@ def get_parsing_function(prompt):
 
         return check_file
 
-    elif prompt == "A single adult red deer only grazing.":
+    elif prompt == "A single adult red deer only foraging.":
 
         def check_file(json_file):
             individual_tracks = get_tracks_from_json(json_file)
@@ -1274,8 +1274,8 @@ def get_parsing_function(prompt):
                     age=DAge.ADULT.name.lower(),
                     deer_species=Species.RED_DEER.name.lower(),
                 )
-                actions = get_unique_actions_from_tracks(adult_deer_tracks)
-                return ("grazing" in actions) and (len(actions) == 1)
+                activities = get_unique_activities_from_tracks(adult_deer_tracks)
+                return ("foraging" in activities) and (len(activities) == 1)
 
         return check_file
 
@@ -1311,7 +1311,7 @@ if __name__ == "__main__":
 
     for q_cat in queries_dict:
         for q in queries_dict[q_cat]:
-            if q == "A single adult red deer only grazing.":
+            if q == "A single adult red deer only foraging.":
                 corresponding_files = [
                     f.stem
                     for f in json_folder.rglob("*/*.json")
