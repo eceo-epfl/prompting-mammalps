@@ -381,6 +381,28 @@ def tracks_contain_adult_deer_sex(
     )
 
 
+def get_unique_species_from_tracks(
+    individual_tracks: List[IndividualTrack],
+) -> set:
+    """
+    Returns the list of species present in the individual tracks
+
+    Args:
+        individual_tracks (List[IndividualTrack]): List of individual tracks, each organized by segments.
+
+    Returns:
+        set: the unique species present in the individual tracks
+    """
+
+    # Since species are not mutable attributes, it is consistent in a track and we can retrieve first elements only
+    return set(
+        segment[0]["attributes"]["Species"]
+        for track in individual_tracks
+        for segment in track
+        if ("attributes" in segment[0] and "Species" in segment[0]["attributes"])
+    )
+
+
 ## Attributes and location
 def get_tracks_overlapping_point(
     individual_tracks: List[IndividualTrack], point: Point
