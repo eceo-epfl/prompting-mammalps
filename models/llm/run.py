@@ -4,6 +4,7 @@ from pathlib import Path
 import yaml
 import logging
 
+import yaml
 from parse_json_tools import (
     get_adult_deer_tracks_from_sex,
     get_deer_tracks_from_age,
@@ -21,7 +22,7 @@ from parse_json_tools import (
     tracks_contain_adult_deer_sex,
     tracks_contain_deer_age,
 )
-from smolagents import CodeAgent, TransformersModel, PromptTemplates
+from smolagents import CodeAgent, PromptTemplates, TransformersModel
 
 
 def main(args):
@@ -45,7 +46,7 @@ def main(args):
 
     with open("prompt.yaml", "r") as f:
         prompts = yaml.load(f, Loader=yaml.SafeLoader)
-    
+
     prompt_templates = PromptTemplates(prompts)
 
     # Load model and code agent

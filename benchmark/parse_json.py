@@ -1,5 +1,6 @@
 import argparse
 import json
+from enum import StrEnum
 from pathlib import Path
 from typing import Dict, List, Optional, Tuple, Union
 
@@ -13,6 +14,75 @@ IndividualTrack = List[BehaviorSegment]
 Point = Tuple[int]
 BBox = Tuple[Point]
 Mask = List[Point]
+
+
+class Species(StrEnum):
+    RED_DEER = "red_deer"
+    ROE_DEER = "roe_deer"
+    FOX = "fox"
+    HARE = "hare"
+    MARTEN = "marten"
+    WOLF = "wolf"
+    CHAMOIS = "chamois"
+
+
+class Action(StrEnum):
+    WALKING = "walking"
+    STANDING_HEAD_UP = "standing_head_up"
+    STANDING_HEAD_DOWN = "standing_head_down"
+    GRAZING = "grazing"
+    SNIFFING = "sniffing"
+    LOOKING_AT_CAMERA = "looking_at_camera"
+    TROTTING_OR_RUNNING = "trotting_or_running"
+    SCRATCHING_OWN_HEAD_OR_BODY = "scratching_own_head_or_body"
+    RUBBING_ANTLERS_ON_GROUND = "rubbing_antlers_on_ground"
+    PAWING_GROUND = "pawing_ground"
+    SHAKING_HEAD_OR_BODY = "shaking_head_or_body"
+    VOCALIZING = "vocalizing"
+    BATHING = "bathing"
+    JUMPING = "jumping"
+    DRINKING = "drinking"
+    LAYING_DOWN = "laying_down"
+    DEFECATING = "defecating"
+    URINATING = "urinating"
+    BROWSING = "browsing"
+    STRETCHING_BODY = "stretching_body"
+    SUCKLING = "suckling"
+    PREPARING_TO_SUCKLE = "preparing_to_suckle"
+
+
+class Activity(StrEnum):
+    FORAGING = "foraging"
+    VIGILANCE = "vigilance"
+    COURTSHIP = "courtship"
+    CAMERA_REACTION = "camera_reaction"
+    ESCAPING = "escaping"
+    CHASING = "chasing"
+    NURSING = "nursing"
+    GROOMING = "grooming"
+    PLAYING = "playing"
+    RESTING = "resting"
+    MARKING_OR_WALLOWING = "marking_or_wallowing"
+
+
+class DAge(StrEnum):
+    """Deer age"""
+
+    ADULT = "adult"
+    JUVENILE = "juvenile"
+
+
+class DSex(StrEnum):
+    "Sex for adult deers"
+    MALE = "male"
+    FEMALE = "female"
+
+
+class Meteo(StrEnum):
+    SUNNY = "sunny"
+    CLEAR = "clear"
+    OVERCAST = "overcast"
+    RAINY = "rainy"
 
 
 ### Basic functions
@@ -102,17 +172,33 @@ def get_tracks_from_video_detections(
 
 
 def check_segment_contains_attribute(
-    segment: BehaviorSegment, attribute_name: str, attribute_value: str
+    segment: BehaviorSegment,
+    attribute_name: str,
+    attribute_value: Union[Species, Action, Activity, DSex, DAge, Meteo],
 ):
-    # We can check only the first element of the segment since they all contain the same attributes
+    # Checks if the first element of the segment has the given attribute name and value
     return (
         "attributes" in segment[0]
         and segment[0]["attributes"].get(attribute_name) == attribute_value
     )
 
 
+def check_segment_contains_any_attribute_value(
+    segment: BehaviorSegment,
+    attribute_value: Union[Species, Action, Activity, DSex, DAge, Meteo],
+):
+    # Checks if the first element of the segment has the given attribute value for Action, Action2, or Activity
+    return (
+        check_segment_contains_attribute(segment, "Action", attribute_value)
+        or check_segment_contains_attribute(segment, "Action2", attribute_value)
+        or check_segment_contains_attribute(segment, "Activity", attribute_value)
+    )
+
+
 def get_tracks_from_attribute(
-    individual_tracks: List[IndividualTrack], attribute_name: str, attribute_value: str
+    individual_tracks: List[IndividualTrack],
+    attribute_name: str,
+    attribute_value: Union[Species, Action, Activity, DSex, DAge, Meteo],
 ):
     """
     Retrieve tracks corresponding to a given attribute name and value.
@@ -143,7 +229,9 @@ def get_tracks_from_attribute(
 
 
 def get_segments_from_attribute(
-    individual_tracks: List[IndividualTrack], attribute_name: str, attribute_value: str
+    individual_tracks: List[IndividualTrack],
+    attribute_name: str,
+    attribute_value: Union[Species, Action, Activity, DSex, DAge, Meteo],
 ):
     """
     Retrieve behavior segments corresponding to a given attribute name and value.
@@ -166,7 +254,9 @@ def get_segments_from_attribute(
 
 
 def get_segments_from_attribute_as_tracks(
-    individual_tracks: List[IndividualTrack], attribute_name: str, attribute_value: str
+    individual_tracks: List[IndividualTrack],
+    attribute_name: str,
+    attribute_value: Union[Species, Action, Activity, DSex, DAge, Meteo],
 ):
     """
     Retrieve tracks corresponding to a given attribute name and value.
@@ -190,14 +280,14 @@ def get_segments_from_attribute_as_tracks(
                 segment, attribute_name, attribute_value
             )
         ]
-        if len(track):
+        if len(track) > 0:
             attr_tracks.append(track)
 
     return attr_tracks
 
 
 def get_tracks_from_species(
-    individual_tracks: List[IndividualTrack], species_name: str
+    individual_tracks: List[IndividualTrack], species_name: Species
 ) -> List[IndividualTrack]:
     """
     Retrieve tracks corresponding to a given species name
@@ -206,7 +296,7 @@ def get_tracks_from_species(
 
 
 def get_tracks_from_action(
-    individual_tracks: List[IndividualTrack], action_name: str
+    individual_tracks: List[IndividualTrack], action_name: Action
 ) -> List[IndividualTrack]:
     """
     Retrieve tracks corresponding to a given action
@@ -219,7 +309,7 @@ def get_tracks_from_action(
 
 
 def get_tracks_from_activity(
-    individual_tracks: List[IndividualTrack], activity_name: str
+    individual_tracks: List[IndividualTrack], activity_name: Activity
 ) -> List[IndividualTrack]:
     """
     Retrieve tracks corresponding to a given activity
@@ -232,8 +322,8 @@ def get_tracks_from_activity(
 
 def get_deer_tracks_from_age(
     individual_tracks: List[IndividualTrack],
-    age: str,
-    deer_species: Optional[str] = None,
+    age: DAge,
+    deer_species: Optional[Species] = None,
 ) -> List[IndividualTrack]:
     """
     Retrieve deer tracks corresponding to a given age
@@ -244,28 +334,28 @@ def get_deer_tracks_from_age(
         )
     else:
         deer_tracks = get_tracks_from_species(
-            individual_tracks, "red_deer"
-        ) + get_tracks_from_species(individual_tracks, "roe_deer")
+            individual_tracks, Species.RED_DEER
+        ) + get_tracks_from_species(individual_tracks, Species.ROE_DEER)
     return get_tracks_from_attribute(deer_tracks, "Deer_age", age)
 
 
 def get_adult_deer_tracks_from_sex(
     individual_tracks: List[IndividualTrack],
-    sex: str,
-    deer_species: Optional[str] = None,
+    sex: DSex,
+    deer_species: Optional[Species] = None,
 ) -> List[IndividualTrack]:
     """
     Retrieve adult deer tracks corresponding to a given sex
     """
 
     adult_deer_tracks = get_deer_tracks_from_age(
-        individual_tracks, "adult", deer_species=deer_species
+        individual_tracks, DAge.ADULT, deer_species=deer_species
     )
     return get_tracks_from_attribute(adult_deer_tracks, "Deer_adult_sex", sex)
 
 
 def get_nb_tracks_species_in_video(
-    individual_tracks: List[IndividualTrack], species_name
+    individual_tracks: List[IndividualTrack], species_name: Species
 ) -> int:
     """
     Returns the number of tracks for a given species in the video
@@ -275,7 +365,7 @@ def get_nb_tracks_species_in_video(
 
 
 def tracks_contain_species(
-    individual_tracks: List[IndividualTrack], species_name: str
+    individual_tracks: List[IndividualTrack], species_name: Species
 ) -> bool:
     """
     Returns True if the video contains tracks with the given species
@@ -285,7 +375,7 @@ def tracks_contain_species(
 
 
 def get_nb_tracks_action_in_video(
-    individual_tracks: List[IndividualTrack], action_name: str
+    individual_tracks: List[IndividualTrack], action_name: Action
 ) -> int:
     """
     Returns the number of tracks for a given action in the video
@@ -294,7 +384,7 @@ def get_nb_tracks_action_in_video(
 
 
 def tracks_contain_action(
-    individual_tracks: List[IndividualTrack], action_name: str
+    individual_tracks: List[IndividualTrack], action_name: Action
 ) -> bool:
     """
     Returns True if the video contains tracks with the given action
@@ -303,7 +393,7 @@ def tracks_contain_action(
 
 
 def get_nb_tracks_activity_in_video(
-    individual_tracks: List[IndividualTrack], activity_name: str
+    individual_tracks: List[IndividualTrack], activity_name: Activity
 ) -> int:
     """
     Returns the number of tracks for a given activity in the video
@@ -313,7 +403,7 @@ def get_nb_tracks_activity_in_video(
 
 def tracks_contain_activity(
     individual_tracks: List[IndividualTrack],
-    activity_name: str,
+    activity_name: Activity,
 ) -> bool:
     """
     Returns True if the video contains tracks with the given activity
@@ -323,8 +413,8 @@ def tracks_contain_activity(
 
 def get_nb_deer_tracks_age_in_video(
     individual_tracks: List[IndividualTrack],
-    age: str,
-    deer_species: Optional[str] = None,
+    age: DAge,
+    deer_species: Optional[Species] = None,
 ) -> int:
     """
     Returns the number of deer tracks for a given age in the video
@@ -336,8 +426,8 @@ def get_nb_deer_tracks_age_in_video(
 
 def tracks_contain_deer_age(
     individual_tracks: List[IndividualTrack],
-    age: str,
-    deer_species: Optional[str] = None,
+    age: DAge,
+    deer_species: Optional[Species] = None,
 ) -> bool:
     """
     Returns True if the video contains deer tracks with the given age
@@ -352,8 +442,8 @@ def tracks_contain_deer_age(
 
 def get_nb_adult_deer_tracks_sex_in_video(
     individual_tracks: List[IndividualTrack],
-    sex: str,
-    deer_species: Optional[str] = None,
+    sex: DSex,
+    deer_species: Optional[Species] = None,
 ) -> int:
     """
     Returns the number of adult deer tracks for a given sex in the video
@@ -367,8 +457,8 @@ def get_nb_adult_deer_tracks_sex_in_video(
 
 def tracks_contain_adult_deer_sex(
     individual_tracks: List[IndividualTrack],
-    sex: str,
-    deer_species: Optional[str] = None,
+    sex: DSex,
+    deer_species: Optional[Species] = None,
 ) -> bool:
     """
     Returns True if the video contains adult deer tracks with the given sex
@@ -385,7 +475,7 @@ def get_unique_species_from_tracks(
     individual_tracks: List[IndividualTrack],
 ) -> set:
     """
-    Returns the list of species present in the individual tracks
+    Returns the set of species present in the individual tracks
 
     Args:
         individual_tracks (List[IndividualTrack]): List of individual tracks, each organized by segments.
@@ -396,11 +486,162 @@ def get_unique_species_from_tracks(
 
     # Since species are not mutable attributes, it is consistent in a track and we can retrieve first elements only
     return set(
-        segment[0]["attributes"]["Species"]
+        track[0][0]["attributes"]["Species"]
+        for track in individual_tracks
+        if ("attributes" in track[0][0] and "Species" in track[0][0]["attributes"])
+    )
+
+
+def get_unique_actions_from_tracks(
+    individual_tracks: List[IndividualTrack],
+) -> set:
+    """
+    Returns the set of actions present in the individual tracks
+
+    Args:
+        individual_tracks (List[IndividualTrack]): List of individual tracks, each organized by segments.
+
+    Returns:
+        set: the unique actions present in the individual tracks
+    """
+    actions = []
+    for track in individual_tracks:
+        for segment in track:
+            if "attributes" in segment[0]:
+                if "Action" in segment[0]["attributes"]:
+                    actions.append(segment[0]["attributes"]["Action"])
+                if (
+                    "Action2" in segment[0]["attributes"]
+                    and segment[0]["attributes"]["Action2"] != "none"
+                ):
+                    actions.append(segment[0]["attributes"]["Action2"])
+
+    return set(actions)
+
+
+def get_unique_activities_from_tracks(
+    individual_tracks: List[IndividualTrack],
+) -> set:
+    """
+    Returns the set of activities present in the individual tracks
+
+    Args:
+        individual_tracks (List[IndividualTrack]): List of individual tracks, each organized by segments.
+
+    Returns:
+        set: the unique activities present in the individual tracks
+    """
+
+    return set(
+        segment[0]["attributes"]["Activity"]
         for track in individual_tracks
         for segment in track
-        if ("attributes" in segment[0] and "Species" in segment[0]["attributes"])
+        if ("attributes" in segment[0] and "Activity" in segment[0]["attributes"])
     )
+
+
+def get_frame_ids_from_action(
+    single_track: IndividualTrack, action_name: Action
+) -> List[int]:
+    """
+    Returns the list of video frame ids in which a given action occurs in the given track
+
+    Args:
+        single_track (IndividualTrack): an individual track
+        action_name: the action of interest to look for in the individual track
+
+    Returns:
+        List[int]: the video frame ids in which the action was found in the track
+    """
+    action_fids = []
+    for behavior_segment in single_track:
+        if check_segment_contains_attribute(
+            behavior_segment, attribute_name="Action", attribute_value=action_name
+        ) or check_segment_contains_attribute(
+            behavior_segment, attribute_name="Action2", attribute_value=action_name
+        ):
+            action_fids += [bf["frame_id"] for bf in behavior_segment]
+
+    return action_fids
+
+
+def get_frame_ids_from_activity(
+    single_track: IndividualTrack, activity_name: Activity
+) -> List[int]:
+    """
+    Returns the list of video frame ids in which a given activity occurs in the given track
+
+    Args:
+        single_track (IndividualTrack): an individual track
+        activity_name: the activity of interest to look for in the individual track
+
+    Returns:
+        List[int]: the video frame ids in which the activity was found in the track
+    """
+    activity_ids = []
+    for behavior_segment in single_track:
+        if check_segment_contains_attribute(
+            behavior_segment, attribute_name="Activity", attribute_value=activity_name
+        ):
+            activity_ids += [bf["frame_id"] for bf in behavior_segment]
+
+    return activity_ids
+
+
+def check_track_contains_continuous_sequence(
+    single_track: IndividualTrack,
+    attributes_sequence: Union[
+        List[Union[Action, Activity]], List[Action], List[Activity]
+    ],
+) -> bool:
+    """
+    Checks if a given individual track contains a continuous series of behavior segments that contain attributes matching the sequence of interest
+    Args:
+        single_track (IndividualTrack): an individual track
+        attributes_sequence (List[Union[Action, Activity]]): an ordered list representing a sequence of actions or activities
+
+    Returns:
+        bool: True if the entire sequence appears in the track, False otherwise. Returns True if an empty sequence is given
+    """
+    if not attributes_sequence:
+        return True
+
+    # Get anchor segment matching first sequence element
+    for bs_id, behavior_segment in enumerate(single_track):
+        seq_iter = iter(attributes_sequence)
+        next_elem = next(seq_iter)
+
+        if check_segment_contains_any_attribute_value(behavior_segment, next_elem):
+            prev_elem = next_elem
+            for next_elem in seq_iter:
+                # We skip following segments if they still match the previous attribute
+                # With the exception of the next element being present
+                while (
+                    bs_id < len(single_track)
+                    and check_segment_contains_any_attribute_value(
+                        single_track[bs_id], prev_elem
+                    )
+                    and (
+                        not check_segment_contains_any_attribute_value(
+                            single_track[bs_id], next_elem
+                        )
+                    )
+                ):
+                    bs_id += 1
+                if bs_id >= len(single_track):
+                    # We reached the end of the track, sequence can't be completed
+                    break
+                if not check_segment_contains_any_attribute_value(
+                    single_track[bs_id], next_elem
+                ):
+                    # The next behavior segment that does not match previous attribute also does not match the next one
+                    # So the sequence is not complete.
+                    break
+                prev_elem = next_elem
+            else:
+                return True
+
+    return False
 
 
 ## Attributes and location
