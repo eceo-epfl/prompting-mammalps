@@ -1,9 +1,8 @@
 import argparse
 import json
+from enum import StrEnum
 from pathlib import Path
 from typing import Dict, List, Optional, Tuple, Union
-
-from run_associate_videos_to_queries import Action, Activity, DAge, DSex, Meteo, Species
 
 FrameDetections = Dict
 VideoDict = List[FrameDetections]
@@ -15,6 +14,75 @@ IndividualTrack = List[BehaviorSegment]
 Point = Tuple[int]
 BBox = Tuple[Point]
 Mask = List[Point]
+
+
+class Species(StrEnum):
+    RED_DEER = "red_deer"
+    ROE_DEER = "roe_deer"
+    FOX = "fox"
+    HARE = "hare"
+    MARTEN = "marten"
+    WOLF = "wolf"
+    CHAMOIS = "chamois"
+
+
+class Action(StrEnum):
+    WALKING = "walking"
+    STANDING_HEAD_UP = "standing_head_up"
+    STANDING_HEAD_DOWN = "standing_head_down"
+    GRAZING = "grazing"
+    SNIFFING = "sniffing"
+    LOOKING_AT_CAMERA = "looking_at_camera"
+    TROTTING_OR_RUNNING = "trotting_or_running"
+    SCRATCHING_OWN_HEAD_OR_BODY = "scratching_own_head_or_body"
+    RUBBING_ANTLERS_ON_GROUND = "rubbing_antlers_on_ground"
+    PAWING_GROUND = "pawing_ground"
+    SHAKING_HEAD_OR_BODY = "shaking_head_or_body"
+    VOCALIZING = "vocalizing"
+    BATHING = "bathing"
+    JUMPING = "jumping"
+    DRINKING = "drinking"
+    LAYING_DOWN = "laying_down"
+    DEFECATING = "defecating"
+    URINATING = "urinating"
+    BROWSING = "browsing"
+    STRETCHING_BODY = "stretching_body"
+    SUCKLING = "suckling"
+    PREPARING_TO_SUCKLE = "preparing_to_suckle"
+
+
+class Activity(StrEnum):
+    FORAGING = "foraging"
+    VIGILANCE = "vigilance"
+    COURTSHIP = "courtship"
+    CAMERA_REACTION = "camera_reaction"
+    ESCAPING = "escaping"
+    CHASING = "chasing"
+    NURSING = "nursing"
+    GROOMING = "grooming"
+    PLAYING = "playing"
+    RESTING = "resting"
+    MARKING_OR_WALLOWING = "marking_or_wallowing"
+
+
+class DAge(StrEnum):
+    """Deer age"""
+
+    ADULT = "adult"
+    JUVENILE = "juvenile"
+
+
+class DSex(StrEnum):
+    "Sex for adult deers"
+    MALE = "male"
+    FEMALE = "female"
+
+
+class Meteo(StrEnum):
+    SUNNY = "sunny"
+    CLEAR = "clear"
+    OVERCAST = "overcast"
+    RAINY = "rainy"
 
 
 ### Basic functions
