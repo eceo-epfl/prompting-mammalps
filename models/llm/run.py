@@ -2,6 +2,7 @@ import json
 from argparse import ArgumentParser
 from pathlib import Path
 import yaml
+import logging
 
 from parse_json_tools import (
     get_adult_deer_tracks_from_sex,
@@ -48,9 +49,18 @@ def main(args):
     prompt_templates = PromptTemplates(prompts)
 
     # Load model and code agent
-    model = TransformersModel("meta-llama/Meta-Llama-3.1-8B-Instruct", device_map="cuda")
+    model_id = "meta-llama/Meta-Llama-3.1-8B-Instruct"
+    model = TransformersModel(model_id, device_map="cuda")
     agent = CodeAgent(tools=tools, model=model, prompt_templates=prompt_templates, max_print_outputs_length=500)
-    
+
+    # Logger
+    output_log = Path(args.output_folder) / "process.log"
+    logging.basicConfig(filename=output_log, filemode="w", 
+                                 format='%(asctime)s,%(msecs)03d %(name)s %(levelname)s %(message)s',
+                                datefmt='%Y-%m-%d %H:%M:%S',
+                                level=logging.INFO)
+    logger = logging.getLogger()
+
     # Load queries
     with open(args.input_queries_videos, "r") as f:
         queries_dict = json.load(f)
@@ -60,20 +70,23 @@ def main(args):
     test_file = "./S1_C1_E4_V0016.json"
 
     # For every query
-    for query in queries_list[3:]:
-        message = "Verify if the content of the file matches the following prompt (return True or False):" + f"'{query}'. Don't forget to save the implementation of the check_file function first as you will need it again."
+    for query in queries_list:
+        logger.info(f"Processing query {query}")
+        message = "Verify if the content of the file matches the following prompt (return True or False):" + f"'{query}'. Don't forget: always match elements from the prompt to the label space; save your implementation of the check_file function first as you will need it again."
         agent.run(message, return_full_result=True, max_steps=5, additional_args={"json_file": test_file})
         
         # Get the function that was created and apply it to all files
         try:
             check_file = agent.python_executor.custom_tools["check_file"]
+            logging.info(agent.memory.return_full_code())
             output_queries_videos[query] = [f.stem for f in Path(args.json_folder).rglob("*/*.json") if check_file(f)]
         except Exception as e:
-            print(f"Could not apply check_file function for query: {query}")
-            print(e)
+            logging.warning(f"Could not apply check_file function for query: {query}")
+            logging.warning(e)
 
         # Save results at every step
-        with open(args.output_queries_videos, "w") as f:
+        output_json_file = Path(args.output_folder) / (model_id.split("/")[1] + "_retrieval_results.json")
+        with open(output_json_file, "w") as f:
             json.dump(output_queries_videos, f, indent=2)
 
 
@@ -94,9 +107,9 @@ if __name__ == "__main__":
         "--llm", choices=["apertus", "mistral", "qwen", "llama"], default="llama"
     )
     parser.add_argument(
-        "-OQ",
-        "--output_queries_videos",
-        help="JSON file containing retrieved videos for each query",
+        "-O",
+        "--output_folder",
+        help="output folder containing logs, intermediary results and output files",
     )
 
     args = parser.parse_args()
