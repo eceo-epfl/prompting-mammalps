@@ -88,6 +88,13 @@ class Meteo(StrEnum):
 
 ### Basic functions
 def load_video_detections(json_file: Union[Path, str]) -> VideoDict:
+    """
+    Loads video detections from a JSON file.
+    Args:
+        json_file (Union[Path, str]): The path to the JSON file.
+    Returns:
+        VideoDict: A dictionary containing video frame detections.
+    """
     with open(json_file, "r") as f:
         content = json.load(f)
 
@@ -324,6 +331,11 @@ def get_tracks_from_activity(
 ) -> List[IndividualTrack]:
     """
     Retrieve tracks corresponding to a given activity
+    Args:
+        individual_tracks (List[IndividualTrack]): List of individual tracks, each organized by segments.
+        activity_name (Activity): The activity name to match.
+    Returns:
+        List[IndividualTrack]: List of tracks where at least one detection has the specified activity.
     """
 
     return get_segments_from_attribute_as_tracks(
@@ -338,6 +350,12 @@ def get_deer_tracks_from_age(
 ) -> List[IndividualTrack]:
     """
     Retrieve deer tracks corresponding to a given age
+    Args:
+        individual_tracks (List[IndividualTrack]): List of individual tracks, each organized by segments.
+        age (DAge): The deer age to match.
+        deer_species (Optional[Species]): The deer species to match. If None, both red deer and roe deer are considered.
+    Returns:
+        List[IndividualTrack]: List of deer tracks where at least one detection has the specified age
     """
     if deer_species is not None:
         deer_tracks = get_tracks_from_species(
@@ -357,6 +375,12 @@ def get_adult_deer_tracks_from_sex(
 ) -> List[IndividualTrack]:
     """
     Retrieve adult deer tracks corresponding to a given sex
+    Args:
+        individual_tracks (List[IndividualTrack]): List of individual tracks, each organized by segments.
+        sex (DSex): The deer sex to match.
+        deer_species (Optional[Species]): The deer species to match. If None, both red deer and roe deer are considered.
+    Returns:
+        List[IndividualTrack]: List of adult deer tracks where at least one detection has the specified sex.
     """
 
     adult_deer_tracks = get_deer_tracks_from_age(
@@ -370,8 +394,12 @@ def get_nb_tracks_species_in_video(
 ) -> int:
     """
     Returns the number of tracks for a given species in the video
+    Args:
+        individual_tracks (List[IndividualTrack]): List of individual tracks, each organized by segments.
+        species_name (Species): The species name to match.
+    Returns:
+        int: The number of tracks for the given species in the video.
     """
-
     return len(get_tracks_from_species(individual_tracks, species_name))
 
 
@@ -380,8 +408,12 @@ def tracks_contain_species(
 ) -> bool:
     """
     Returns True if the video contains tracks with the given species
+    Args:
+        individual_tracks (List[IndividualTrack]): List of individual tracks, each organized by segments.
+        species_name (Species): The species name to match.
+    Returns:
+        bool: True if the video contains tracks with the given species, False otherwise.
     """
-
     return get_nb_tracks_species_in_video(individual_tracks, species_name) >= 1
 
 
@@ -390,6 +422,11 @@ def get_nb_tracks_action_in_video(
 ) -> int:
     """
     Returns the number of tracks for a given action in the video
+    Args:
+        individual_tracks (List[IndividualTrack]): List of individual tracks, each organized by segments.
+        action_name (Action): The action name to match.
+    Returns:
+        int: The number of tracks for the given action in the video.
     """
     return len(get_tracks_from_action(individual_tracks, action_name))
 
@@ -399,6 +436,11 @@ def tracks_contain_action(
 ) -> bool:
     """
     Returns True if the video contains tracks with the given action
+    Args:
+        individual_tracks (List[IndividualTrack]): List of individual tracks, each organized by segments.
+        action_name (Action): The action name to match.
+    Returns:
+        bool: True if the video contains tracks with the given action, False otherwise.
     """
     return get_nb_tracks_action_in_video(individual_tracks, action_name) >= 1
 
@@ -408,6 +450,11 @@ def get_nb_tracks_activity_in_video(
 ) -> int:
     """
     Returns the number of tracks for a given activity in the video
+    Args:
+        individual_tracks (List[IndividualTrack]): List of individual tracks, each organized by segments.
+        activity_name (Activity): The activity name to match.
+    Returns:
+        int: The number of tracks for the given activity in the video.
     """
     return len(get_tracks_from_activity(individual_tracks, activity_name))
 
@@ -418,6 +465,11 @@ def tracks_contain_activity(
 ) -> bool:
     """
     Returns True if the video contains tracks with the given activity
+    Args:
+        individual_tracks (List[IndividualTrack]): List of individual tracks, each organized by segments.
+        activity_name (Activity): The activity name to match.
+    Returns:
+        bool: True if the video contains tracks with the given activity, False otherwise.
     """
     return get_nb_tracks_activity_in_video(individual_tracks, activity_name) >= 1
 
@@ -429,6 +481,12 @@ def get_nb_deer_tracks_age_in_video(
 ) -> int:
     """
     Returns the number of deer tracks for a given age in the video
+    Args:
+        individual_tracks (List[IndividualTrack]): List of individual tracks, each organized by segments.
+        age (DAge): The deer age to match.
+        deer_species (Optional[Species]): The deer species to match. If None, both red deer and roe deer are considered.
+    Returns:
+        int: The number of deer tracks for the given age in the video.
     """
     return len(
         get_deer_tracks_from_age(individual_tracks, age, deer_species=deer_species)
@@ -442,6 +500,12 @@ def tracks_contain_deer_age(
 ) -> bool:
     """
     Returns True if the video contains deer tracks with the given age
+    Args:
+        individual_tracks (List[IndividualTrack]): List of individual tracks, each organized by segments.
+        age (DAge): The deer age to match.
+        deer_species (Optional[Species]): The deer species to match. If None, both red deer and roe deer are considered.
+    Returns:
+        bool: True if the video contains deer tracks with the given age, False otherwise.
     """
     return (
         get_nb_deer_tracks_age_in_video(
@@ -458,6 +522,12 @@ def get_nb_adult_deer_tracks_sex_in_video(
 ) -> int:
     """
     Returns the number of adult deer tracks for a given sex in the video
+    Args:
+        individual_tracks (List[IndividualTrack]): List of individual tracks, each organized by segments.
+        sex (DSex): The deer sex to match.
+        deer_species (Optional[Species]): The deer species to match. If None, both red deer and roe deer are considered.
+    Returns:
+        int: The number of adult deer tracks for the given sex
     """
     return len(
         get_adult_deer_tracks_from_sex(
@@ -473,6 +543,12 @@ def tracks_contain_adult_deer_sex(
 ) -> bool:
     """
     Returns True if the video contains adult deer tracks with the given sex
+    Args:
+        individual_tracks (List[IndividualTrack]): List of individual tracks, each organized by segments.
+        sex (DSex): The deer sex to match.
+        deer_species (Optional[Species]): The deer species to match. If None, both red deer and roe deer are considered.
+    Returns:
+        bool: True if the video contains adult deer tracks with the given sex, False otherwise.
     """
     return (
         get_nb_adult_deer_tracks_sex_in_video(
@@ -653,6 +729,32 @@ def check_track_contains_continuous_sequence(
                 return True
 
     return False
+
+
+## Weather and time attributes
+def get_weather_conditions_from_videos(json_file: Union[Path, str]) -> Meteo:
+    """Retrieve weather from video info attributes weather conditions
+    Args:
+        json_file (Union[Path, str]): The path to the JSON file.
+    Returns:
+        Meteo: The weather condition of the video.
+    """
+    video_info = load_video_info(json_file)
+    return video_info["attributes"]["weather"]
+
+
+def check_contains_weather_condition(
+    json_file: Union[Path, str], weather_condition: Meteo
+) -> bool:
+    """Check if the video contains the specified weather condition
+    Args:
+        json_file (Union[Path, str]): The path to the JSON file.
+        weather_condition (Meteo): The weather condition to check.
+    Returns:
+        bool: True if the video contains the specified weather condition, False otherwise.
+    """
+    video_weather = get_weather_conditions_from_videos(json_file)
+    return video_weather == weather_condition
 
 
 ## Attributes and location

@@ -973,6 +973,31 @@ def get_parsing_function(prompt):
             )
 
         return check_file
+    elif prompt == "A red deer resting while it is raining.":
+
+        def check_file(json_file):
+            individual_tracks = get_tracks_from_json(json_file)
+
+            red_deer_tracks = get_tracks_from_species(
+                individual_tracks, species_name=Species.RED_DEER
+            )
+            return tracks_contain_activity(
+                red_deer_tracks, activity_name=Activity.RESTING
+            ) and check_contains_weather_condition(
+                json_file, weather_condition=Meteo.RAINY
+            )
+
+        return check_file
+
+    elif prompt == "A rainy weather.":
+
+        def check_file(json_file):
+
+            return check_contains_weather_condition(
+                json_file, weather_condition=Meteo.RAINY
+            )
+
+        return check_file
 
     elif prompt == "An animal participating in courtship.":
 
@@ -1091,6 +1116,24 @@ def get_parsing_function(prompt):
             return False
 
         return check_file
+    elif prompt == "A red deer vocalizing while it is raining.":
+
+        def check_file(json_file):
+            individual_tracks = get_tracks_from_json(json_file)
+
+            red_deer_tracks = get_tracks_from_species(
+                individual_tracks, species_name=Species.RED_DEER
+            )
+            vocalizing_tracks = get_tracks_from_action(
+                red_deer_tracks, action_name=Action.VOCALIZING
+            )
+            return tracks_contain_action(
+                vocalizing_tracks, action_name=Action.VOCALIZING
+            ) and check_contains_weather_condition(
+                json_file, weather_condition=Meteo.RAINY
+            )
+
+        return check_file
 
     elif prompt == "A video of two or more animals.":
 
@@ -1185,7 +1228,68 @@ def get_parsing_function(prompt):
             )
 
         return check_file
+    elif prompt == "A wolf chasing in a clear weather.":
 
+        def check_file(json_file):
+            individual_tracks = get_tracks_from_json(json_file)
+            wolf_tracks = get_tracks_from_species(
+                individual_tracks, species_name=Species.WOLF
+            )
+            return tracks_contain_activity(
+                wolf_tracks, activity_name=Activity.CHASING
+            ) and check_contains_weather_condition(
+                json_file, weather_condition=Meteo.CLEAR
+            )
+
+        return check_file
+    elif prompt == "A wolf chasing in an overcast weather.":
+
+        def check_file(json_file):
+            individual_tracks = get_tracks_from_json(json_file)
+            wolf_tracks = get_tracks_from_species(
+                individual_tracks, species_name=Species.WOLF
+            )
+            return tracks_contain_activity(
+                wolf_tracks, activity_name=Activity.CHASING
+            ) and check_contains_weather_condition(
+                json_file, weather_condition=Meteo.OVERCAST
+            )
+
+        return check_file
+    elif prompt == "An animal in vigilance while the weather is rainy or overcast.":
+
+        def check_file(json_file):
+            individual_tracks = get_tracks_from_json(json_file)
+            return (
+                tracks_contain_activity(
+                    individual_tracks, activity_name=Activity.VIGILANCE
+                )
+                and check_contains_weather_condition(
+                    json_file, weather_condition=Meteo.RAINY
+                )
+                or check_contains_weather_condition(
+                    json_file, weather_condition=Meteo.OVERCAST
+                )
+            )
+
+        return check_file
+    elif prompt == "An animal in vigilance while the weather is clear or sunny.":
+
+        def check_file(json_file):
+            individual_tracks = get_tracks_from_json(json_file)
+            return (
+                tracks_contain_activity(
+                    individual_tracks, activity_name=Activity.VIGILANCE
+                )
+                and check_contains_weather_condition(
+                    json_file, weather_condition=Meteo.CLEAR
+                )
+                or check_contains_weather_condition(
+                    json_file, weather_condition=Meteo.SUNNY
+                )
+            )
+
+        return check_file
     elif prompt == "A juvenile red deer suckling.":
 
         def check_file(json_file):
@@ -1338,7 +1442,46 @@ def get_parsing_function(prompt):
             return False
 
         return check_file
+    elif (
+        prompt
+        == "An animal reacting to the camera while the weather is rainy or overcast."
+    ):
 
+        def check_file(json_file):
+            individual_tracks = get_tracks_from_json(json_file)
+            return (
+                tracks_contain_activity(
+                    individual_tracks, activity_name=Activity.CAMERA_REACTION
+                )
+                and check_contains_weather_condition(
+                    json_file, weather_condition=Meteo.RAINY
+                )
+                or check_contains_weather_condition(
+                    json_file, weather_condition=Meteo.OVERCAST
+                )
+            )
+
+        return check_file
+    elif (
+        prompt
+        == "An animal reacting to the camera while the weather is clear or sunny."
+    ):
+
+        def check_file(json_file):
+            individual_tracks = get_tracks_from_json(json_file)
+            return (
+                tracks_contain_activity(
+                    individual_tracks, activity_name=Activity.CAMERA_REACTION
+                )
+                and check_contains_weather_condition(
+                    json_file, weather_condition=Meteo.CLEAR
+                )
+                or check_contains_weather_condition(
+                    json_file, weather_condition=Meteo.SUNNY
+                )
+            )
+
+        return check_file
     elif (
         prompt
         == "An animal escaping from another animal of the same species chasing it."
@@ -1529,7 +1672,7 @@ if __name__ == "__main__":
     args = parser.parse_args()
     json_folder = Path(args.json_folder)
 
-    with open("queries_and_videos_empty.json", "r") as f:
+    with open("benchmark/queries_and_videos_empty_check.json", "r") as f:
         queries_dict = json.load(f)
 
     # Initialize output dict with empty lists for each query
@@ -1560,5 +1703,5 @@ if __name__ == "__main__":
         for q in queries_dict[q_cat]:
             print(q, ":", len(out_queries_dict[q_cat][q]), "videos")
 
-    with open("queries_and_videos.json", "w") as f:
+    with open("benchmark/queries_and_videos_check.json", "w") as f:
         json.dump(out_queries_dict, f, indent=2)
