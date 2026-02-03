@@ -74,6 +74,7 @@ class DAge(StrEnum):
 
 class DSex(StrEnum):
     "Sex for adult deers"
+
     MALE = "male"
     FEMALE = "female"
 
@@ -154,7 +155,7 @@ def get_tracks_from_video_detections(
                 beh_seg_id += 1
 
             prev_attrs[individual_id] = detection.get("attributes")
-
+            #
             if individual_id in individual_tracks:
                 if beh_seg_id in individual_tracks[individual_id]:
                     individual_tracks[individual_id][beh_seg_id].append(detection)
@@ -291,6 +292,11 @@ def get_tracks_from_species(
 ) -> List[IndividualTrack]:
     """
     Retrieve tracks corresponding to a given species name
+    Args:
+        individual_tracks (List[IndividualTrack]): List of individual tracks, each organized by segments.
+        species_name (Species): The species name to match.
+    Returns:
+        List[IndividualTrack]: List of tracks where at least one detection has the specified species.
     """
     return get_tracks_from_attribute(individual_tracks, "Species", species_name)
 
@@ -300,6 +306,11 @@ def get_tracks_from_action(
 ) -> List[IndividualTrack]:
     """
     Retrieve tracks corresponding to a given action
+    Args:
+        individual_tracks (List[IndividualTrack]): List of individual tracks, each organized by segments.
+        action_name (Action): The action name to match.
+    Returns:
+        List[IndividualTrack]: List of tracks where at least one detection has the specified action.
     """
     attr_tracks = get_segments_from_attribute_as_tracks(
         individual_tracks, "Action", action_name
