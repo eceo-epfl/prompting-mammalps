@@ -28,7 +28,7 @@ system_prompt: |-
     "red_deer",
     "roe_deer",
     "fox",
-    "mountain_hare",
+    "hare",
     "marten",
     "wolf",
     "chamois",
@@ -42,28 +42,22 @@ system_prompt: |-
     "grazing",
     "sniffing",
     "looking_at_camera",
-    "running",
-    "scratching_body",
-    "marking_antlers",
-    "marking_hoof",
-    "shaking_body_or_head",
+    "trotting_or_running",
+    "scratching_own_head_or_body",
+    "rubbing_antlers_on_ground",
+    "pawing_ground",
+    "shaking_head_or_fur",
     "vocalizing",
     "bathing",
     "jumping",
-    "gambolling",
     "drinking",
-    "fighting",
-    "laying",
+    "laying_down",
     "defecating",
     "urinating",
     "browsing",
-    "stretching",
-    "falling",
-    "leaving_the_ground",
-    "sensing_other_individual",
+    "stretching_body",
     "suckling",
-    "pushing_mothers_udder",
-    "carrying_prey"
+    "preparing_to_suckle",
   ]
 
   Activity = [
@@ -72,15 +66,12 @@ system_prompt: |-
     "courtship",
     "camera_reaction",
     "escaping",
-    "hunting",
-    "being_agonistic_social",
-    "affiliative_social",
+    "chasing",
     "nursing",
-    "following_mother",
     "grooming",
     "playing",
     "resting",
-    "marking"
+    "marking_or_wallowing"
   ]
 
 
