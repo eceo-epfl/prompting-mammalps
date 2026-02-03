@@ -35,7 +35,9 @@
     "A red deer browsing.",
     "An animal running while foraging.",
     "A video of an animal drinking.",
-    "A video of an animal laying down while resting."
+    "A video of an animal laying down while resting.",
+    "A red deer resting while it is raining.",
+    "A rainy weather."
   ],
   "COURTSHIP": [
     "An animal participating in courtship.",
@@ -53,7 +55,8 @@
     "An adult male red deer pawing the ground and rubbing its antlers on the ground while wallowing.",
     "An adult male red deer bathing while wallowing.",
     "An adult male red deer urinating while wallowing.",
-    "An adult male red deer in vigilance after vocalizing."
+    "An adult male red deer in vigilance after vocalizing.",
+    "A red deer vocalizing while it is raining"
   ],
   "SOCIAL": [
     "A video of two or more animals.",
@@ -76,7 +79,11 @@
     "A juvenile red deer doing the exact same activities as an adult female red deer.",
     "A juvenile red deer doing the exact same actions as an adult female red deer.",
     "A juvenile red deer doing at least one different action than an adult female red deer.",
-    "An adult female red deer nursing."
+    "An adult female red deer nursing.",
+    "A wolf chasing in a clear weather.",
+    "A wolf chasing in an overcast weather.",
+    "An animal in vigilance while the weather is rainy or overcast.",
+    "An animal in vigilance while the weather is clear or sunny."
   ],
   "CAMERA_REACTION": [
     "An animal reacting to a camera.",
@@ -96,7 +103,9 @@
     "An animal reacting to a camera and then foraging.",
     "An animal foraging, then reacting to a camera and then going back to foraging.",
     "An animal reacting to a camera and then running away.",
-    "An animal foraging, then reacting to a camera and then running away."
+    "An animal foraging, then reacting to a camera and then running away.",
+    "An animal reacting to the camera while the weather is rainy or overcast.",
+    "An animal reacting to the camera while the weather is clear or sunny."
   ],
   "COMMON": [
     "A single adult red deer only foraging.",
