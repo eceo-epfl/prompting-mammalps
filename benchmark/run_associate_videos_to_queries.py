@@ -1389,7 +1389,7 @@ def get_parsing_function(prompt):
 
     elif (
         prompt
-        == "Two or more red deer foraging and and at least one is also in vigilance."
+        == "Two or more red deer foraging and at least one is also in vigilance at some point."
     ):
 
         def check_file(json_file):
