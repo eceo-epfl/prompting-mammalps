@@ -1,8 +1,8 @@
 import argparse
 import json
-from enum import StrEnum
+from enum import Enum
 from pathlib import Path
-from typing import Dict, List, Optional, Tuple, Union
+from typing import Dict, List, Optional, Tuple, Union, Literal
 
 from smolagents import tool
 
@@ -19,8 +19,8 @@ Mask = List[Point]
 
 
 # TODO: Ideally, we also give this to the LLM coding context
-@tool
-class Species(StrEnum):
+# https://github.com/huggingface/smolagents/issues/1194
+class Species(Enum):
     RED_DEER = "red_deer"
     ROE_DEER = "roe_deer"
     FOX = "fox"
@@ -30,8 +30,7 @@ class Species(StrEnum):
     CHAMOIS = "chamois"
 
 
-@tool
-class Action(StrEnum):
+class Action(Enum):
     WALKING = "walking"
     STANDING_HEAD_UP = "standing_head_up"
     STANDING_HEAD_DOWN = "standing_head_down"
@@ -56,8 +55,7 @@ class Action(StrEnum):
     PREPARING_TO_SUCKLE = "preparing_to_suckle"
 
 
-@tool
-class Activity(StrEnum):
+class Activity(Enum):
     FORAGING = "foraging"
     VIGILANCE = "vigilance"
     COURTSHIP = "courtship"
@@ -71,23 +69,20 @@ class Activity(StrEnum):
     MARKING_OR_WALLOWING = "marking_or_wallowing"
 
 
-@tool
-class DAge(StrEnum):
+class DAge(Enum):
     """Deer age"""
 
     ADULT = "adult"
     JUVENILE = "juvenile"
 
 
-@tool
-class DSex(StrEnum):
+class DSex(Enum):
     "Sex for adult deers"
     MALE = "male"
     FEMALE = "female"
 
 
-@tool
-class Meteo(StrEnum):
+class Meteo(Enum):
     SUNNY = "sunny"
     CLEAR = "clear"
     OVERCAST = "overcast"
@@ -314,7 +309,7 @@ def get_segments_from_attribute_as_tracks(
 
 @tool
 def get_tracks_from_species(
-    individual_tracks: List[IndividualTrack], species_name: Species
+    individual_tracks: List[IndividualTrack], species_name: Literal[Species]
 ) -> List[IndividualTrack]:
     """
     Retrieve tracks corresponding to a given species name.
@@ -330,7 +325,7 @@ def get_tracks_from_species(
 
 @tool
 def get_tracks_from_action(
-    individual_tracks: List[IndividualTrack], action_name: Action
+    individual_tracks: List[IndividualTrack], action_name: Literal[Action]
 ) -> List[IndividualTrack]:
     """
     Retrieve tracks corresponding to a given action name.
@@ -350,7 +345,7 @@ def get_tracks_from_action(
 
 @tool
 def get_tracks_from_activity(
-    individual_tracks: List[IndividualTrack], activity_name: Activity
+    individual_tracks: List[IndividualTrack], activity_name: Literal[Activity]
 ) -> List[IndividualTrack]:
     """
     Retrieve tracks corresponding to a given activity name.
@@ -370,7 +365,7 @@ def get_tracks_from_activity(
 @tool
 def get_deer_tracks_from_age(
     individual_tracks: List[IndividualTrack],
-    age: DAge,
+    age: Literal[DAge],
     deer_species: Optional[Species] = None,
 ) -> List[IndividualTrack]:
     """
@@ -397,7 +392,7 @@ def get_deer_tracks_from_age(
 @tool
 def get_adult_deer_tracks_from_sex(
     individual_tracks: List[IndividualTrack],
-    sex: DSex,
+    sex: Literal[DSex],
     deer_species: Optional[Species] = None,
 ) -> List[IndividualTrack]:
     """
@@ -419,7 +414,7 @@ def get_adult_deer_tracks_from_sex(
 
 @tool
 def get_nb_tracks_species_in_video(
-    individual_tracks: List[IndividualTrack], species_name: Species
+    individual_tracks: List[IndividualTrack], species_name: Literal[tuple(e.value for e in Species)]
 ) -> int:
     """
     Returns the number of tracks for a given species in the video
@@ -436,7 +431,7 @@ def get_nb_tracks_species_in_video(
 
 @tool
 def tracks_contain_species(
-    individual_tracks: List[IndividualTrack], species_name: Species
+    individual_tracks: List[IndividualTrack], species_name: Literal[tuple(e.value for e in Species)]
 ) -> bool:
     """
     Checks if any of the individual tracks contain the species of interest.
@@ -453,7 +448,7 @@ def tracks_contain_species(
 
 @tool
 def get_nb_tracks_action_in_video(
-    individual_tracks: List[IndividualTrack], action_name: Action
+    individual_tracks: List[IndividualTrack], action_name: Literal[Action]
 ) -> int:
     """
     Returns the number of tracks for a given action in the video
@@ -469,7 +464,7 @@ def get_nb_tracks_action_in_video(
 
 @tool
 def tracks_contain_action(
-    individual_tracks: List[IndividualTrack], action_name: Action
+    individual_tracks: List[IndividualTrack], action_name: Literal[Action]
 ) -> bool:
     """
     Checks if any of the individual tracks contain the action of interest.
@@ -485,7 +480,7 @@ def tracks_contain_action(
 
 @tool
 def get_nb_tracks_activity_in_video(
-    individual_tracks: List[IndividualTrack], activity_name: Activity
+    individual_tracks: List[IndividualTrack], activity_name: Literal[Activity]
 ) -> int:
     """
     Returns the number of tracks for a given activity in the video
@@ -502,7 +497,7 @@ def get_nb_tracks_activity_in_video(
 @tool
 def tracks_contain_activity(
     individual_tracks: List[IndividualTrack],
-    activity_name: Activity,
+    activity_name: Literal[Activity],
 ) -> bool:
     """
     Checks if any of the individual tracks contain the activity of interest.
@@ -519,7 +514,7 @@ def tracks_contain_activity(
 @tool
 def get_nb_deer_tracks_age_in_video(
     individual_tracks: List[IndividualTrack],
-    age: DAge,
+    age: Literal[DAge],
     deer_species: Optional[Species] = None,
 ) -> int:
     """
@@ -540,7 +535,7 @@ def get_nb_deer_tracks_age_in_video(
 @tool
 def tracks_contain_deer_age(
     individual_tracks: List[IndividualTrack],
-    age: DAge,
+    age: Literal[DAge],
     deer_species: Optional[Species] = None,
 ) -> bool:
     """
@@ -564,7 +559,7 @@ def tracks_contain_deer_age(
 @tool
 def get_nb_adult_deer_tracks_sex_in_video(
     individual_tracks: List[IndividualTrack],
-    sex: DSex,
+    sex: Literal[DSex],
     deer_species: Optional[Species] = None,
 ) -> int:
     """
@@ -587,7 +582,7 @@ def get_nb_adult_deer_tracks_sex_in_video(
 @tool
 def tracks_contain_adult_deer_sex(
     individual_tracks: List[IndividualTrack],
-    sex: DSex,
+    sex: Literal[DSex],
     deer_species: Optional[Species] = None,
 ) -> bool:
     """
@@ -611,7 +606,7 @@ def tracks_contain_adult_deer_sex(
 @tool
 def get_unique_species_from_tracks(
     individual_tracks: List[IndividualTrack],
-) -> set[Species]:
+) -> set:
     """
     Returns the set of species present in the individual tracks
 
@@ -633,7 +628,7 @@ def get_unique_species_from_tracks(
 @tool
 def get_unique_actions_from_tracks(
     individual_tracks: List[IndividualTrack],
-) -> set[Action]:
+) -> set:
     """
     Returns the set of actions present in the individual tracks
 
@@ -661,7 +656,7 @@ def get_unique_actions_from_tracks(
 @tool
 def get_unique_activities_from_tracks(
     individual_tracks: List[IndividualTrack],
-) -> set[Activity]:
+) -> set:
     """
     Returns the set of activities present in the individual tracks
 
