@@ -37,7 +37,8 @@
     "A video of an animal drinking.",
     "A video of an animal laying down while resting.",
     "A red deer resting while it is raining.",
-    "A rainy weather."
+    "A rainy weather.",
+    "A juvenile red deer playing in a clear weather."
   ],
   "COURTSHIP": [
     "An animal participating in courtship.",
@@ -56,7 +57,10 @@
     "An adult male red deer bathing while wallowing.",
     "An adult male red deer urinating while wallowing.",
     "An adult male red deer in vigilance after vocalizing.",
-    "A red deer vocalizing while it is raining"
+    "A red deer vocalizing while it is raining.",
+    "A roe deer participating in courtship while it is raining.",
+    "A red deer participating in courtship while it is raining.",
+    "A roe deer running in a rainy weather while participating in courtship."
   ],
   "SOCIAL": [
     "A video of two or more animals.",
@@ -82,6 +86,12 @@
     "An adult female red deer nursing.",
     "A wolf chasing in a clear weather.",
     "A wolf chasing in an overcast weather.",
+    "A fox chasing in a clear weather.",
+    "A roe deer foraging in a sunny weather.",
+    "A red deer foraging in a sunny weather.",
+    "A roe deer foraging in a rainy weather.",
+    "A red deer foraging in a rainy weather.",
+    "A female adult red deer escaping in a sunny weather.",
     "An animal in vigilance while the weather is rainy or overcast.",
     "An animal in vigilance while the weather is clear or sunny."
   ],
