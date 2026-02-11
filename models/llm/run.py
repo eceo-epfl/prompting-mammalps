@@ -4,6 +4,7 @@ from pathlib import Path
 import yaml
 import logging
 import inspect
+import ast
 
 import yaml
 from parse_json_tools import (
@@ -18,14 +19,15 @@ from parse_json_tools import (
     get_tracks_from_activity,
     get_tracks_from_json,
     get_tracks_from_species,
+    tracks_contain_species,
     tracks_contain_action,
     tracks_contain_activity,
     tracks_contain_adult_deer_sex,
     tracks_contain_deer_age,
+    check_contains_weather_condition,
     Species, Action, Activity, DAge, DSex, Meteo
 )
 from smolagents import CodeAgent, PromptTemplates, TransformersModel
-
 
 def main(args):
     tools = [
@@ -35,6 +37,7 @@ def main(args):
         get_tracks_from_activity,
         get_adult_deer_tracks_from_sex,
         get_deer_tracks_from_age,
+        tracks_contain_species,
         tracks_contain_action,
         tracks_contain_activity,
         tracks_contain_adult_deer_sex,
@@ -44,6 +47,7 @@ def main(args):
         get_nb_tracks_action_in_video,
         get_nb_tracks_activity_in_video,
         get_nb_tracks_species_in_video,
+        check_contains_weather_condition
     ]
 
     with open("prompt.yaml", "r") as f:
@@ -76,7 +80,7 @@ def main(args):
         queries_dict = json.load(f)
 
     queries_list = [q for q_cat in queries_dict.values() for q in q_cat if "<vid>" not in q]
-    output_queries_videos = {q: [] for q in queries_list}
+    output_queries_functions = {}
     test_file = "./S1_C1_E16_V0040.json"
 
     # For every query
@@ -88,17 +92,17 @@ def main(args):
         # Get the function that was created and apply it to all files
         try:
             check_file = agent.python_executor.custom_tools["check_file"]
-            check_file_str = inspect.getsource(check_file)
-            logging.info(agent.memory.return_full_code())
-            output_queries_videos[query] = [f.stem for f in Path(args.json_folder).rglob("*/*.json") if check_file(f)]
+            check_file_str = check_file.__source__
+            logging.info(check_file_str)
+            output_queries_functions[query] = check_file_str
         except Exception as e:
             logging.warning(f"Could not apply check_file function for query: {query}")
             logging.warning(e)
 
         # Save results at every step
-        output_json_file = Path(args.output_folder) / (model_id.split("/")[1] + "_retrieval_results.json")
+        output_json_file = Path(args.output_folder) / (model_id.split("/")[1] + "_generated_functions.json")
         with open(output_json_file, "w") as f:
-            json.dump(output_queries_videos, f, indent=2)
+            json.dump(output_queries_functions, f, indent=2)
 
 
 if __name__ == "__main__":
@@ -108,11 +112,6 @@ if __name__ == "__main__":
         "-IQ",
         "--input_queries_videos",
         help="JSON file containing the queries of interest and associated ground truth videos",
-    )
-    parser.add_argument(
-        "-IJ",
-        "--json_folder",
-        help="Folder containing video prediction or annotation files as structured JSON",
     )
     # parser.add_argument(
     #     "--llm", choices=["apertus", "mistral", "qwen", "llama"], default="llama"

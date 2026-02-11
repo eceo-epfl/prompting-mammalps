@@ -309,7 +309,7 @@ def get_segments_from_attribute_as_tracks(
 def check_enum_type(value, enumType):
     if not isinstance(value, enumType):
         print(f"species_name must be an element from {enumType}")
-        print(f"Available {enumType} are:", [e for e in enumType])
+        print(f"Available {enumType} are:", [e.name for e in enumType])
         raise AttributeError
 
 @tool
@@ -765,64 +765,31 @@ def check_track_contains_continuous_sequence(
 
     return False
 
-
-## Attributes and location
-def get_tracks_overlapping_point(
-    individual_tracks: List[IndividualTrack], point: Point
-) -> List[IndividualTrack]:
-    """
-    Retrieve tracks that overlap with a given point
+## Weather and time attributes
+def get_weather_conditions_from_videos(json_file: Union[Path, str]) -> Meteo:
+    """Retrieve weather from video info attributes weather conditions
     Args:
-        individual_tracks: Dictionary containing video detection data
-        point: Point coordinates as (x,y) tuple
+        json_file (Union[Path, str]): The path to the JSON file.
     Returns:
-        List of tracks that overlap with the point
+        Meteo: The weather condition of the video.
     """
-    pass
+    video_info = load_video_info(json_file)
+    return video_info["attributes"]["weather"]
 
-
-def get_tracks_overlapping_bbox(
-    individual_tracks: List[IndividualTrack], bbox: BBox
-) -> List[IndividualTrack]:
-    """
-    Retrieve tracks that overlap with a given bounding box
-    Args:
-        individual_tracks: Dictionary containing video detection data
-        bbox: Bounding box coordinates as ((xtl,ytl),(xbr,ybr)) tuple
-    Returns:
-        List of tracks that overlap with the bounding box
-    """
-    pass
-
-
-def get_tracks_overlapping_mask(
-    individual_tracks: List[IndividualTrack], mask: Mask
-) -> List[IndividualTrack]:
-    """
-    Retrieve tracks that overlap with a given mask
-    Args:
-        individual_tracks: Dictionary containing video detection data
-        mask: List of (x,y) points defining a polygon mask
-    Returns:
-        List of tracks that overlap with the mask
-    """
-    pass
-
-
-## Attributes and video
-def tracks_contain_same_activities_as_ref(
-    individual_tracks: List[IndividualTrack], ref_json: VideoDict
+@tool
+def check_contains_weather_condition(
+    json_file: Union[Path, str], weather_condition: Literal[Meteo]
 ) -> bool:
-    pass
-
-
-def tracks_contain_same_species_as_ref():
-    pass
-
-
-def tracks_contain_same_activity_sequence_as_ref():
-    pass
-
+    """Check if the video contains the specified weather condition
+    Args:
+        json_file (Union[Path, str]): The path to the JSON file.
+        weather_condition (Meteo): The weather condition to check.
+    Returns:
+        bool: True if the video contains the specified weather condition, False otherwise.
+    """
+    check_enum_type(weather_condition, Meteo)
+    video_weather = get_weather_conditions_from_videos(json_file)
+    return video_weather == weather_condition
 
 if __name__ == "__main__":
 
