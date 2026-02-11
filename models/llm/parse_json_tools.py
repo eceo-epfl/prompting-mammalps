@@ -306,6 +306,11 @@ def get_segments_from_attribute_as_tracks(
 
     return attr_tracks
 
+def check_enum_type(value, enumType):
+    if not isinstance(value, enumType):
+        print(f"species_name must be an element from {enumType}")
+        print(f"Available {enumType} are:", [e for e in enumType])
+        raise AttributeError
 
 @tool
 def get_tracks_from_species(
@@ -320,6 +325,8 @@ def get_tracks_from_species(
     Returns:
         List[IndividualTrack]: The reduced list of individual tracks where only tracks corresponding to the given species_name have been preserved
     """
+    check_enum_type(species_name, Species)
+
     return get_tracks_from_attribute(individual_tracks, "Species", species_name)
 
 
@@ -336,6 +343,7 @@ def get_tracks_from_action(
     Returns:
         List[IndividualTrack]: The reduced list of individual tracks where only tracks corresponding to the given action_name have been preserved
     """
+    check_enum_type(action_name, Action)
     attr_tracks = get_segments_from_attribute_as_tracks(
         individual_tracks, "Action", action_name
     ) + get_segments_from_attribute_as_tracks(individual_tracks, "Action2", action_name)
@@ -356,7 +364,7 @@ def get_tracks_from_activity(
     Returns:
         List[IndividualTrack]: The reduced list of individual tracks where only tracks corresponding to the given activity_name have been preserved
     """
-
+    check_enum_type(activity_name, Activity)
     return get_segments_from_attribute_as_tracks(
         individual_tracks, "Activity", activity_name
     )
@@ -378,6 +386,8 @@ def get_deer_tracks_from_age(
     Returns:
         List[IndividualTrack]: The reduced list of individual tracks where only deer tracks corresponding to the given age group have been preserved
     """
+    check_enum_type(age, DAge)
+    check_enum_type(deer_species, Species)
     if deer_species is not None:
         deer_tracks = get_tracks_from_species(
             individual_tracks, species_name=deer_species
@@ -405,6 +415,8 @@ def get_adult_deer_tracks_from_sex(
     Returns:
         List[IndividualTrack]: The reduced list of individual tracks where only adult deer tracks corresponding to the given sex group have been preserved
     """
+    check_enum_type(sex, DSex)
+    check_enum_type(deer_species, Species)
 
     adult_deer_tracks = get_deer_tracks_from_age(
         individual_tracks, DAge.ADULT, deer_species=deer_species
@@ -414,7 +426,7 @@ def get_adult_deer_tracks_from_sex(
 
 @tool
 def get_nb_tracks_species_in_video(
-    individual_tracks: List[IndividualTrack], species_name: Literal[tuple(e.value for e in Species)]
+    individual_tracks: List[IndividualTrack], species_name: Literal[Species]
 ) -> int:
     """
     Returns the number of tracks for a given species in the video
@@ -425,13 +437,14 @@ def get_nb_tracks_species_in_video(
     Returns:
         int: the number of individual tracks corresponding to the given species.
     """
+    check_enum_type(species_name, Species)
 
     return len(get_tracks_from_species(individual_tracks, species_name))
 
 
 @tool
 def tracks_contain_species(
-    individual_tracks: List[IndividualTrack], species_name: Literal[tuple(e.value for e in Species)]
+    individual_tracks: List[IndividualTrack], species_name: Literal[Species]
 ) -> bool:
     """
     Checks if any of the individual tracks contain the species of interest.
@@ -442,6 +455,7 @@ def tracks_contain_species(
     Returns:
         bool: True if at least one of the individual tracks contain the given species.
     """
+    check_enum_type(species_name, Species)
 
     return get_nb_tracks_species_in_video(individual_tracks, species_name) >= 1
 
@@ -459,6 +473,7 @@ def get_nb_tracks_action_in_video(
     Returns:
         int: the number of individual tracks contaning at least one BehaviorSegment of the given action_name.
     """
+    check_enum_type(action_name, Action)
     return len(get_tracks_from_action(individual_tracks, action_name))
 
 
@@ -475,6 +490,7 @@ def tracks_contain_action(
     Returns:
         bool: True if the video contains at least one BehaviorSegment of the given action_name
     """
+    check_enum_type(action_name, Action)
     return get_nb_tracks_action_in_video(individual_tracks, action_name) >= 1
 
 
@@ -491,6 +507,7 @@ def get_nb_tracks_activity_in_video(
     Returns:
         int: the number of individual tracks contaning at least one BehaviorSegment of the given activity_name.
     """
+    check_enum_type(activity_name, Activity)
     return len(get_tracks_from_activity(individual_tracks, activity_name))
 
 
@@ -508,6 +525,7 @@ def tracks_contain_activity(
     Returns:
         bool: True if the video contains at least one BehaviorSegment of the given activity_name
     """
+    check_enum_type(activity_name, Activity)
     return get_nb_tracks_activity_in_video(individual_tracks, activity_name) >= 1
 
 
@@ -527,6 +545,8 @@ def get_nb_deer_tracks_age_in_video(
     Returns:
         int: The number of individual tracks containing a deer of the given age group.
     """
+    check_enum_type(age, DAge)
+    check_enum_type(deer_species, Species)
     return len(
         get_deer_tracks_from_age(individual_tracks, age, deer_species=deer_species)
     )
@@ -548,6 +568,8 @@ def tracks_contain_deer_age(
     Returns:
         bool: True if the video contains at least one deer track corresponding to the given age group
     """
+    check_enum_type(age, DAge)
+    check_enum_type(deer_species, Species)
     return (
         get_nb_deer_tracks_age_in_video(
             individual_tracks, age, deer_species=deer_species
@@ -572,6 +594,8 @@ def get_nb_adult_deer_tracks_sex_in_video(
     Returns:
         int: The number of individual tracks containing an adult deer of the given sex group.
     """
+    check_enum_type(sex, DSex)
+    check_enum_type(deer_species, Species)
     return len(
         get_adult_deer_tracks_from_sex(
             individual_tracks, sex, deer_species=deer_species
@@ -595,6 +619,8 @@ def tracks_contain_adult_deer_sex(
     Returns:
         bool: True if the video contains at least one adult deer track corresponding to the given sex group
     """
+    check_enum_type(sex, DSex)
+    check_enum_type(deer_species, Species)
     return (
         get_nb_adult_deer_tracks_sex_in_video(
             individual_tracks, sex, deer_species=deer_species
@@ -693,6 +719,14 @@ def check_track_contains_continuous_sequence(
     """
     if not attributes_sequence:
         return True
+
+    for attribute in attributes_sequence:
+        if isinstance(attribute, Action):
+            check_enum_type(attribute, Action)
+        elif isinstance(attribute, Activity):
+            check_enum_type(attribute, Activity)
+        else:
+            raise AttributeError(f"{attribute} must be an element from either an Action or an Activity")
 
     # Get anchor segment matching first sequence element
     for bs_id, behavior_segment in enumerate(single_track):
