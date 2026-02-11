@@ -83,7 +83,7 @@ def main(args):
     for query in queries_list:
         logger.info(f"Processing query {query}")
         message = "Verify if the content of the file matches the following prompt (return True or False):" + f"'{query}'. Don't forget: always match elements from the prompt to the label space; save your implementation of the check_file function first as you will need it again."
-        agent.run(message, return_full_result=True, max_steps=5, additional_args={"json_file": test_file})
+        agent.run(message, return_full_result=False, max_steps=10, additional_args={"json_file": test_file})
         
         # Get the function that was created and apply it to all files
         try:
