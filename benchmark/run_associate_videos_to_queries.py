@@ -973,6 +973,31 @@ def get_parsing_function(prompt):
             )
 
         return check_file
+    elif prompt == "A red deer resting while it is raining.":
+
+        def check_file(json_file):
+            individual_tracks = get_tracks_from_json(json_file)
+
+            red_deer_tracks = get_tracks_from_species(
+                individual_tracks, species_name=Species.RED_DEER
+            )
+            return tracks_contain_activity(
+                red_deer_tracks, activity_name=Activity.RESTING
+            ) and check_contains_weather_condition(
+                json_file, weather_condition=Meteo.RAINY
+            )
+
+        return check_file
+
+    elif prompt == "A rainy weather.":
+
+        def check_file(json_file):
+
+            return check_contains_weather_condition(
+                json_file, weather_condition=Meteo.RAINY
+            )
+
+        return check_file
 
     elif prompt == "An animal participating in courtship.":
 
@@ -1091,6 +1116,84 @@ def get_parsing_function(prompt):
             return False
 
         return check_file
+    elif prompt == "A red deer vocalizing while it is raining.":
+
+        def check_file(json_file):
+            individual_tracks = get_tracks_from_json(json_file)
+
+            red_deer_tracks = get_tracks_from_species(
+                individual_tracks, species_name=Species.RED_DEER
+            )
+            vocalizing_tracks = get_tracks_from_action(
+                red_deer_tracks, action_name=Action.VOCALIZING
+            )
+            return tracks_contain_action(
+                vocalizing_tracks, action_name=Action.VOCALIZING
+            ) and check_contains_weather_condition(
+                json_file, weather_condition=Meteo.RAINY
+            )
+
+        return check_file
+    elif (
+        prompt
+        == "A roe deer running in a rainy weather while participating in courtship."
+    ):
+
+        def check_file(json_file):
+            individual_tracks = get_tracks_from_json(json_file)
+
+            roe_deer_tracks = get_tracks_from_species(
+                individual_tracks, species_name=Species.ROE_DEER
+            )
+            courtship_tracks = get_tracks_from_activity(
+                roe_deer_tracks, activity_name=Activity.COURTSHIP
+            )
+            running_courtship_tracks = get_tracks_from_action(
+                courtship_tracks, action_name=Action.TROTTING_OR_RUNNING
+            )
+            return tracks_contain_action(
+                running_courtship_tracks, action_name=Action.TROTTING_OR_RUNNING
+            ) and check_contains_weather_condition(
+                json_file, weather_condition=Meteo.RAINY
+            )
+
+        return check_file
+    elif prompt == "A roe deer participating in courtship while it is raining.":
+
+        def check_file(json_file):
+            individual_tracks = get_tracks_from_json(json_file)
+
+            roe_deer_tracks = get_tracks_from_species(
+                individual_tracks, species_name=Species.ROE_DEER
+            )
+            courtship_tracks = get_tracks_from_activity(
+                roe_deer_tracks, activity_name=Activity.COURTSHIP
+            )
+            return tracks_contain_activity(
+                courtship_tracks, activity_name=Activity.COURTSHIP
+            ) and check_contains_weather_condition(
+                json_file, weather_condition=Meteo.RAINY
+            )
+
+        return check_file
+    elif prompt == "A red deer participating in courtship while it is raining.":
+
+        def check_file(json_file):
+            individual_tracks = get_tracks_from_json(json_file)
+
+            red_deer_tracks = get_tracks_from_species(
+                individual_tracks, species_name=Species.RED_DEER
+            )
+            courtship_tracks = get_tracks_from_activity(
+                red_deer_tracks, activity_name=Activity.COURTSHIP
+            )
+            return tracks_contain_activity(
+                courtship_tracks, activity_name=Activity.COURTSHIP
+            ) and check_contains_weather_condition(
+                json_file, weather_condition=Meteo.RAINY
+            )
+
+        return check_file
 
     elif prompt == "A video of two or more animals.":
 
@@ -1185,7 +1288,184 @@ def get_parsing_function(prompt):
             )
 
         return check_file
+    elif prompt == "A wolf chasing in a clear weather.":
 
+        def check_file(json_file):
+            individual_tracks = get_tracks_from_json(json_file)
+            wolf_tracks = get_tracks_from_species(
+                individual_tracks, species_name=Species.WOLF
+            )
+            return tracks_contain_activity(
+                wolf_tracks, activity_name=Activity.CHASING
+            ) and check_contains_weather_condition(
+                json_file, weather_condition=Meteo.CLEAR
+            )
+
+        return check_file
+    elif prompt == "A wolf chasing in an overcast weather.":
+
+        def check_file(json_file):
+            individual_tracks = get_tracks_from_json(json_file)
+            wolf_tracks = get_tracks_from_species(
+                individual_tracks, species_name=Species.WOLF
+            )
+            return tracks_contain_activity(
+                wolf_tracks, activity_name=Activity.CHASING
+            ) and check_contains_weather_condition(
+                json_file, weather_condition=Meteo.OVERCAST
+            )
+
+        return check_file
+    elif prompt == "A fox chasing in a clear weather.":
+
+        def check_file(json_file):
+            individual_tracks = get_tracks_from_json(json_file)
+            fox_tracks = get_tracks_from_species(
+                individual_tracks, species_name=Species.FOX
+            )
+            return tracks_contain_activity(
+                fox_tracks, activity_name=Activity.CHASING
+            ) and check_contains_weather_condition(
+                json_file, weather_condition=Meteo.CLEAR
+            )
+
+        return check_file
+    elif prompt == "A female adult roe deer running in a rainy weather.":
+
+        def check_file(json_file):
+            individual_tracks = get_tracks_from_json(json_file)
+            female_roe_deer_tracks = get_adult_deer_tracks_from_sex(
+                individual_tracks,
+                sex=DSex.FEMALE,
+                deer_species=Species.ROE_DEER,
+            )
+            return tracks_contain_activity(
+                female_roe_deer_tracks, activity_name=Action.TROTTING_OR_RUNNING
+            ) and check_contains_weather_condition(
+                json_file, weather_condition=Meteo.RAINY
+            )
+
+        return check_file
+    elif prompt == "A roe deer foraging in a sunny weather.":
+
+        def check_file(json_file):
+            individual_tracks = get_tracks_from_json(json_file)
+            roe_deer_tracks = get_tracks_from_species(
+                individual_tracks, species_name=Species.ROE_DEER
+            )
+            return tracks_contain_activity(
+                roe_deer_tracks, activity_name=Activity.FORAGING
+            ) and check_contains_weather_condition(
+                json_file, weather_condition=Meteo.SUNNY
+            )
+
+        return check_file
+    elif prompt == "A red deer foraging in a sunny weather.":
+
+        def check_file(json_file):
+            individual_tracks = get_tracks_from_json(json_file)
+            red_deer_tracks = get_tracks_from_species(
+                individual_tracks, species_name=Species.RED_DEER
+            )
+            return tracks_contain_activity(
+                red_deer_tracks, activity_name=Activity.FORAGING
+            ) and check_contains_weather_condition(
+                json_file, weather_condition=Meteo.SUNNY
+            )
+
+        return check_file
+    elif prompt == "A roe deer foraging in a rainy weather.":
+
+        def check_file(json_file):
+            individual_tracks = get_tracks_from_json(json_file)
+            roe_deer_tracks = get_tracks_from_species(
+                individual_tracks, species_name=Species.ROE_DEER
+            )
+            return tracks_contain_activity(
+                roe_deer_tracks, activity_name=Activity.FORAGING
+            ) and check_contains_weather_condition(
+                json_file, weather_condition=Meteo.RAINY
+            )
+
+        return check_file
+    elif prompt == "A red deer foraging in a rainy weather.":
+
+        def check_file(json_file):
+            individual_tracks = get_tracks_from_json(json_file)
+            red_deer_tracks = get_tracks_from_species(
+                individual_tracks, species_name=Species.RED_DEER
+            )
+            return tracks_contain_activity(
+                red_deer_tracks, activity_name=Activity.FORAGING
+            ) and check_contains_weather_condition(
+                json_file, weather_condition=Meteo.RAINY
+            )
+
+        return check_file
+    elif prompt == "A juvenile red deer playing in a clear weather.":
+
+        def check_file(json_file):
+            individual_tracks = get_tracks_from_json(json_file)
+            juvenile_red_deer_tracks = get_deer_tracks_from_age(
+                individual_tracks,
+                age=DAge.JUVENILE,
+                deer_species=Species.RED_DEER,
+            )
+            return tracks_contain_activity(
+                juvenile_red_deer_tracks, activity_name=Activity.PLAYING
+            ) and check_contains_weather_condition(
+                json_file, weather_condition=Meteo.CLEAR
+            )
+
+        return check_file
+    elif prompt == "A female adult red deer escaping in a sunny weather.":
+
+        def check_file(json_file):
+            individual_tracks = get_tracks_from_json(json_file)
+            female_red_deer_tracks = get_adult_deer_tracks_from_sex(
+                individual_tracks, sex=DSex.FEMALE, deer_species=Species.RED_DEER
+            )
+            return tracks_contain_activity(
+                female_red_deer_tracks, activity_name=Activity.ESCAPING
+            ) and check_contains_weather_condition(
+                json_file, weather_condition=Meteo.SUNNY
+            )
+
+        return check_file
+    elif prompt == "An animal in vigilance while the weather is rainy or overcast.":
+
+        def check_file(json_file):
+            individual_tracks = get_tracks_from_json(json_file)
+            return (
+                tracks_contain_activity(
+                    individual_tracks, activity_name=Activity.VIGILANCE
+                )
+                and check_contains_weather_condition(
+                    json_file, weather_condition=Meteo.RAINY
+                )
+                or check_contains_weather_condition(
+                    json_file, weather_condition=Meteo.OVERCAST
+                )
+            )
+
+        return check_file
+    elif prompt == "An animal in vigilance while the weather is clear or sunny.":
+
+        def check_file(json_file):
+            individual_tracks = get_tracks_from_json(json_file)
+            return (
+                tracks_contain_activity(
+                    individual_tracks, activity_name=Activity.VIGILANCE
+                )
+                and check_contains_weather_condition(
+                    json_file, weather_condition=Meteo.CLEAR
+                )
+                or check_contains_weather_condition(
+                    json_file, weather_condition=Meteo.SUNNY
+                )
+            )
+
+        return check_file
     elif prompt == "A juvenile red deer suckling.":
 
         def check_file(json_file):
@@ -1338,7 +1618,46 @@ def get_parsing_function(prompt):
             return False
 
         return check_file
+    elif (
+        prompt
+        == "An animal reacting to the camera while the weather is rainy or overcast."
+    ):
 
+        def check_file(json_file):
+            individual_tracks = get_tracks_from_json(json_file)
+            return (
+                tracks_contain_activity(
+                    individual_tracks, activity_name=Activity.CAMERA_REACTION
+                )
+                and check_contains_weather_condition(
+                    json_file, weather_condition=Meteo.RAINY
+                )
+                or check_contains_weather_condition(
+                    json_file, weather_condition=Meteo.OVERCAST
+                )
+            )
+
+        return check_file
+    elif (
+        prompt
+        == "An animal reacting to the camera while the weather is clear or sunny."
+    ):
+
+        def check_file(json_file):
+            individual_tracks = get_tracks_from_json(json_file)
+            return (
+                tracks_contain_activity(
+                    individual_tracks, activity_name=Activity.CAMERA_REACTION
+                )
+                and check_contains_weather_condition(
+                    json_file, weather_condition=Meteo.CLEAR
+                )
+                or check_contains_weather_condition(
+                    json_file, weather_condition=Meteo.SUNNY
+                )
+            )
+
+        return check_file
     elif (
         prompt
         == "An animal escaping from another animal of the same species chasing it."
