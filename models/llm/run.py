@@ -24,6 +24,10 @@ from parse_json_tools import (
     tracks_contain_activity,
     tracks_contain_adult_deer_sex,
     tracks_contain_deer_age,
+    get_unique_species_from_tracks,
+    get_unique_actions_from_tracks,
+    get_unique_activities_from_tracks,
+    check_track_contains_continuous_sequence,
     check_contains_weather_condition,
     Species, Action, Activity, DAge, DSex, Meteo
 )
@@ -47,6 +51,10 @@ def main(args):
         get_nb_tracks_action_in_video,
         get_nb_tracks_activity_in_video,
         get_nb_tracks_species_in_video,
+        get_unique_species_from_tracks,
+        get_unique_actions_from_tracks,
+        get_unique_activities_from_tracks,
+        check_track_contains_continuous_sequence,
         check_contains_weather_condition
     ]
 
@@ -57,7 +65,7 @@ def main(args):
 
     # Load model and code agent
     model_id = "meta-llama/Meta-Llama-3.1-8B-Instruct"
-    model = TransformersModel(model_id, device_map="cuda")
+    model = TransformersModel(model_id, device_map="cuda", max_new_tokens=8096)
     agent = CodeAgent(tools=tools, model=model, prompt_templates=prompt_templates, max_print_outputs_length=500)
 
     agent.python_executor.send_variables({"Species": Species, 
@@ -84,7 +92,7 @@ def main(args):
     test_file = "./S1_C1_E16_V0040.json"
 
     # For every query
-    for query in queries_list:
+    for query in queries_list[31:]:
         logger.info(f"Processing query {query}")
         message = "Verify if the content of the file matches the following prompt (return True or False):" + f"'{query}'. Don't forget: always match elements from the prompt to the label space; save your implementation of the check_file function first as you will need it again."
         agent.run(message, return_full_result=False, max_steps=10, additional_args={"json_file": test_file})

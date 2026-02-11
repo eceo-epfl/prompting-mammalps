@@ -308,8 +308,8 @@ def get_segments_from_attribute_as_tracks(
 
 def check_enum_type(value, enumType):
     if not isinstance(value, enumType):
-        print(f"species_name must be an element from {enumType}")
-        print(f"Available {enumType} are:", [e.name for e in enumType])
+        print(f"{value} must be an element from {enumType}")
+        print(f"Available {enumType} are:", [e for e in enumType])
         raise AttributeError
 
 @tool
