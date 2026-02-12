@@ -90,13 +90,15 @@ system_prompt: |-
 
   Here are a few examples using the provided tools and the label space:
   ---
+  ---
+  # Example 1
   Task: "Verify if the content of the file json_file matches the prompt. Prompt: 'A video of a roe deer playing.'"
 
   Thought: The task requires to parse the json_file and assess whether it contains information about a roe deer playing. Let's first interpret the prompt. We need the occurence of at least one animal, which is of the species 'roe deer'. This same animal needs to be 'playing'. 
-  The 'roe deer' is part of the Species label space, but is listed as 'roe_deer'. 'playing' has a direct equivalent in the Action label space, so we can use 'playing' directly.
-  Now, which tool can I use to retrieve informations about the species and the actions. It seems like there is not one function that checks for the presence of a species and an action at the same time, so I need to chain tool function calls. `get_tracks_from_species` returns a list of IndividualTracks matching a given species and is therefore appropriate to retrieve the roe deer tracks. 
-  `get_tracks_from_action` returns a list of IndividualTracks matching a given action, and is then relevant to retrieve tracks matching the action 'playing'.
-  But I need to return a boolean. This is what the 'tracks_contain_action' does. Instead of calling `get_tracks_from_action`, I can directly return the output from 'tracks_contain_action'
+  The 'roe deer' is part of the Species label space, but is listed as 'roe_deer'. 'playing' has a direct equivalent in the Activity label space, so we can use 'playing' directly.
+  Now, which tool can I use to retrieve informations about the species and the activities. It seems like there is not one function that checks for the presence of a species and an activity at the same time, so I need to chain tool function calls. `get_tracks_from_species` returns a list of IndividualTracks matching a given species and is therefore appropriate to retrieve the roe deer tracks. 
+  `get_tracks_from_activity` returns a list of IndividualTracks matching a given activity, and is then relevant to retrieve tracks matching the activity 'playing'.
+  But I need to return a boolean. This is what the 'tracks_contain_activity' does. Instead of calling `get_tracks_from_activity`, I can directly return the output from 'tracks_contain_activity'
   Ok I know the sequence of tools I need to call to parse the JSON file for the query. Let's implement the check_file functions:
 
   {{code_block_opening_tag}}
@@ -104,8 +106,8 @@ system_prompt: |-
       individual_tracks = get_tracks_from_json(json_file)
       roe_deer_tracks = get_tracks_from_species(individual_tracks, species_name=Species.ROE_DEER)
 
-      return tracks_contain_action(
-          roe_deer_tracks, action_name=Action.PLAYING
+      return tracks_contain_activity(
+          roe_deer_tracks, activity_name=Activity.PLAYING
       )
   {{code_block_closing_tag}}
 
@@ -118,6 +120,7 @@ system_prompt: |-
   final_answer(result)
   {{code_block_closing_tag}}
   ---
+  # Example 2
   Task: "Verify if the content of the file json_file matches the prompt. Prompt: 'A video of an animal grazing.'"
 
   Thought: The task requires to parse the json_file and assess whether it contains information about an animal grazing. Let's first interpret the prompt. There is no mention of a specific species, so we can assume it can be any of them. The only condition is that the individual must be grazing.
@@ -143,6 +146,8 @@ system_prompt: |-
   final_answer(result)
   {{code_block_closing_tag}}
   ---
+  ---
+
   Here are the rules you should always follow to solve your task:
   1. Always provide a 'Thought:' sequence, and a '{{code_block_opening_tag}}' sequence ending with '{{code_block_closing_tag}}', else you will fail.
   2. Use only variables that you have defined!
