@@ -198,9 +198,12 @@ def check_segment_contains_attribute(
     attribute_value: Union[Species, Action, Activity, DSex, DAge, Meteo],
 ):
     # Checks if the first element of the segment has the given attribute name and value
+    expected_value = (
+        attribute_value.value if isinstance(attribute_value, Enum) else attribute_value
+    )
     return (
         "attributes" in segment[0]
-        and segment[0]["attributes"].get(attribute_name) == attribute_value
+        and segment[0]["attributes"].get(attribute_name) == expected_value
     )
 
 
@@ -306,7 +309,9 @@ def get_segments_from_attribute_as_tracks(
 
     return attr_tracks
 
-def check_enum_type(value, enumType):
+def check_enum_type(value, enumType, allow_none: bool = False):
+    if allow_none and value is None:
+        return
     if not isinstance(value, enumType):
         print(f"{value} must be an element from {enumType}")
         print(f"Available {enumType} are:", [e for e in enumType])
@@ -387,7 +392,7 @@ def get_deer_tracks_from_age(
         List[IndividualTrack]: The reduced list of individual tracks where only deer tracks corresponding to the given age group have been preserved
     """
     check_enum_type(age, DAge)
-    check_enum_type(deer_species, Species)
+    check_enum_type(deer_species, Species, allow_none=True)
     if deer_species is not None:
         deer_tracks = get_tracks_from_species(
             individual_tracks, species_name=deer_species
@@ -416,7 +421,7 @@ def get_adult_deer_tracks_from_sex(
         List[IndividualTrack]: The reduced list of individual tracks where only adult deer tracks corresponding to the given sex group have been preserved
     """
     check_enum_type(sex, DSex)
-    check_enum_type(deer_species, Species)
+    check_enum_type(deer_species, Species, allow_none=True)
 
     adult_deer_tracks = get_deer_tracks_from_age(
         individual_tracks, DAge.ADULT, deer_species=deer_species
@@ -546,7 +551,7 @@ def get_nb_deer_tracks_age_in_video(
         int: The number of individual tracks containing a deer of the given age group.
     """
     check_enum_type(age, DAge)
-    check_enum_type(deer_species, Species)
+    check_enum_type(deer_species, Species, allow_none=True)
     return len(
         get_deer_tracks_from_age(individual_tracks, age, deer_species=deer_species)
     )
@@ -569,7 +574,7 @@ def tracks_contain_deer_age(
         bool: True if the video contains at least one deer track corresponding to the given age group
     """
     check_enum_type(age, DAge)
-    check_enum_type(deer_species, Species)
+    check_enum_type(deer_species, Species, allow_none=True)
     return (
         get_nb_deer_tracks_age_in_video(
             individual_tracks, age, deer_species=deer_species
@@ -595,7 +600,7 @@ def get_nb_adult_deer_tracks_sex_in_video(
         int: The number of individual tracks containing an adult deer of the given sex group.
     """
     check_enum_type(sex, DSex)
-    check_enum_type(deer_species, Species)
+    check_enum_type(deer_species, Species, allow_none=True)
     return len(
         get_adult_deer_tracks_from_sex(
             individual_tracks, sex, deer_species=deer_species
@@ -620,7 +625,7 @@ def tracks_contain_adult_deer_sex(
         bool: True if the video contains at least one adult deer track corresponding to the given sex group
     """
     check_enum_type(sex, DSex)
-    check_enum_type(deer_species, Species)
+    check_enum_type(deer_species, Species, allow_none=True)
     return (
         get_nb_adult_deer_tracks_sex_in_video(
             individual_tracks, sex, deer_species=deer_species
@@ -789,7 +794,10 @@ def check_contains_weather_condition(
     """
     check_enum_type(weather_condition, Meteo)
     video_weather = get_weather_conditions_from_videos(json_file)
-    return video_weather == weather_condition
+    expected_weather = (
+        weather_condition.value if isinstance(weather_condition, Enum) else weather_condition
+    )
+    return video_weather == expected_weather
 
 if __name__ == "__main__":
 
