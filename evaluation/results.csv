@@ -1,0 +1,114 @@
+queries,union,intersection,IoU,Comment
+A red deer vocalizing while it is raining.,3,3,1.0,
+A roe deer participating in courtship while it is raining.,8,8,1.0,
+A female adult roe deer reacting to a camera.,1,1,1.0,
+A juvenile red deer walking while in vigilance.,57,57,1.0,
+A video of three or more red deer escaping.,2,2,1.0,
+A video of three or more red deer.,70,70,1.0,
+A video of two or more animals.,425,425,1.0,
+A roe deer running in a rainy weather while participating in courtship.,8,8,1.0,
+A red deer participating in courtship while it is raining.,4,4,1.0,
+A female adult red deer reacting to a camera.,74,74,1.0,
+A video of two or more wolves.,1,1,1.0,
+An adult male red deer in vigilance after vocalizing.,54,54,1.0,
+An adult male red deer urinating while wallowing.,3,3,1.0,
+An animal running while reacting to a camera.,45,45,1.0,
+An adult male red deer pawing the ground and rubbing its antlers on the ground while wallowing.,38,38,1.0,
+An adult male red deer pawing the ground while wallowing.,50,50,1.0,
+An adult female roe deer running while participating in courtship.,15,15,1.0,
+An adult red deer reacting to a camera.,129,129,1.0,
+A juvenile red deer reacting to a camera.,39,39,1.0,
+An adult female red deer foraging and a juvenile red deer foraging.,180,180,1.0,
+An adult male red deer running while participating in courtship.,15,15,1.0,
+A wolf chasing in a clear weather.,6,6,1.0,
+An adult roe deer reacting to a camera.,5,5,1.0,
+An animal reacting to a camera.,170,170,1.0,
+A juvenile roe deer reacting to a camera.,1,1,1.0,
+A red deer foraging in a rainy weather.,265,265,1.0,
+A roe deer foraging in a rainy weather.,10,10,1.0,
+A red deer foraging in a sunny weather.,84,84,1.0,
+A roe deer foraging in a sunny weather.,26,26,1.0,
+An adult female red deer nursing.,4,4,1.0,
+A video showing individuals from at least two different species.,10,10,1.0,
+A male adult red deer reacting to a camera.,55,55,1.0,
+Two or more red deer foraging and at least one is also in vigilance at some point.,132,132,1.0,
+A video of two or more juvenile red deer.,32,32,1.0,
+An animal escaping from another animal of a different species chasing it.,6,6,1.0,
+An animal escaping from another animal of the same species chasing it.,6,6,1.0,
+A juvenile red deer suckling.,4,4,1.0,
+A juvenile red deer nursing.,7,7,1.0,
+An animal looking at a camera.,125,125,1.0,
+An adult male roe deer running while participating in courtship.,18,18,1.0,
+A wolf reacting to a camera.,3,3,1.0,
+A roe deer trotting while foraging.,36,36,1.0,
+A wolf foraging.,16,16,1.0,
+A chamois in vigilance.,7,7,1.0,
+A chamois.,12,12,1.0,
+A hare foraging.,19,19,1.0,
+An adult red deer browsing.,15,15,1.0,
+A juvenile red deer playing.,14,14,1.0,
+A marten.,6,6,1.0,
+A hare.,27,27,1.0,
+A wolf chasing.,8,8,1.0,
+A male adult red deer rubbing its antlers on the ground.,96,96,1.0,
+A male adult roe deer jumping.,6,6,1.0,
+A juvenile red deer scratching its body.,51,51,1.0,
+A female adult roe deer sniffing.,1,1,1.0,
+An animal browsing.,33,33,1.0,
+A roe deer grazing.,24,24,1.0,
+An animal bathing.,42,42,1.0,
+An animal running.,397,397,1.0,
+A juvenile roe deer foraging.,3,3,1.0,
+A fox foraging.,18,18,1.0,
+A mountain hare in vigilance.,7,7,1.0,
+A video of an animal laying down while resting.,68,68,1.0,
+"An animal foraging, then reacting to a camera and then going back to foraging.",28,28,1.0,
+An adult red deer vocalizing while participating in courtship.,111,111,1.0,
+An adult red deer standing head up while participating in courtship.,88,88,1.0,
+An animal participating in courtship.,147,147,1.0,
+A juvenile red deer playing in a clear weather.,1,1,1.0,
+A rainy weather.,345,345,1.0,
+A red deer resting while it is raining.,21,21,1.0,
+A mountain hare grazing.,2,2,1.0,
+A video of three or more red deer reacting to a camera.,1,1,1.0,
+A video of an animal drinking.,41,41,1.0,
+An animal running while foraging.,179,179,1.0,
+A red deer browsing.,18,18,1.0,
+An animal resting.,70,70,1.0,
+An animal stretching its body.,13,13,1.0,
+A juvenile red deer doing at least one different action than an adult female red deer.,190,189,0.9947368421052631,"reference is track-level, qwen code is global"
+An animal bathing while grooming.,27,25,0.9259259259259259,"reference is track-level, qwen code is global"
+A juvenile red deer doing the exact same activities as an adult female red deer.,105,95,0.9047619047619048,"reference is track-level, qwen code is global"
+A video of one adult male and one adult female roe deer running while participating in courtship.,16,14,0.875,"reference is track-level, qwen code is global"
+An animal in vigilance while the weather is clear or sunny.,659,573,0.8694992412746586,"here the reference should be changed to take and/or priority into account"
+An adult female red deer running while participating in courtship.,19,16,0.8421052631578947,"reference is track-level, qwen code is global",""
+A video of two red deer.,323,253,0.7832817337461301,"reference checks for exactly two, qwen code checks for at least 2"
+An animal reacting to a camera and then running away.,59,46,0.7796610169491526,qwen code doesn't check the sequence order
+An animal in vigilance while the weather is rainy or overcast.,476,301,0.6323529411764706,here the reference should be changed to take and/or priority into account
+A single adult red deer only foraging.,1921,1160,0.6038521603331598,qwen code doesn't check for absence of other activities
+An adult red deer laying down while participating in courtship.,14,8,0.5714285714285714,"reference is track-level, qwen code is global"
+An animal doing any other activity than foraging.,2764,1338,0.4840810419681621,qwen code doesn't check for absence of foraging
+An animal reacting to the camera while the weather is clear or sunny.,260,124,0.47692307692307695,here the reference should be changed to take and/or priority into account
+An animal reacting to a camera and then foraging.,112,53,0.4732142857142857,qwen code doesn't check the sequence order
+An adult male red deer bathing while wallowing.,19,8,0.42105263157894735,qwen code doesn't check the sequence order
+A video of one adult male and one adult female red deer running while participating in courtship.,17,7,0.4117647058823529,"reference is track-level, qwen code is global"
+A juvenile red deer doing the exact same actions as an adult female red deer.,207,54,0.2608695652173913,"reference is track-level, qwen code is global"
+An animal reacting to the camera while the weather is rainy or overcast.,355,46,0.1295774647887324,here the reference should be changed to take and/or priority into account
+A video of two adult red deer vocalizing while participating in courtship.,11,1,0.09090909090909091,"reference is track-level, qwen code is global + reference checks for exactly two, qwen code checks for at least 2"
+A video of two female adult red deer walking while foraging.,499,34,0.06813627254509018,"reference is track-level, qwen code is global"
+An animal that is neither a red deer nor a roe deer.,2761,89,0.03223469757334299,"implementation logic is the same, not sure why the results are different!"
+A female adult red deer escaping in a sunny weather.,1,0,0.0,not sure why yet
+A video of three or more male adult red deer walking while foraging.,1,0,0.0,"reference is track-level, qwen code is global"
+A video of two adult roe deer sniffing while reacting to a camera.,5,0,0.0,"reference is track-level, qwen code is global"
+A fox sniffing while foraging.,1,0,0.0,"reference is track-level, qwen code is global"
+"An animal foraging, then reacting to a camera and then running away.",12,0,0.0,"reference interpretes running away as scaping, reference considers trotting_or_running "
+A juvenile roe deer preparing to suckle.,0,0,,
+A chamois resting.,0,0,,
+A fox chasing.,0,0,,
+A juvenile red deer shaking its head or its body.,0,0,,
+A juvenile roe deer suckling.,0,0,,
+A wolf chasing in an overcast weather.,0,0,,
+A fox chasing in a clear weather.,0,0,,
+A fox reacting to a camera.,0,0,,
+An empty video.,0,0,,
+,,,,
