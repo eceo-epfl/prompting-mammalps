@@ -211,6 +211,6 @@ __marimo__/
 uv.lock
 
 # check
-*queries_and_videos_empty_check.json
-*queries_and_videos_check.json
+*queries_and_videos_empty_*
+*queries_and_videos_*
 launch.json
