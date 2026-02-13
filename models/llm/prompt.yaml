@@ -22,57 +22,70 @@ system_prompt: |-
  
   Additionally, the elements present in the JSON file follow a strict label space that you need to follow. 
   If a text element from the input query does not find any strict equivalent in the label space, reflect and choose its closest match within the label space.
-  Never look for elements in the JSON file that are not part of the label space.
+  Never look for elements in the JSON file that are not part of the label space. To ensure this, always use the following enums.
   
-  Species = [
-    "red_deer",
-    "roe_deer",
-    "fox",
-    "hare",
-    "marten",
-    "wolf",
-    "chamois",
-    "lynx"
-  ]
+  class Species(Enum):
+    RED_DEER = "red_deer"
+    ROE_DEER = "roe_deer"
+    FOX = "fox"
+    HARE = "hare"
+    MARTEN = "marten"
+    WOLF = "wolf"
+    CHAMOIS = "chamois"
 
-  Action = [
-    "walking",
-    "standing_head_up",
-    "standing_head_down",
-    "grazing",
-    "sniffing",
-    "looking_at_camera",
-    "trotting_or_running",
-    "scratching_own_head_or_body",
-    "rubbing_antlers_on_ground",
-    "pawing_ground",
-    "shaking_head_or_fur",
-    "vocalizing",
-    "bathing",
-    "jumping",
-    "drinking",
-    "laying_down",
-    "defecating",
-    "urinating",
-    "browsing",
-    "stretching_body",
-    "suckling",
-    "preparing_to_suckle",
-  ]
+  class Action(Enum):
+    WALKING = "walking"
+    STANDING_HEAD_UP = "standing_head_up"
+    STANDING_HEAD_DOWN = "standing_head_down"
+    GRAZING = "grazing"
+    SNIFFING = "sniffing"
+    LOOKING_AT_CAMERA = "looking_at_camera"
+    TROTTING_OR_RUNNING = "trotting_or_running"
+    SCRATCHING_OWN_HEAD_OR_BODY = "scratching_own_head_or_body"
+    RUBBING_ANTLERS_ON_GROUND = "rubbing_antlers_on_ground"
+    PAWING_GROUND = "pawing_ground"
+    SHAKING_HEAD_OR_BODY = "shaking_head_or_body"
+    VOCALIZING = "vocalizing"
+    BATHING = "bathing"
+    JUMPING = "jumping"
+    DRINKING = "drinking"
+    LAYING_DOWN = "laying_down"
+    DEFECATING = "defecating"
+    URINATING = "urinating"
+    BROWSING = "browsing"
+    STRETCHING_BODY = "stretching_body"
+    SUCKLING = "suckling"
+    PREPARING_TO_SUCKLE = "preparing_to_suckle"
 
-  Activity = [
-    "foraging",
-    "vigilance",
-    "courtship",
-    "camera_reaction",
-    "escaping",
-    "chasing",
-    "nursing",
-    "grooming",
-    "playing",
-    "resting",
-    "marking_or_wallowing"
-  ]
+  class Activity(Enum):
+    FORAGING = "foraging"
+    VIGILANCE = "vigilance"
+    COURTSHIP = "courtship"
+    CAMERA_REACTION = "camera_reaction"
+    ESCAPING = "escaping"
+    CHASING = "chasing"
+    NURSING = "nursing"
+    GROOMING = "grooming"
+    PLAYING = "playing"
+    RESTING = "resting"
+    MARKING_OR_WALLOWING = "marking_or_wallowing"
+
+  class DAge(Enum):
+    """Deer age"""
+
+    ADULT = "adult"
+    JUVENILE = "juvenile"
+
+  class DSex(Enum):
+    "Sex for adult deers"
+    MALE = "male"
+    FEMALE = "female"
+
+  class Meteo(Enum):
+    SUNNY = "sunny"
+    CLEAR = "clear"
+    OVERCAST = "overcast"
+    RAINY = "rainy"
 
 
   Here are a few examples using the provided tools and the label space:
@@ -89,10 +102,10 @@ system_prompt: |-
   {{code_block_opening_tag}}
   def check_file(json_file):
       individual_tracks = get_tracks_from_json(json_file)
-      roe_deer_tracks = get_tracks_from_species(individual_tracks, species_name='roe_deer')
+      roe_deer_tracks = get_tracks_from_species(individual_tracks, species_name=Species.ROE_DEER)
 
       return tracks_contain_action(
-          roe_deer_tracks, action_name='playing'
+          roe_deer_tracks, action_name=Action.PLAYING
       )
   {{code_block_closing_tag}}
 
@@ -117,7 +130,7 @@ system_prompt: |-
       individual_tracks = get_tracks_from_json(json_file)
 
       return tracks_contain_action(
-          individual_tracks, action_name='grazing'
+          individual_tracks, action_name=Action.GRAZING
       )
   {{code_block_closing_tag}}
 

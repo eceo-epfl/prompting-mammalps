@@ -117,6 +117,21 @@
     "An animal reacting to the camera while the weather is rainy or overcast.",
     "An animal reacting to the camera while the weather is clear or sunny."
   ],
+  "VIDEO_COMPARISON": [
+    "A male adult red deer doing the same sequence of actions while wallowing as any individual of <vid></vid>.",
+    "A male adult red deer doing the same unique actions while wallowing as any individual of <vid></vid>.",
+    "A male adult red deer doing different actions while wallowing than any individual of <vid></vid>.",
+    "A juvenile red deer doing the same sequence of actions while nursing as any individual of <vid></vid>.",
+    "A juvenile red deer doing the same unique actions while nursing as any individual of <vid></vid>.",
+    "A juvenile red deer doing different actions while nursing than any individual of <vid></vid>.",
+    "An individual doing the same sequence of actions while reacting to the camera as any individual of <vid></vid>.",
+    "An individual doing the same unique actions while reacting to the camera as any individual of <vid></vid>.",
+    "An individual doing different actions while reacting to the camera than any individual of <vid></vid>.",
+    "An animal being in vigilance in a different weather condition than in <vid></vid>.",
+    "A wolf chasing in a different weather condition than in <vid></vid>.",
+    "An individual sharing at least one activity with any individual from <vid></vid>.",
+    "An individual sharing at least one activity with any individual from <vid></vid> but in a different weather condition."
+  ],
   "COMMON": [
     "A single adult red deer only foraging.",
     "An empty video."

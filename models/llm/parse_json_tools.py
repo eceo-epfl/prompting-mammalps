@@ -1,8 +1,8 @@
 import argparse
 import json
-from enum import StrEnum
+from enum import Enum
 from pathlib import Path
-from typing import Dict, List, Optional, Tuple, Union
+from typing import Dict, List, Optional, Tuple, Union, Literal
 
 from smolagents import tool
 
@@ -19,8 +19,8 @@ Mask = List[Point]
 
 
 # TODO: Ideally, we also give this to the LLM coding context
-@tool
-class Species(StrEnum):
+# https://github.com/huggingface/smolagents/issues/1194
+class Species(Enum):
     RED_DEER = "red_deer"
     ROE_DEER = "roe_deer"
     FOX = "fox"
@@ -30,8 +30,7 @@ class Species(StrEnum):
     CHAMOIS = "chamois"
 
 
-@tool
-class Action(StrEnum):
+class Action(Enum):
     WALKING = "walking"
     STANDING_HEAD_UP = "standing_head_up"
     STANDING_HEAD_DOWN = "standing_head_down"
@@ -56,8 +55,7 @@ class Action(StrEnum):
     PREPARING_TO_SUCKLE = "preparing_to_suckle"
 
 
-@tool
-class Activity(StrEnum):
+class Activity(Enum):
     FORAGING = "foraging"
     VIGILANCE = "vigilance"
     COURTSHIP = "courtship"
@@ -71,23 +69,20 @@ class Activity(StrEnum):
     MARKING_OR_WALLOWING = "marking_or_wallowing"
 
 
-@tool
-class DAge(StrEnum):
+class DAge(Enum):
     """Deer age"""
 
     ADULT = "adult"
     JUVENILE = "juvenile"
 
 
-@tool
-class DSex(StrEnum):
+class DSex(Enum):
     "Sex for adult deers"
     MALE = "male"
     FEMALE = "female"
 
 
-@tool
-class Meteo(StrEnum):
+class Meteo(Enum):
     SUNNY = "sunny"
     CLEAR = "clear"
     OVERCAST = "overcast"
@@ -311,10 +306,15 @@ def get_segments_from_attribute_as_tracks(
 
     return attr_tracks
 
+def check_enum_type(value, enumType):
+    if not isinstance(value, enumType):
+        print(f"{value} must be an element from {enumType}")
+        print(f"Available {enumType} are:", [e for e in enumType])
+        raise AttributeError
 
 @tool
 def get_tracks_from_species(
-    individual_tracks: List[IndividualTrack], species_name: Species
+    individual_tracks: List[IndividualTrack], species_name: Literal[Species]
 ) -> List[IndividualTrack]:
     """
     Retrieve tracks corresponding to a given species name.
@@ -325,12 +325,14 @@ def get_tracks_from_species(
     Returns:
         List[IndividualTrack]: The reduced list of individual tracks where only tracks corresponding to the given species_name have been preserved
     """
+    check_enum_type(species_name, Species)
+
     return get_tracks_from_attribute(individual_tracks, "Species", species_name)
 
 
 @tool
 def get_tracks_from_action(
-    individual_tracks: List[IndividualTrack], action_name: Action
+    individual_tracks: List[IndividualTrack], action_name: Literal[Action]
 ) -> List[IndividualTrack]:
     """
     Retrieve tracks corresponding to a given action name.
@@ -341,6 +343,7 @@ def get_tracks_from_action(
     Returns:
         List[IndividualTrack]: The reduced list of individual tracks where only tracks corresponding to the given action_name have been preserved
     """
+    check_enum_type(action_name, Action)
     attr_tracks = get_segments_from_attribute_as_tracks(
         individual_tracks, "Action", action_name
     ) + get_segments_from_attribute_as_tracks(individual_tracks, "Action2", action_name)
@@ -350,7 +353,7 @@ def get_tracks_from_action(
 
 @tool
 def get_tracks_from_activity(
-    individual_tracks: List[IndividualTrack], activity_name: Activity
+    individual_tracks: List[IndividualTrack], activity_name: Literal[Activity]
 ) -> List[IndividualTrack]:
     """
     Retrieve tracks corresponding to a given activity name.
@@ -361,7 +364,7 @@ def get_tracks_from_activity(
     Returns:
         List[IndividualTrack]: The reduced list of individual tracks where only tracks corresponding to the given activity_name have been preserved
     """
-
+    check_enum_type(activity_name, Activity)
     return get_segments_from_attribute_as_tracks(
         individual_tracks, "Activity", activity_name
     )
@@ -370,7 +373,7 @@ def get_tracks_from_activity(
 @tool
 def get_deer_tracks_from_age(
     individual_tracks: List[IndividualTrack],
-    age: DAge,
+    age: Literal[DAge],
     deer_species: Optional[Species] = None,
 ) -> List[IndividualTrack]:
     """
@@ -383,6 +386,8 @@ def get_deer_tracks_from_age(
     Returns:
         List[IndividualTrack]: The reduced list of individual tracks where only deer tracks corresponding to the given age group have been preserved
     """
+    check_enum_type(age, DAge)
+    check_enum_type(deer_species, Species)
     if deer_species is not None:
         deer_tracks = get_tracks_from_species(
             individual_tracks, species_name=deer_species
@@ -397,7 +402,7 @@ def get_deer_tracks_from_age(
 @tool
 def get_adult_deer_tracks_from_sex(
     individual_tracks: List[IndividualTrack],
-    sex: DSex,
+    sex: Literal[DSex],
     deer_species: Optional[Species] = None,
 ) -> List[IndividualTrack]:
     """
@@ -410,6 +415,8 @@ def get_adult_deer_tracks_from_sex(
     Returns:
         List[IndividualTrack]: The reduced list of individual tracks where only adult deer tracks corresponding to the given sex group have been preserved
     """
+    check_enum_type(sex, DSex)
+    check_enum_type(deer_species, Species)
 
     adult_deer_tracks = get_deer_tracks_from_age(
         individual_tracks, DAge.ADULT, deer_species=deer_species
@@ -419,7 +426,7 @@ def get_adult_deer_tracks_from_sex(
 
 @tool
 def get_nb_tracks_species_in_video(
-    individual_tracks: List[IndividualTrack], species_name: Species
+    individual_tracks: List[IndividualTrack], species_name: Literal[Species]
 ) -> int:
     """
     Returns the number of tracks for a given species in the video
@@ -430,13 +437,14 @@ def get_nb_tracks_species_in_video(
     Returns:
         int: the number of individual tracks corresponding to the given species.
     """
+    check_enum_type(species_name, Species)
 
     return len(get_tracks_from_species(individual_tracks, species_name))
 
 
 @tool
 def tracks_contain_species(
-    individual_tracks: List[IndividualTrack], species_name: Species
+    individual_tracks: List[IndividualTrack], species_name: Literal[Species]
 ) -> bool:
     """
     Checks if any of the individual tracks contain the species of interest.
@@ -447,13 +455,14 @@ def tracks_contain_species(
     Returns:
         bool: True if at least one of the individual tracks contain the given species.
     """
+    check_enum_type(species_name, Species)
 
     return get_nb_tracks_species_in_video(individual_tracks, species_name) >= 1
 
 
 @tool
 def get_nb_tracks_action_in_video(
-    individual_tracks: List[IndividualTrack], action_name: Action
+    individual_tracks: List[IndividualTrack], action_name: Literal[Action]
 ) -> int:
     """
     Returns the number of tracks for a given action in the video
@@ -464,12 +473,13 @@ def get_nb_tracks_action_in_video(
     Returns:
         int: the number of individual tracks contaning at least one BehaviorSegment of the given action_name.
     """
+    check_enum_type(action_name, Action)
     return len(get_tracks_from_action(individual_tracks, action_name))
 
 
 @tool
 def tracks_contain_action(
-    individual_tracks: List[IndividualTrack], action_name: Action
+    individual_tracks: List[IndividualTrack], action_name: Literal[Action]
 ) -> bool:
     """
     Checks if any of the individual tracks contain the action of interest.
@@ -480,12 +490,13 @@ def tracks_contain_action(
     Returns:
         bool: True if the video contains at least one BehaviorSegment of the given action_name
     """
+    check_enum_type(action_name, Action)
     return get_nb_tracks_action_in_video(individual_tracks, action_name) >= 1
 
 
 @tool
 def get_nb_tracks_activity_in_video(
-    individual_tracks: List[IndividualTrack], activity_name: Activity
+    individual_tracks: List[IndividualTrack], activity_name: Literal[Activity]
 ) -> int:
     """
     Returns the number of tracks for a given activity in the video
@@ -496,13 +507,14 @@ def get_nb_tracks_activity_in_video(
     Returns:
         int: the number of individual tracks contaning at least one BehaviorSegment of the given activity_name.
     """
+    check_enum_type(activity_name, Activity)
     return len(get_tracks_from_activity(individual_tracks, activity_name))
 
 
 @tool
 def tracks_contain_activity(
     individual_tracks: List[IndividualTrack],
-    activity_name: Activity,
+    activity_name: Literal[Activity],
 ) -> bool:
     """
     Checks if any of the individual tracks contain the activity of interest.
@@ -513,13 +525,14 @@ def tracks_contain_activity(
     Returns:
         bool: True if the video contains at least one BehaviorSegment of the given activity_name
     """
+    check_enum_type(activity_name, Activity)
     return get_nb_tracks_activity_in_video(individual_tracks, activity_name) >= 1
 
 
 @tool
 def get_nb_deer_tracks_age_in_video(
     individual_tracks: List[IndividualTrack],
-    age: DAge,
+    age: Literal[DAge],
     deer_species: Optional[Species] = None,
 ) -> int:
     """
@@ -532,6 +545,8 @@ def get_nb_deer_tracks_age_in_video(
     Returns:
         int: The number of individual tracks containing a deer of the given age group.
     """
+    check_enum_type(age, DAge)
+    check_enum_type(deer_species, Species)
     return len(
         get_deer_tracks_from_age(individual_tracks, age, deer_species=deer_species)
     )
@@ -540,7 +555,7 @@ def get_nb_deer_tracks_age_in_video(
 @tool
 def tracks_contain_deer_age(
     individual_tracks: List[IndividualTrack],
-    age: DAge,
+    age: Literal[DAge],
     deer_species: Optional[Species] = None,
 ) -> bool:
     """
@@ -553,6 +568,8 @@ def tracks_contain_deer_age(
     Returns:
         bool: True if the video contains at least one deer track corresponding to the given age group
     """
+    check_enum_type(age, DAge)
+    check_enum_type(deer_species, Species)
     return (
         get_nb_deer_tracks_age_in_video(
             individual_tracks, age, deer_species=deer_species
@@ -564,7 +581,7 @@ def tracks_contain_deer_age(
 @tool
 def get_nb_adult_deer_tracks_sex_in_video(
     individual_tracks: List[IndividualTrack],
-    sex: DSex,
+    sex: Literal[DSex],
     deer_species: Optional[Species] = None,
 ) -> int:
     """
@@ -577,6 +594,8 @@ def get_nb_adult_deer_tracks_sex_in_video(
     Returns:
         int: The number of individual tracks containing an adult deer of the given sex group.
     """
+    check_enum_type(sex, DSex)
+    check_enum_type(deer_species, Species)
     return len(
         get_adult_deer_tracks_from_sex(
             individual_tracks, sex, deer_species=deer_species
@@ -587,7 +606,7 @@ def get_nb_adult_deer_tracks_sex_in_video(
 @tool
 def tracks_contain_adult_deer_sex(
     individual_tracks: List[IndividualTrack],
-    sex: DSex,
+    sex: Literal[DSex],
     deer_species: Optional[Species] = None,
 ) -> bool:
     """
@@ -600,6 +619,8 @@ def tracks_contain_adult_deer_sex(
     Returns:
         bool: True if the video contains at least one adult deer track corresponding to the given sex group
     """
+    check_enum_type(sex, DSex)
+    check_enum_type(deer_species, Species)
     return (
         get_nb_adult_deer_tracks_sex_in_video(
             individual_tracks, sex, deer_species=deer_species
@@ -611,7 +632,7 @@ def tracks_contain_adult_deer_sex(
 @tool
 def get_unique_species_from_tracks(
     individual_tracks: List[IndividualTrack],
-) -> set[Species]:
+) -> set:
     """
     Returns the set of species present in the individual tracks
 
@@ -633,7 +654,7 @@ def get_unique_species_from_tracks(
 @tool
 def get_unique_actions_from_tracks(
     individual_tracks: List[IndividualTrack],
-) -> set[Action]:
+) -> set:
     """
     Returns the set of actions present in the individual tracks
 
@@ -661,7 +682,7 @@ def get_unique_actions_from_tracks(
 @tool
 def get_unique_activities_from_tracks(
     individual_tracks: List[IndividualTrack],
-) -> set[Activity]:
+) -> set:
     """
     Returns the set of activities present in the individual tracks
 
@@ -698,6 +719,14 @@ def check_track_contains_continuous_sequence(
     """
     if not attributes_sequence:
         return True
+
+    for attribute in attributes_sequence:
+        if isinstance(attribute, Action):
+            check_enum_type(attribute, Action)
+        elif isinstance(attribute, Activity):
+            check_enum_type(attribute, Activity)
+        else:
+            raise AttributeError(f"{attribute} must be an element from either an Action or an Activity")
 
     # Get anchor segment matching first sequence element
     for bs_id, behavior_segment in enumerate(single_track):
@@ -736,64 +765,31 @@ def check_track_contains_continuous_sequence(
 
     return False
 
-
-## Attributes and location
-def get_tracks_overlapping_point(
-    individual_tracks: List[IndividualTrack], point: Point
-) -> List[IndividualTrack]:
-    """
-    Retrieve tracks that overlap with a given point
+## Weather and time attributes
+def get_weather_conditions_from_videos(json_file: Union[Path, str]) -> Meteo:
+    """Retrieve weather from video info attributes weather conditions
     Args:
-        individual_tracks: Dictionary containing video detection data
-        point: Point coordinates as (x,y) tuple
+        json_file (Union[Path, str]): The path to the JSON file.
     Returns:
-        List of tracks that overlap with the point
+        Meteo: The weather condition of the video.
     """
-    pass
+    video_info = load_video_info(json_file)
+    return video_info["attributes"]["weather"]
 
-
-def get_tracks_overlapping_bbox(
-    individual_tracks: List[IndividualTrack], bbox: BBox
-) -> List[IndividualTrack]:
-    """
-    Retrieve tracks that overlap with a given bounding box
-    Args:
-        individual_tracks: Dictionary containing video detection data
-        bbox: Bounding box coordinates as ((xtl,ytl),(xbr,ybr)) tuple
-    Returns:
-        List of tracks that overlap with the bounding box
-    """
-    pass
-
-
-def get_tracks_overlapping_mask(
-    individual_tracks: List[IndividualTrack], mask: Mask
-) -> List[IndividualTrack]:
-    """
-    Retrieve tracks that overlap with a given mask
-    Args:
-        individual_tracks: Dictionary containing video detection data
-        mask: List of (x,y) points defining a polygon mask
-    Returns:
-        List of tracks that overlap with the mask
-    """
-    pass
-
-
-## Attributes and video
-def tracks_contain_same_activities_as_ref(
-    individual_tracks: List[IndividualTrack], ref_json: VideoDict
+@tool
+def check_contains_weather_condition(
+    json_file: Union[Path, str], weather_condition: Literal[Meteo]
 ) -> bool:
-    pass
-
-
-def tracks_contain_same_species_as_ref():
-    pass
-
-
-def tracks_contain_same_activity_sequence_as_ref():
-    pass
-
+    """Check if the video contains the specified weather condition
+    Args:
+        json_file (Union[Path, str]): The path to the JSON file.
+        weather_condition (Meteo): The weather condition to check.
+    Returns:
+        bool: True if the video contains the specified weather condition, False otherwise.
+    """
+    check_enum_type(weather_condition, Meteo)
+    video_weather = get_weather_conditions_from_videos(json_file)
+    return video_weather == weather_condition
 
 if __name__ == "__main__":
 

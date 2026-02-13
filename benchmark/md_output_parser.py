@@ -54,7 +54,7 @@ class MDVideoOutputParser:
 
         return self.results
 
-    def to_dataframe(self) -> pd.DataFrame:
+    def to_dataframe(self, file_id_pattern=r"S\d_C\d_E\d+_V\d{4}") -> pd.DataFrame:
         """
         Converts the results into a pandas DataFrame.
 
@@ -62,12 +62,14 @@ class MDVideoOutputParser:
         pd.DataFrame: A DataFrame with all parsed data.
         """
         detection_df = pd.DataFrame(index=None)
-        file_id_pattern = r"S\d_C\d_E\d+_V\d{4}"
 
         for site, site_results in self.results.items():
             for site_cam, site_cam_results in site_results.items():
                 for file, file_results in site_cam_results.items():
                     results_df = pd.DataFrame.from_dict(file_results["frames"])
+                    results_df["attributes.Weather"] = file_results["info"][
+                        "attributes"
+                    ]["weather"]
                     results_df["file_id"] = re.search(file_id_pattern, file).group(0)
                     results_df["detection_file_path"] = file_results[
                         "detection_file_path"
