@@ -1625,11 +1625,10 @@ def get_parsing_function(prompt):
 
         def check_file(json_file):
             individual_tracks = get_tracks_from_json(json_file)
-            return (
-                tracks_contain_activity(
-                    individual_tracks, activity_name=Activity.CAMERA_REACTION
-                )
-                and check_contains_weather_condition(
+            return tracks_contain_activity(
+                individual_tracks, activity_name=Activity.CAMERA_REACTION
+            ) and (
+                check_contains_weather_condition(
                     json_file, weather_condition=Meteo.RAINY
                 )
                 or check_contains_weather_condition(
@@ -1645,11 +1644,10 @@ def get_parsing_function(prompt):
 
         def check_file(json_file):
             individual_tracks = get_tracks_from_json(json_file)
-            return (
-                tracks_contain_activity(
-                    individual_tracks, activity_name=Activity.CAMERA_REACTION
-                )
-                and check_contains_weather_condition(
+            return tracks_contain_activity(
+                individual_tracks, activity_name=Activity.CAMERA_REACTION
+            ) and (
+                check_contains_weather_condition(
                     json_file, weather_condition=Meteo.CLEAR
                 )
                 or check_contains_weather_condition(
@@ -1848,7 +1846,7 @@ if __name__ == "__main__":
     args = parser.parse_args()
     json_folder = Path(args.json_folder)
 
-    with open("benchmark/queries_and_videos_empty.json", "r") as f:
+    with open("benchmark/queries_and_videos_empty_check.json", "r") as f:
         queries_dict = json.load(f)
 
     # Initialize output dict with empty lists for each query
@@ -1879,5 +1877,5 @@ if __name__ == "__main__":
         for q in queries_dict[q_cat]:
             print(q, ":", len(out_queries_dict[q_cat][q]), "videos")
 
-    with open("benchmark/queries_and_videos.json", "w") as f:
+    with open("benchmark/queries_and_videos_check_test.json", "w") as f:
         json.dump(out_queries_dict, f, indent=2)
