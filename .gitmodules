@@ -1,4 +1,4 @@
 [submodule "models/salma"]
 	path = models/salma
 	url = git@github.com:amathislab/VideoMAEdev.git
-	branch = salma
+	branch = inference_code
