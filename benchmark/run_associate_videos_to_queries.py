@@ -1436,11 +1436,10 @@ def get_parsing_function(prompt):
 
         def check_file(json_file):
             individual_tracks = get_tracks_from_json(json_file)
-            return (
-                tracks_contain_activity(
-                    individual_tracks, activity_name=Activity.VIGILANCE
-                )
-                and check_contains_weather_condition(
+            return tracks_contain_activity(
+                individual_tracks, activity_name=Activity.VIGILANCE
+            ) and (
+                check_contains_weather_condition(
                     json_file, weather_condition=Meteo.RAINY
                 )
                 or check_contains_weather_condition(
@@ -1453,11 +1452,10 @@ def get_parsing_function(prompt):
 
         def check_file(json_file):
             individual_tracks = get_tracks_from_json(json_file)
-            return (
-                tracks_contain_activity(
-                    individual_tracks, activity_name=Activity.VIGILANCE
-                )
-                and check_contains_weather_condition(
+            return tracks_contain_activity(
+                individual_tracks, activity_name=Activity.VIGILANCE
+            ) and (
+                check_contains_weather_condition(
                     json_file, weather_condition=Meteo.CLEAR
                 )
                 or check_contains_weather_condition(
