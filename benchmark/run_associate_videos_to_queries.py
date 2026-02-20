@@ -1838,10 +1838,17 @@ def get_parsing_function(prompt):
     ):
 
         def check_file(json_file):
-            video_ref = "S3_C3_E545_V0406.mp4"
+            video_ref = get_video_ref_from_prompt(prompt)
             individual_tracks_ref = get_video_ref_tracks(video_ref)
+            male_red_deer_tracks_ref = get_adult_deer_tracks_from_sex(
+                individual_tracks_ref,
+                sex=DSex.MALE,
+                deer_species=Species.RED_DEER,
+            )
+            male_red_deer_tracks_ref_wallowing = get_tracks_from_activity(
+                male_red_deer_tracks_ref, activity_name=Activity.MARKING_OR_WALLOWING
+            )
             individual_tracks = get_tracks_from_json(json_file)
-
             male_red_deer_tracks = get_adult_deer_tracks_from_sex(
                 individual_tracks,
                 sex=DSex.MALE,
@@ -1851,7 +1858,7 @@ def get_parsing_function(prompt):
                 male_red_deer_tracks, activity_name=Activity.MARKING_OR_WALLOWING
             )
             for track in male_red_deer_tracks_wallowing:
-                for ref_track in individual_tracks_ref:
+                for ref_track in male_red_deer_tracks_ref_wallowing:
                     ref_sequence = get_action_sequences_from_tracks([ref_track])
                     if check_track_contains_continuous_sequence(track, ref_sequence[0]):
                         return True
@@ -1865,10 +1872,17 @@ def get_parsing_function(prompt):
     ):
 
         def check_file(json_file):
-            video_ref = "S3_C2_E524_V0087.mp4"
+            video_ref = get_video_ref_from_prompt(prompt)
             individual_tracks_ref = get_video_ref_tracks(video_ref)
+            male_red_deer_tracks_ref = get_adult_deer_tracks_from_sex(
+                individual_tracks_ref,
+                sex=DSex.MALE,
+                deer_species=Species.RED_DEER,
+            )
+            male_red_deer_tracks_ref_wallowing = get_tracks_from_activity(
+                male_red_deer_tracks_ref, activity_name=Activity.MARKING_OR_WALLOWING
+            )
             individual_tracks = get_tracks_from_json(json_file)
-
             male_red_deer_tracks = get_adult_deer_tracks_from_sex(
                 individual_tracks,
                 sex=DSex.MALE,
@@ -1878,7 +1892,7 @@ def get_parsing_function(prompt):
                 male_red_deer_tracks, activity_name=Activity.MARKING_OR_WALLOWING
             )
             for track in male_red_deer_tracks_wallowing:
-                for ref_track in individual_tracks_ref:
+                for ref_track in male_red_deer_tracks_ref_wallowing:
                     ref_sequence = get_action_sequences_from_tracks([ref_track])
                     if check_track_contains_continuous_sequence(track, ref_sequence[0]):
                         return True
@@ -1891,7 +1905,7 @@ def get_parsing_function(prompt):
     ):
 
         def check_file(json_file):
-            video_ref = "S3_C3_E524_V0327.mp4"
+            video_ref = get_video_ref_from_prompt(prompt)
             individual_tracks_ref = get_video_ref_tracks(video_ref)
             individual_tracks = get_tracks_from_json(json_file)
             male_red_deer_tracks = get_adult_deer_tracks_from_sex(
@@ -1925,7 +1939,7 @@ def get_parsing_function(prompt):
     ):
 
         def check_file(json_file):
-            video_ref = "S3_C2_E524_V0087.mp4"
+            video_ref = get_video_ref_from_prompt(prompt)
             individual_tracks_ref = get_video_ref_tracks(video_ref)
             individual_tracks = get_tracks_from_json(json_file)
             male_red_deer_tracks = get_adult_deer_tracks_from_sex(
@@ -1959,7 +1973,7 @@ def get_parsing_function(prompt):
     ):
 
         def check_file(json_file):
-            video_ref = "S3_C3_E524_V0327.mp4"
+            video_ref = get_video_ref_from_prompt(prompt)
             individual_tracks_ref = get_video_ref_tracks(video_ref)
             individual_tracks = get_tracks_from_json(json_file)
             male_red_deer_tracks = get_adult_deer_tracks_from_sex(
@@ -1994,7 +2008,7 @@ def get_parsing_function(prompt):
     ):
 
         def check_file(json_file):
-            video_ref = "S1_C6_F394_V0310.mp4"
+            video_ref = get_video_ref_from_prompt(prompt)
             individual_tracks_ref = get_video_ref_tracks(video_ref)
             individual_tracks = get_tracks_from_json(json_file)
             juvenile_red_deer_tracks = get_deer_tracks_from_age(
@@ -2027,7 +2041,7 @@ def get_parsing_function(prompt):
     ):
 
         def check_file(json_file):
-            video_ref = "S1_C6_F404_V0330.mp4"
+            video_ref = get_video_ref_from_prompt(prompt)
             individual_tracks_ref = get_video_ref_tracks(video_ref)
             individual_tracks = get_tracks_from_json(json_file)
             juvenile_red_deer_tracks = get_deer_tracks_from_age(
@@ -2060,7 +2074,7 @@ def get_parsing_function(prompt):
     ):
 
         def check_file(json_file):
-            video_ref = "S1_C6_F404_V0330.mp4"
+            video_ref = get_video_ref_from_prompt(prompt)
             individual_tracks_ref = get_video_ref_tracks(video_ref)
             individual_tracks = get_tracks_from_json(json_file)
             juvenile_red_deer_tracks = get_deer_tracks_from_age(
@@ -2094,7 +2108,7 @@ def get_parsing_function(prompt):
     ):
 
         def check_file(json_file):
-            video_ref = "S1_C6_F394_V0310.mp4"
+            video_ref = get_video_ref_from_prompt(prompt)
             individual_tracks_ref = get_video_ref_tracks(video_ref)
             individual_tracks = get_tracks_from_json(json_file)
             juvenile_red_deer_tracks = get_deer_tracks_from_age(
@@ -2128,7 +2142,7 @@ def get_parsing_function(prompt):
     ):
 
         def check_file(json_file):
-            video_ref = "S1_C6_F404_V0330.mp4"
+            video_ref = get_video_ref_from_prompt(prompt)
             individual_tracks_ref = get_video_ref_tracks(video_ref)
             individual_tracks = get_tracks_from_json(json_file)
             juvenile_red_deer_tracks = get_deer_tracks_from_age(
@@ -2162,7 +2176,7 @@ def get_parsing_function(prompt):
     ):
 
         def check_file(json_file):
-            video_ref = "S1_C4_F173_V0137.mp4"
+            video_ref = get_video_ref_from_prompt(prompt)
             individual_tracks_ref = get_video_ref_tracks(video_ref)
             individual_tracks = get_tracks_from_json(json_file)
             camera_reaction_tracks = get_tracks_from_activity(
@@ -2187,7 +2201,8 @@ def get_parsing_function(prompt):
     ):
 
         def check_file(json_file):
-            video_ref = "S1_C2_E8_V0021.mp4"
+
+            video_ref = get_video_ref_from_prompt(prompt)
             individual_tracks_ref = get_video_ref_tracks(video_ref)
             individual_tracks = get_tracks_from_json(json_file)
             camera_reaction_tracks = get_tracks_from_activity(
@@ -2211,7 +2226,7 @@ def get_parsing_function(prompt):
     ):
 
         def check_file(json_file):
-            video_ref = "S1_C2_E8_V0021.mp4"
+            video_ref = get_video_ref_from_prompt(prompt)
             individual_tracks_ref = get_video_ref_tracks(video_ref)
             individual_tracks = get_tracks_from_json(json_file)
             camera_reaction_tracks = get_tracks_from_activity(
@@ -2235,7 +2250,7 @@ def get_parsing_function(prompt):
     ):
 
         def check_file(json_file):
-            video_ref = "S2_C2_F536_V0066.mp4"
+            video_ref = get_video_ref_from_prompt(prompt)
             individual_tracks = get_tracks_from_json(json_file)
             vigilance_tracks = get_tracks_from_activity(
                 individual_tracks, activity_name=Activity.VIGILANCE
@@ -2257,7 +2272,7 @@ def get_parsing_function(prompt):
     ):
 
         def check_file(json_file):
-            video_ref = "S2_C1_F573_V0093.mp4"
+            video_ref = get_video_ref_from_prompt(prompt)
             individual_tracks = get_tracks_from_json(json_file)
             wolf_tracks = get_tracks_from_species(individual_tracks, Species.WOLF)
             wolf_chasing_tracks = get_tracks_from_activity(
@@ -2272,11 +2287,11 @@ def get_parsing_function(prompt):
         return check_file
     elif (
         prompt
-        == "An individual sharing at least one activity with any individual from <vid>S3_C2_E706_V0214.mp4</vid>."
+        == "An individual sharing at least one activity with any individual from <vid>S2_C1_F573_V0093.mp4</vid>."
     ):
 
         def check_file(json_file):
-            video_ref = "S3_C2_E706_V0214.mp4"
+            video_ref = get_video_ref_from_prompt(prompt)
             if not video_ref:
                 return False
             individual_tracks_ref = get_video_ref_tracks(video_ref)
@@ -2298,7 +2313,7 @@ def get_parsing_function(prompt):
     ):
 
         def check_file(json_file):
-            video_ref = "S3_C2_E670_V0159.mp4"
+            video_ref = get_video_ref_from_prompt(prompt)
             individual_tracks_ref = get_video_ref_tracks(video_ref)
             individual_tracks = get_tracks_from_json(json_file)
             weather_condition = get_weather_conditions_from_videos(json_file)
@@ -2343,7 +2358,7 @@ if __name__ == "__main__":
     args = parser.parse_args()
     json_folder = Path(args.json_folder)
 
-    with open("benchmark/queries_and_videos_empty.json", "r") as f:
+    with open("benchmark/queries_and_videos_empty_check.json", "r") as f:
         queries_dict = json.load(f)
 
     # Initialize output dict with empty lists for each query
@@ -2374,5 +2389,5 @@ if __name__ == "__main__":
         for q in queries_dict[q_cat]:
             print(q, ":", len(out_queries_dict[q_cat][q]), "videos")
 
-    with open("benchmark/queries_and_videos.json", "w") as f:
+    with open("benchmark/queries_and_videos_check.json", "w") as f:
         json.dump(out_queries_dict, f, indent=2)

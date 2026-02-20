@@ -778,6 +778,19 @@ def get_weather_conditions_from_video_ref(
 
 
 ## video comparison functions
+def get_video_ref_from_prompt(prompt):
+    """Extracts the reference video name from the prompt
+    Args:
+        prompt (str): The input prompt containing the reference video name in the format <vid>video_name</vid>
+    Returns:
+        str: The extracted reference video name
+    """
+    start = prompt.find("<vid>") + len("<vid>")
+    end = prompt.find("</vid>")
+    video_name = prompt[start:end]
+    return video_name
+
+
 def get_video_ref_tracks(
     video_name: Union[Path, str],
     json_folder: Union[
