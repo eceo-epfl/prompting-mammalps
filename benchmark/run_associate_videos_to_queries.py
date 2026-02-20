@@ -1820,6 +1820,505 @@ def get_parsing_function(prompt):
                 return ("foraging" in activities) and (len(activities) == 1)
 
         return check_file
+    elif prompt == "A male adult red deer wallowing.":
+
+        def check_file(json_file):
+            individual_tracks = get_tracks_from_json(json_file)
+            male_red_deer_tracks = get_adult_deer_tracks_from_sex(
+                individual_tracks,
+                sex=DSex.MALE,
+                deer_species=Species.RED_DEER,
+            )
+            return tracks_contain_activity(
+                male_red_deer_tracks, activity_name=Activity.MARKING_OR_WALLOWING
+            )
+
+        return check_file
+    elif (
+        prompt
+        == "A male adult red deer doing the same sequence of actions while wallowing as any individual of <vid>S3_C3_E545_V0406.mp4</vid>."
+    ):
+
+        def check_file(json_file):
+            video_ref = "S3_C3_E545_V0406.mp4"
+            individual_tracks_ref = get_video_ref_tracks(video_ref)
+            individual_tracks = get_tracks_from_json(json_file)
+
+            male_red_deer_tracks = get_adult_deer_tracks_from_sex(
+                individual_tracks,
+                sex=DSex.MALE,
+                deer_species=Species.RED_DEER,
+            )
+            male_red_deer_tracks_wallowing = get_tracks_from_activity(
+                male_red_deer_tracks, activity_name=Activity.MARKING_OR_WALLOWING
+            )
+            for track in male_red_deer_tracks_wallowing:
+                for ref_track in individual_tracks_ref:
+                    ref_sequence = get_action_sequences_from_tracks([ref_track])
+                    if check_track_contains_continuous_sequence(track, ref_sequence[0]):
+                        return True
+            return False
+
+        return check_file
+
+    elif (
+        prompt
+        == "A male adult red deer doing the same sequence of actions while wallowing as any individual of <vid>S3_C2_E524_V0087.mp4</vid>."
+    ):
+
+        def check_file(json_file):
+            video_ref = "S3_C2_E524_V0087.mp4"
+            individual_tracks_ref = get_video_ref_tracks(video_ref)
+            individual_tracks = get_tracks_from_json(json_file)
+
+            male_red_deer_tracks = get_adult_deer_tracks_from_sex(
+                individual_tracks,
+                sex=DSex.MALE,
+                deer_species=Species.RED_DEER,
+            )
+            male_red_deer_tracks_wallowing = get_tracks_from_activity(
+                male_red_deer_tracks, activity_name=Activity.MARKING_OR_WALLOWING
+            )
+            for track in male_red_deer_tracks_wallowing:
+                for ref_track in individual_tracks_ref:
+                    ref_sequence = get_action_sequences_from_tracks([ref_track])
+                    if check_track_contains_continuous_sequence(track, ref_sequence[0]):
+                        return True
+            return False
+
+        return check_file
+    elif (
+        prompt
+        == "A male adult red deer doing the same unique actions while wallowing as any individual of <vid>S3_C3_E524_V0327.mp4</vid>."
+    ):
+
+        def check_file(json_file):
+            video_ref = "S3_C3_E524_V0327.mp4"
+            individual_tracks_ref = get_video_ref_tracks(video_ref)
+            individual_tracks = get_tracks_from_json(json_file)
+            male_red_deer_tracks = get_adult_deer_tracks_from_sex(
+                individual_tracks,
+                sex=DSex.MALE,
+                deer_species=Species.RED_DEER,
+            )
+            male_red_deer_tracks_ref = get_adult_deer_tracks_from_sex(
+                individual_tracks_ref,
+                sex=DSex.MALE,
+                deer_species=Species.RED_DEER,
+            )
+            male_red_deer_tracks_wallowing = get_tracks_from_activity(
+                male_red_deer_tracks, activity_name=Activity.MARKING_OR_WALLOWING
+            )
+            male_red_deer_tracks_wallowing_ref = get_tracks_from_activity(
+                male_red_deer_tracks_ref, activity_name=Activity.MARKING_OR_WALLOWING
+            )
+            for track in male_red_deer_tracks_wallowing:
+                for ref_track in male_red_deer_tracks_wallowing_ref:
+                    ref_actions = get_unique_actions_from_tracks([ref_track])
+                    track_actions = get_unique_actions_from_tracks([track])
+                    if ref_actions.issubset(track_actions):
+                        return True
+            return False
+
+        return check_file
+    elif (
+        prompt
+        == "A male adult red deer doing the same unique actions while wallowing as any individual of <vid>S3_C2_E524_V0087.mp4</vid>."
+    ):
+
+        def check_file(json_file):
+            video_ref = "S3_C2_E524_V0087.mp4"
+            individual_tracks_ref = get_video_ref_tracks(video_ref)
+            individual_tracks = get_tracks_from_json(json_file)
+            male_red_deer_tracks = get_adult_deer_tracks_from_sex(
+                individual_tracks,
+                sex=DSex.MALE,
+                deer_species=Species.RED_DEER,
+            )
+            male_red_deer_tracks_ref = get_adult_deer_tracks_from_sex(
+                individual_tracks_ref,
+                sex=DSex.MALE,
+                deer_species=Species.RED_DEER,
+            )
+            male_red_deer_tracks_wallowing = get_tracks_from_activity(
+                male_red_deer_tracks, activity_name=Activity.MARKING_OR_WALLOWING
+            )
+            male_red_deer_tracks_wallowing_ref = get_tracks_from_activity(
+                male_red_deer_tracks_ref, activity_name=Activity.MARKING_OR_WALLOWING
+            )
+            for track in male_red_deer_tracks_wallowing:
+                for ref_track in male_red_deer_tracks_wallowing_ref:
+                    ref_actions = get_unique_actions_from_tracks([ref_track])
+                    track_actions = get_unique_actions_from_tracks([track])
+                    if ref_actions.issubset(track_actions):
+                        return True
+            return False
+
+        return check_file
+    elif (
+        prompt
+        == "A male adult red deer doing different actions while wallowing than any individual of <vid>S3_C3_E524_V0327.mp4</vid>."
+    ):
+
+        def check_file(json_file):
+            video_ref = "S3_C3_E524_V0327.mp4"
+            individual_tracks_ref = get_video_ref_tracks(video_ref)
+            individual_tracks = get_tracks_from_json(json_file)
+            male_red_deer_tracks = get_adult_deer_tracks_from_sex(
+                individual_tracks,
+                sex=DSex.MALE,
+                deer_species=Species.RED_DEER,
+            )
+            male_red_deer_tracks_ref = get_adult_deer_tracks_from_sex(
+                individual_tracks_ref,
+                sex=DSex.MALE,
+                deer_species=Species.RED_DEER,
+            )
+            male_red_deer_tracks_wallowing = get_tracks_from_activity(
+                male_red_deer_tracks, activity_name=Activity.MARKING_OR_WALLOWING
+            )
+            male_red_deer_tracks_wallowing_ref = get_tracks_from_activity(
+                male_red_deer_tracks_ref, activity_name=Activity.MARKING_OR_WALLOWING
+            )
+            for track in male_red_deer_tracks_wallowing:
+                for ref_track in male_red_deer_tracks_wallowing_ref:
+                    ref_actions = get_unique_actions_from_tracks([ref_track])
+                    track_actions = get_unique_actions_from_tracks([track])
+                    if len(ref_actions.intersection(track_actions)) == 0:
+                        return True
+            return False
+
+        return check_file
+
+    elif (
+        prompt
+        == "A juvenile red deer doing the same sequence of actions while nursing as any individual of <vid>S1_C6_F394_V0310.mp4</vid>."
+    ):
+
+        def check_file(json_file):
+            video_ref = "S1_C6_F394_V0310.mp4"
+            individual_tracks_ref = get_video_ref_tracks(video_ref)
+            individual_tracks = get_tracks_from_json(json_file)
+            juvenile_red_deer_tracks = get_deer_tracks_from_age(
+                individual_tracks,
+                age=DAge.JUVENILE,
+                deer_species=Species.RED_DEER,
+            )
+            juvenile_red_deer_tracks_ref = get_deer_tracks_from_age(
+                individual_tracks_ref,
+                age=DAge.JUVENILE,
+                deer_species=Species.RED_DEER,
+            )
+            juvenile_red_deer_tracks_nursing = get_tracks_from_activity(
+                juvenile_red_deer_tracks, activity_name=Activity.NURSING
+            )
+            juvenile_red_deer_tracks_nursing_ref = get_tracks_from_activity(
+                juvenile_red_deer_tracks_ref, activity_name=Activity.NURSING
+            )
+            for track in juvenile_red_deer_tracks_nursing:
+                for ref_track in juvenile_red_deer_tracks_nursing_ref:
+                    ref_sequence = get_action_sequences_from_tracks([ref_track])
+                    if check_track_contains_continuous_sequence(track, ref_sequence[0]):
+                        return True
+            return False
+
+        return check_file
+    elif (
+        prompt
+        == "A juvenile red deer doing the same sequence of actions while nursing as any individual of <vid>S1_C6_F404_V0330.mp4</vid>."
+    ):
+
+        def check_file(json_file):
+            video_ref = "S1_C6_F404_V0330.mp4"
+            individual_tracks_ref = get_video_ref_tracks(video_ref)
+            individual_tracks = get_tracks_from_json(json_file)
+            juvenile_red_deer_tracks = get_deer_tracks_from_age(
+                individual_tracks,
+                age=DAge.JUVENILE,
+                deer_species=Species.RED_DEER,
+            )
+            juvenile_red_deer_tracks_ref = get_deer_tracks_from_age(
+                individual_tracks_ref,
+                age=DAge.JUVENILE,
+                deer_species=Species.RED_DEER,
+            )
+            juvenile_red_deer_tracks_nursing = get_tracks_from_activity(
+                juvenile_red_deer_tracks, activity_name=Activity.NURSING
+            )
+            juvenile_red_deer_tracks_nursing_ref = get_tracks_from_activity(
+                juvenile_red_deer_tracks_ref, activity_name=Activity.NURSING
+            )
+            for track in juvenile_red_deer_tracks_nursing:
+                for ref_track in juvenile_red_deer_tracks_nursing_ref:
+                    ref_sequence = get_action_sequences_from_tracks([ref_track])
+                    if check_track_contains_continuous_sequence(track, ref_sequence[0]):
+                        return True
+            return False
+
+        return check_file
+    elif (
+        prompt
+        == "A juvenile red deer doing the same unique actions while nursing as any individual of <vid>S1_C6_F404_V0330.mp4</vid>."
+    ):
+
+        def check_file(json_file):
+            video_ref = "S1_C6_F404_V0330.mp4"
+            individual_tracks_ref = get_video_ref_tracks(video_ref)
+            individual_tracks = get_tracks_from_json(json_file)
+            juvenile_red_deer_tracks = get_deer_tracks_from_age(
+                individual_tracks,
+                age=DAge.JUVENILE,
+                deer_species=Species.RED_DEER,
+            )
+            juvenile_red_deer_tracks_ref = get_deer_tracks_from_age(
+                individual_tracks_ref,
+                age=DAge.JUVENILE,
+                deer_species=Species.RED_DEER,
+            )
+            juvenile_red_deer_tracks_nursing = get_tracks_from_activity(
+                juvenile_red_deer_tracks, activity_name=Activity.NURSING
+            )
+            juvenile_red_deer_tracks_nursing_ref = get_tracks_from_activity(
+                juvenile_red_deer_tracks_ref, activity_name=Activity.NURSING
+            )
+            for track in juvenile_red_deer_tracks_nursing:
+                for ref_track in juvenile_red_deer_tracks_nursing_ref:
+                    ref_actions = get_unique_actions_from_tracks([ref_track])
+                    track_actions = get_unique_actions_from_tracks([track])
+                    if ref_actions.issubset(track_actions):
+                        return True
+            return False
+
+        return check_file
+    elif (
+        prompt
+        == "A juvenile red deer doing the same unique actions while nursing as any individual of <vid>S1_C6_F394_V0310.mp4</vid>."
+    ):
+
+        def check_file(json_file):
+            video_ref = "S1_C6_F394_V0310.mp4"
+            individual_tracks_ref = get_video_ref_tracks(video_ref)
+            individual_tracks = get_tracks_from_json(json_file)
+            juvenile_red_deer_tracks = get_deer_tracks_from_age(
+                individual_tracks,
+                age=DAge.JUVENILE,
+                deer_species=Species.RED_DEER,
+            )
+            juvenile_red_deer_tracks_ref = get_deer_tracks_from_age(
+                individual_tracks_ref,
+                age=DAge.JUVENILE,
+                deer_species=Species.RED_DEER,
+            )
+            juvenile_red_deer_tracks_nursing = get_tracks_from_activity(
+                juvenile_red_deer_tracks, activity_name=Activity.NURSING
+            )
+            juvenile_red_deer_tracks_nursing_ref = get_tracks_from_activity(
+                juvenile_red_deer_tracks_ref, activity_name=Activity.NURSING
+            )
+            for track in juvenile_red_deer_tracks_nursing:
+                for ref_track in juvenile_red_deer_tracks_nursing_ref:
+                    ref_actions = get_unique_actions_from_tracks([ref_track])
+                    track_actions = get_unique_actions_from_tracks([track])
+                    if ref_actions.issubset(track_actions):
+                        return True
+            return False
+
+        return check_file
+    elif (
+        prompt
+        == "A juvenile red deer doing different actions while nursing than any individual of <vid>S1_C6_F404_V0330.mp4</vid>."
+    ):
+
+        def check_file(json_file):
+            video_ref = "S1_C6_F404_V0330.mp4"
+            individual_tracks_ref = get_video_ref_tracks(video_ref)
+            individual_tracks = get_tracks_from_json(json_file)
+            juvenile_red_deer_tracks = get_deer_tracks_from_age(
+                individual_tracks,
+                age=DAge.JUVENILE,
+                deer_species=Species.RED_DEER,
+            )
+            juvenile_red_deer_tracks_ref = get_deer_tracks_from_age(
+                individual_tracks_ref,
+                age=DAge.JUVENILE,
+                deer_species=Species.RED_DEER,
+            )
+            juvenile_red_deer_tracks_nursing = get_tracks_from_activity(
+                juvenile_red_deer_tracks, activity_name=Activity.NURSING
+            )
+            juvenile_red_deer_tracks_nursing_ref = get_tracks_from_activity(
+                juvenile_red_deer_tracks_ref, activity_name=Activity.NURSING
+            )
+            for track in juvenile_red_deer_tracks_nursing:
+                for ref_track in juvenile_red_deer_tracks_nursing_ref:
+                    ref_actions = get_unique_actions_from_tracks([ref_track])
+                    track_actions = get_unique_actions_from_tracks([track])
+                    if len(ref_actions.intersection(track_actions)) == 0:
+                        return True
+            return False
+
+        return check_file
+    elif (
+        prompt
+        == "An individual doing the same sequence of actions while reacting to the camera as any individual of <vid>S1_C4_F173_V0137.mp4</vid>."
+    ):
+
+        def check_file(json_file):
+            video_ref = "S1_C4_F173_V0137.mp4"
+            individual_tracks_ref = get_video_ref_tracks(video_ref)
+            individual_tracks = get_tracks_from_json(json_file)
+            camera_reaction_tracks = get_tracks_from_activity(
+                individual_tracks, activity_name=Activity.CAMERA_REACTION
+            )
+            camera_reaction_tracks_ref = get_tracks_from_activity(
+                individual_tracks_ref, activity_name=Activity.CAMERA_REACTION
+            )
+            for track in camera_reaction_tracks:
+                for ref_track in camera_reaction_tracks_ref:
+                    ref_sequences = get_action_sequences_from_tracks([ref_track])
+                    if check_track_contains_continuous_sequence(
+                        track, ref_sequences[0]
+                    ):
+                        return True
+            return False
+
+        return check_file
+    elif (
+        prompt
+        == "An individual doing the same unique actions while reacting to the camera as any individual of <vid>S1_C2_E8_V0021.mp4</vid>."
+    ):
+
+        def check_file(json_file):
+            video_ref = "S1_C2_E8_V0021.mp4"
+            individual_tracks_ref = get_video_ref_tracks(video_ref)
+            individual_tracks = get_tracks_from_json(json_file)
+            camera_reaction_tracks = get_tracks_from_activity(
+                individual_tracks, activity_name=Activity.CAMERA_REACTION
+            )
+            camera_reaction_tracks_ref = get_tracks_from_activity(
+                individual_tracks_ref, activity_name=Activity.CAMERA_REACTION
+            )
+            for track in camera_reaction_tracks:
+                for ref_track in camera_reaction_tracks_ref:
+                    ref_actions = get_unique_actions_from_tracks([ref_track])
+                    track_actions = get_unique_actions_from_tracks([track])
+                    if ref_actions.issubset(track_actions):
+                        return True
+            return False
+
+        return check_file
+    elif (
+        prompt
+        == "An individual doing different actions while reacting to the camera than any individual of <vid>S1_C2_E8_V0021.mp4</vid>."
+    ):
+
+        def check_file(json_file):
+            video_ref = "S1_C2_E8_V0021.mp4"
+            individual_tracks_ref = get_video_ref_tracks(video_ref)
+            individual_tracks = get_tracks_from_json(json_file)
+            camera_reaction_tracks = get_tracks_from_activity(
+                individual_tracks, activity_name=Activity.CAMERA_REACTION
+            )
+            camera_reaction_tracks_ref = get_tracks_from_activity(
+                individual_tracks_ref, activity_name=Activity.CAMERA_REACTION
+            )
+            for track in camera_reaction_tracks:
+                track_actions = get_unique_actions_from_tracks([track])
+                for ref_track in camera_reaction_tracks_ref:
+                    ref_actions = get_unique_actions_from_tracks([ref_track])
+                    if len(ref_actions.intersection(track_actions)) == 0:
+                        return True
+            return False
+
+        return check_file
+    elif (
+        prompt
+        == "An animal being in vigilance in a different weather condition than in <vid>S2_C2_F536_V0066.mp4</vid>."
+    ):
+
+        def check_file(json_file):
+            video_ref = "S2_C2_F536_V0066.mp4"
+            individual_tracks = get_tracks_from_json(json_file)
+            vigilance_tracks = get_tracks_from_activity(
+                individual_tracks, activity_name=Activity.VIGILANCE
+            )
+            individual_tracks_ref = get_video_ref_tracks(video_ref)
+            vigilance_tracks_ref = get_tracks_from_activity(
+                individual_tracks_ref, activity_name=Activity.VIGILANCE
+            )
+            weather_condition = get_weather_conditions_from_videos(json_file)
+            weather_condition_ref = get_weather_conditions_from_video_ref(video_ref)
+            if len(vigilance_tracks) > 0 and len(vigilance_tracks_ref) > 0:
+                return weather_condition != weather_condition_ref
+            return False
+
+        return check_file
+    elif (
+        prompt
+        == "A wolf chasing in a different weather condition than in <vid>S2_C1_F573_V0093.mp4</vid>."
+    ):
+
+        def check_file(json_file):
+            video_ref = "S2_C1_F573_V0093.mp4"
+            individual_tracks = get_tracks_from_json(json_file)
+            wolf_tracks = get_tracks_from_species(individual_tracks, Species.WOLF)
+            wolf_chasing_tracks = get_tracks_from_activity(
+                wolf_tracks, activity_name=Activity.CHASING
+            )
+            if len(wolf_chasing_tracks) == 0:
+                return False
+            weather_condition = get_weather_conditions_from_videos(json_file)
+            weather_condition_ref = get_weather_conditions_from_video_ref(video_ref)
+            return weather_condition != weather_condition_ref
+
+        return check_file
+    elif (
+        prompt
+        == "An individual sharing at least one activity with any individual from <vid>S3_C2_E706_V0214.mp4</vid>."
+    ):
+
+        def check_file(json_file):
+            video_ref = "S3_C2_E706_V0214.mp4"
+            if not video_ref:
+                return False
+            individual_tracks_ref = get_video_ref_tracks(video_ref)
+            individual_tracks = get_tracks_from_json(json_file)
+            for track in individual_tracks:
+                track_activities = get_unique_activities_from_tracks([track])
+                for ref_track in individual_tracks_ref:
+                    ref_track_activities = get_unique_activities_from_tracks(
+                        [ref_track]
+                    )
+                    if len(track_activities.intersection(ref_track_activities)) > 0:
+                        return True
+            return False
+
+        return check_file
+    elif (
+        prompt
+        == "An individual sharing at least one activity with any individual from <vid>S3_C2_E670_V0159.mp4</vid> but in a different weather condition."
+    ):
+
+        def check_file(json_file):
+            video_ref = "S3_C2_E670_V0159.mp4"
+            individual_tracks_ref = get_video_ref_tracks(video_ref)
+            individual_tracks = get_tracks_from_json(json_file)
+            weather_condition = get_weather_conditions_from_videos(json_file)
+            weather_condition_ref = get_weather_conditions_from_video_ref(video_ref)
+            for track in individual_tracks:
+                track_activities = get_unique_activities_from_tracks([track])
+                for ref_track in individual_tracks_ref:
+                    ref_track_activities = get_unique_activities_from_tracks(
+                        [ref_track]
+                    )
+                    if (
+                        len(track_activities.intersection(ref_track_activities)) > 0
+                        and weather_condition != weather_condition_ref
+                    ):
+                        return True
+            return False
+
+        return check_file
 
     elif prompt == "An empty video.":
 
@@ -1846,7 +2345,7 @@ if __name__ == "__main__":
     args = parser.parse_args()
     json_folder = Path(args.json_folder)
 
-    with open("benchmark/queries_and_videos_empty_check.json", "r") as f:
+    with open("benchmark/queries_and_videos_empty.json", "r") as f:
         queries_dict = json.load(f)
 
     # Initialize output dict with empty lists for each query
@@ -1877,5 +2376,5 @@ if __name__ == "__main__":
         for q in queries_dict[q_cat]:
             print(q, ":", len(out_queries_dict[q_cat][q]), "videos")
 
-    with open("benchmark/queries_and_videos_check_test.json", "w") as f:
+    with open("benchmark/queries_and_videos.json", "w") as f:
         json.dump(out_queries_dict, f, indent=2)

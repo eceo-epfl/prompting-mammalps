@@ -757,6 +757,78 @@ def check_contains_weather_condition(
     return video_weather == weather_condition
 
 
+def get_weather_conditions_from_video_ref(
+    video_name: Union[Path, str],
+    json_folder: Union[
+        Path, str
+    ] = "/media/EVO870/datasets/prompting-mammalps/annotations/test",
+) -> Meteo:
+    """Retrieve weather from reference video info attributes weather conditions
+    Args:
+        video_name (Union[Path, str]): The name of the reference video.
+        json_folder (Union[Path, str]): The folder containing the JSON files.
+    Returns:
+        Meteo: The weather condition of the reference video.
+    """
+    json_name = video_name.split(".")[0] + ".json"
+    site = json_name.split("_")[0]
+    cam = json_name.split("_")[1]
+    json_file_path = Path(json_folder) / site / cam / json_name
+    return get_weather_conditions_from_videos(json_file_path)
+
+
+## video comparison functions
+def get_video_ref_tracks(
+    video_name: Union[Path, str],
+    json_folder: Union[
+        Path, str
+    ] = "/media/EVO870/datasets/prompting-mammalps/annotations/test",
+) -> Dict:
+    json_name = video_name.split(".")[0] + ".json"
+    site = json_name.split("_")[0]
+    cam = json_name.split("_")[1]
+    json_file_path = Path(json_folder) / site / cam / json_name
+    video_detections = load_video_detections(json_file_path)
+    individual_tracks = get_tracks_from_video_detections(video_detections)
+    return individual_tracks
+
+
+def get_action_sequences_from_tracks(
+    individual_tracks: List[IndividualTrack],
+) -> set:
+    """
+    Returns the set of unique action sequences present in the individual tracks
+
+    Args:
+        individual_tracks (List[IndividualTrack]): List of individual tracks, each organized by segments.
+
+    Returns:
+        set: the unique action sequences present in the individual tracks
+    """
+    action_sequence_tracks = []
+    for track in individual_tracks:
+        track_actions = []
+        for segment in track:
+            if "attributes" in segment[0]:
+                if "Action" in segment[0]["attributes"]:
+                    if (
+                        len(track_actions) == 0
+                        or track_actions[-1] != segment[0]["attributes"]["Action"]
+                    ):
+                        track_actions.append(segment[0]["attributes"]["Action"])
+                if (
+                    "Action2" in segment[0]["attributes"]
+                    and segment[0]["attributes"]["Action2"] != "none"
+                ):
+                    if (
+                        len(track_actions) == 0
+                        or track_actions[-1] != segment[0]["attributes"]["Action2"]
+                    ):
+                        track_actions.append(segment[0]["attributes"]["Action2"])
+        action_sequence_tracks.append(track_actions)
+    return action_sequence_tracks
+
+
 ## Attributes and location
 def get_tracks_overlapping_point(
     individual_tracks: List[IndividualTrack], point: Point
