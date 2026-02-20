@@ -732,19 +732,22 @@ def check_track_contains_continuous_sequence(
 
 
 ## Weather and time attributes
-def get_weather_conditions_from_videos(json_file: Union[Path, str]) -> Meteo:
+def get_weather_conditions_from_videos(video_id: Union[Path, str]) -> Meteo:
     """Retrieve weather from video info attributes weather conditions
     Args:
-        json_file (Union[Path, str]): The path to the JSON file.
+        video_id (Union[Path, str]): The ID of the video.
     Returns:
         Meteo: The weather condition of the video.
     """
-    video_info = load_video_info(json_file)
+    json_folder = Path("/media/EVO870/datasets/prompting-mammalps/annotations/test")
+    video_id_str = str(video_id)
+    json_file_path = str(next(json_folder.rglob(f"*/{video_id_str}.json")))
+    video_info = load_video_info(json_file_path)
     return video_info["attributes"]["weather"]
 
 
 def check_contains_weather_condition(
-    json_file: Union[Path, str], weather_condition: Meteo
+    video_id: Union[Path, str], weather_condition: Meteo
 ) -> bool:
     """Check if the video contains the specified weather condition
     Args:
@@ -753,28 +756,8 @@ def check_contains_weather_condition(
     Returns:
         bool: True if the video contains the specified weather condition, False otherwise.
     """
-    video_weather = get_weather_conditions_from_videos(json_file)
+    video_weather = get_weather_conditions_from_videos(video_id)
     return video_weather == weather_condition
-
-
-def get_weather_conditions_from_video_ref(
-    video_name: Union[Path, str],
-    json_folder: Union[
-        Path, str
-    ] = "/media/EVO870/datasets/prompting-mammalps/annotations/test",
-) -> Meteo:
-    """Retrieve weather from reference video info attributes weather conditions
-    Args:
-        video_name (Union[Path, str]): The name of the reference video.
-        json_folder (Union[Path, str]): The folder containing the JSON files.
-    Returns:
-        Meteo: The weather condition of the reference video.
-    """
-    json_name = video_name.split(".")[0] + ".json"
-    site = json_name.split("_")[0]
-    cam = json_name.split("_")[1]
-    json_file_path = Path(json_folder) / site / cam / json_name
-    return get_weather_conditions_from_videos(json_file_path)
 
 
 ## video comparison functions
@@ -791,16 +774,12 @@ def get_video_ref_from_prompt(prompt):
     return video_name
 
 
-def get_video_ref_tracks(
-    video_name: Union[Path, str],
-    json_folder: Union[
-        Path, str
-    ] = "/media/EVO870/datasets/prompting-mammalps/annotations/test",
+def get_tracks_from_json(
+    video_id: Union[Path, str],
 ) -> Dict:
-    json_name = video_name.split(".")[0] + ".json"
-    site = json_name.split("_")[0]
-    cam = json_name.split("_")[1]
-    json_file_path = Path(json_folder) / site / cam / json_name
+    json_folder = Path("/media/EVO870/datasets/prompting-mammalps/annotations/test")
+    video_id_str = str(video_id)
+    json_file_path = str(next(json_folder.rglob(f"*/{video_id_str}.json")))
     video_detections = load_video_detections(json_file_path)
     individual_tracks = get_tracks_from_video_detections(video_detections)
     return individual_tracks
