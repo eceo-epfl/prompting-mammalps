@@ -86,6 +86,10 @@ class Meteo(StrEnum):
     RAINY = "rainy"
 
 
+# Global variable for JSON annotations folder
+JSON_FOLDER = Path("/media/EVO870/datasets/prompting-mammalps/annotations/test")
+
+
 ### Basic functions
 def load_video_detections(json_file: Union[Path, str]) -> VideoDict:
     """
@@ -739,9 +743,8 @@ def get_weather_conditions_from_videos(video_id: Union[Path, str]) -> Meteo:
     Returns:
         Meteo: The weather condition of the video.
     """
-    json_folder = Path("/media/EVO870/datasets/prompting-mammalps/annotations/test")
     video_id_str = str(video_id)
-    json_file_path = str(next(json_folder.rglob(f"*/{video_id_str}.json")))
+    json_file_path = str(next(JSON_FOLDER.rglob(f"*/{video_id_str}.json")))
     video_info = load_video_info(json_file_path)
     return video_info["attributes"]["weather"]
 
@@ -761,25 +764,11 @@ def check_contains_weather_condition(
 
 
 ## video comparison functions
-def get_video_ref_from_prompt(prompt):
-    """Extracts the reference video name from the prompt
-    Args:
-        prompt (str): The input prompt containing the reference video name in the format <vid>video_name</vid>
-    Returns:
-        str: The extracted reference video name
-    """
-    start = prompt.find("<vid>") + len("<vid>")
-    end = prompt.find("</vid>")
-    video_name = prompt[start:end]
-    return video_name
-
-
 def get_tracks_from_json(
     video_id: Union[Path, str],
 ) -> Dict:
-    json_folder = Path("/media/EVO870/datasets/prompting-mammalps/annotations/test")
     video_id_str = str(video_id)
-    json_file_path = str(next(json_folder.rglob(f"*/{video_id_str}.json")))
+    json_file_path = str(next(JSON_FOLDER.rglob(f"*/{video_id_str}.json")))
     video_detections = load_video_detections(json_file_path)
     individual_tracks = get_tracks_from_video_detections(video_detections)
     return individual_tracks
