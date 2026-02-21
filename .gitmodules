@@ -1,4 +1,10 @@
 [submodule "models/salma"]
 	path = models/salma
 	url = git@github.com:amathislab/VideoMAEdev.git
-	branch = inference_code
+	branch = salma
+[submodule "models/CLIP4Clip"]
+	path = models/CLIP4Clip
+	url = https://github.com/ArrowLuo/CLIP4Clip.git
+[submodule "models/GRAM"]
+	path = models/GRAM
+	url = https://github.com/ispamm/GRAM.git

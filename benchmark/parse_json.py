@@ -86,6 +86,10 @@ class Meteo(StrEnum):
     RAINY = "rainy"
 
 
+# Global variable for JSON annotations folder
+JSON_FOLDER = Path("/media/EVO870/datasets/prompting-mammalps/annotations/test")
+
+
 ### Basic functions
 def load_video_detections(json_file: Union[Path, str]) -> VideoDict:
     """
@@ -732,19 +736,21 @@ def check_track_contains_continuous_sequence(
 
 
 ## Weather and time attributes
-def get_weather_conditions_from_videos(json_file: Union[Path, str]) -> Meteo:
+def get_weather_conditions_from_videos(video_id: Union[Path, str]) -> Meteo:
     """Retrieve weather from video info attributes weather conditions
     Args:
-        json_file (Union[Path, str]): The path to the JSON file.
+        video_id (Union[Path, str]): The ID of the video.
     Returns:
         Meteo: The weather condition of the video.
     """
-    video_info = load_video_info(json_file)
+    video_id_str = str(video_id)
+    json_file_path = str(next(JSON_FOLDER.rglob(f"*/{video_id_str}.json")))
+    video_info = load_video_info(json_file_path)
     return video_info["attributes"]["weather"]
 
 
 def check_contains_weather_condition(
-    json_file: Union[Path, str], weather_condition: Meteo
+    video_id: Union[Path, str], weather_condition: Meteo
 ) -> bool:
     """Check if the video contains the specified weather condition
     Args:
@@ -753,8 +759,55 @@ def check_contains_weather_condition(
     Returns:
         bool: True if the video contains the specified weather condition, False otherwise.
     """
-    video_weather = get_weather_conditions_from_videos(json_file)
+    video_weather = get_weather_conditions_from_videos(video_id)
     return video_weather == weather_condition
+
+
+## video comparison functions
+def get_tracks_from_json(
+    video_id: Union[Path, str],
+) -> Dict:
+    video_id_str = str(video_id)
+    json_file_path = str(next(JSON_FOLDER.rglob(f"*/{video_id_str}.json")))
+    video_detections = load_video_detections(json_file_path)
+    individual_tracks = get_tracks_from_video_detections(video_detections)
+    return individual_tracks
+
+
+def get_action_sequences_from_tracks(
+    individual_tracks: List[IndividualTrack],
+) -> set:
+    """
+    Returns the set of unique action sequences present in the individual tracks
+
+    Args:
+        individual_tracks (List[IndividualTrack]): List of individual tracks, each organized by segments.
+
+    Returns:
+        set: the unique action sequences present in the individual tracks
+    """
+    action_sequence_tracks = []
+    for track in individual_tracks:
+        track_actions = []
+        for segment in track:
+            if "attributes" in segment[0]:
+                if "Action" in segment[0]["attributes"]:
+                    if (
+                        len(track_actions) == 0
+                        or track_actions[-1] != segment[0]["attributes"]["Action"]
+                    ):
+                        track_actions.append(segment[0]["attributes"]["Action"])
+                if (
+                    "Action2" in segment[0]["attributes"]
+                    and segment[0]["attributes"]["Action2"] != "none"
+                ):
+                    if (
+                        len(track_actions) == 0
+                        or track_actions[-1] != segment[0]["attributes"]["Action2"]
+                    ):
+                        track_actions.append(segment[0]["attributes"]["Action2"])
+        action_sequence_tracks.append(track_actions)
+    return action_sequence_tracks
 
 
 ## Attributes and location
