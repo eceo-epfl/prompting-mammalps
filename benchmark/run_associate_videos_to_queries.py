@@ -1845,6 +1845,13 @@ if __name__ == "__main__":
         required=True,
         help="Path to the folder containing JSON annotation files.",
     )
+    parser.add_argument(
+        "-OJ",
+        "--output_json_file",
+        type=str,
+        default="./queries_and_videos.json",
+        help="Path to the output dictionnary containing association results.",
+    )
     args = parser.parse_args()
     json_folder = Path(args.json_folder)
 
@@ -1879,5 +1886,5 @@ if __name__ == "__main__":
         for q in queries_dict[q_cat]:
             print(q, ":", len(out_queries_dict[q_cat][q]), "videos")
 
-    with open("queries_and_videos.json", "w") as f:
+    with open(args.output_json_file, "w") as f:
         json.dump(out_queries_dict, f, indent=2)
