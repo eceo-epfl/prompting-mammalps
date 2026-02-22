@@ -5,6 +5,7 @@ import yaml
 import logging
 import inspect
 import ast
+import os
 
 import yaml
 from parse_json_tools import (
@@ -29,9 +30,15 @@ from parse_json_tools import (
     get_unique_activities_from_tracks,
     check_track_contains_continuous_sequence,
     check_contains_weather_condition,
-    Species, Action, Activity, DAge, DSex, Meteo
+    Species,
+    Action,
+    Activity,
+    DAge,
+    DSex,
+    Meteo,
 )
 from smolagents import CodeAgent, PromptTemplates, TransformersModel
+
 
 def main(args):
     tools = [
@@ -55,7 +62,7 @@ def main(args):
         get_unique_actions_from_tracks,
         get_unique_activities_from_tracks,
         check_track_contains_continuous_sequence,
-        check_contains_weather_condition
+        check_contains_weather_condition,
     ]
 
     with open("prompt.yaml", "r") as f:
@@ -64,39 +71,62 @@ def main(args):
     prompt_templates = PromptTemplates(prompts)
 
     # Load model and code agent
-    model_id = "meta-llama/Meta-Llama-3.1-8B-Instruct"
+    model_id = "Qwen/Qwen3-8B"  # "Qwen/Qwen3-Coder-Next"  # "meta-llama/Meta-Llama-3.1-8B-Instruct"
     model = TransformersModel(model_id, device_map="cuda", max_new_tokens=8096)
-    agent = CodeAgent(tools=tools, model=model, prompt_templates=prompt_templates, max_print_outputs_length=500)
+    agent = CodeAgent(
+        tools=tools,
+        model=model,
+        prompt_templates=prompt_templates,
+        max_print_outputs_length=500,
+    )
 
-    agent.python_executor.send_variables({"Species": Species, 
-                                          "Activity": Activity,
-                                          "Action": Action, 
-                                          "DAge": DAge, 
-                                          "DSex": DSex, 
-                                          "Meteo": Meteo})
+    agent.python_executor.send_variables(
+        {
+            "Species": Species,
+            "Activity": Activity,
+            "Action": Action,
+            "DAge": DAge,
+            "DSex": DSex,
+            "Meteo": Meteo,
+        }
+    )
 
+    os.makedirs(args.output_folder, exist_ok=True)
     # Logger
-    output_log = Path(args.output_folder) / "process.log"
-    logging.basicConfig(filename=output_log, filemode="w", 
-                                 format='%(asctime)s,%(msecs)03d %(name)s %(levelname)s %(message)s',
-                                datefmt='%Y-%m-%d %H:%M:%S',
-                                level=logging.INFO)
+    output_log = Path(args.output_folder) / (model_id.split("/")[1] + "_process.log")
+    logging.basicConfig(
+        filename=output_log,
+        filemode="w",
+        format="%(asctime)s,%(msecs)03d %(name)s %(levelname)s %(message)s",
+        datefmt="%Y-%m-%d %H:%M:%S",
+        level=logging.INFO,
+    )
     logger = logging.getLogger()
 
     # Load queries
     with open(args.input_queries_videos, "r") as f:
         queries_dict = json.load(f)
 
-    queries_list = [q for q_cat in queries_dict.values() for q in q_cat if "<vid>" not in q]
+    queries_list = [
+        q for q_cat in queries_dict.values() for q in q_cat if "<vid>" not in q
+    ]
     output_queries_functions = {}
     test_file = "./S1_C1_E16_V0040.json"
 
     # For every query
-    for query in queries_list[31:]:
+    for query in queries_list:  # [31:]:
         logger.info(f"Processing query {query}")
-        message = "Verify if the content of the file matches the following prompt (return True or False):" + f"'{query}'. Don't forget: always match elements from the prompt to the label space; save your implementation of the check_file function first as you will need it again."
-        agent.run(message, return_full_result=False, max_steps=10, additional_args={"json_file": test_file})
-        
+        message = (
+            "Verify if the content of the file matches the following prompt (return True or False):"
+            + f"'{query}'. Don't forget: always match elements from the prompt to the label space; save your implementation of the check_file function first as you will need it again."
+        )
+        agent.run(
+            message,
+            return_full_result=False,
+            max_steps=10,
+            additional_args={"json_file": test_file},
+        )
+
         # Get the function that was created and apply it to all files
         try:
             check_file = agent.python_executor.custom_tools["check_file"]
@@ -108,7 +138,9 @@ def main(args):
             logging.warning(e)
 
         # Save results at every step
-        output_json_file = Path(args.output_folder) / (model_id.split("/")[1] + "_generated_functions.json")
+        output_json_file = Path(args.output_folder) / (
+            model_id.split("/")[1] + "_generated_functions.json"
+        )
         with open(output_json_file, "w") as f:
             json.dump(output_queries_functions, f, indent=2)
 
