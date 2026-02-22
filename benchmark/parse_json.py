@@ -87,7 +87,9 @@ class Meteo(StrEnum):
 
 
 # Global variable for JSON annotations folder
-JSON_FOLDER = Path("/media/EVO870/datasets/prompting-mammalps/annotations/test")
+# Necessary to avoid passing this as parameter to functions
+# which could be changed by the code agent
+JSON_FOLDER = Path("/media/EVO870/datasets/prompting-mammalps/annotations")
 
 
 ### Basic functions
@@ -764,9 +766,9 @@ def check_contains_weather_condition(
 
 
 ## video comparison functions
-def get_tracks_from_json(
+def get_tracks_from_id(
     video_id: Union[Path, str],
-) -> Dict:
+) -> List[IndividualTrack]:
     video_id_str = str(video_id)
     json_file_path = str(next(JSON_FOLDER.rglob(f"*/{video_id_str}.json")))
     video_detections = load_video_detections(json_file_path)

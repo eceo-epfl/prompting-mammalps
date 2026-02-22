@@ -69,7 +69,7 @@ class MDVideoOutputParser:
                     results_df = pd.DataFrame.from_dict(file_results["frames"])
                     results_df["attributes.Weather"] = file_results["info"][
                         "attributes"
-                    ]["weather"]
+                    ].get("weather", None)
                     results_df["file_id"] = re.search(file_id_pattern, file).group(0)
                     results_df["detection_file_path"] = file_results[
                         "detection_file_path"

@@ -6,10 +6,10 @@ from tqdm import tqdm
 
 
 def get_parsing_function(prompt):
-    if prompt == "An animal doing any other activity than foraging.":
+    if prompt == "An animal engaged in any activity other than foraging.":
 
         def check_file(video_id):
-            individual_tracks = get_tracks_from_json(video_id)
+            individual_tracks = get_tracks_from_id(video_id)
             activities_set = get_unique_activities_from_tracks(individual_tracks)
             return activities_set != set([Activity.FORAGING])
 
@@ -18,7 +18,7 @@ def get_parsing_function(prompt):
     elif prompt == "An animal that is neither a red deer nor a roe deer.":
 
         def check_file(video_id):
-            individual_tracks = get_tracks_from_json(video_id)
+            individual_tracks = get_tracks_from_id(video_id)
             species_set = get_unique_species_from_tracks(individual_tracks)
             return len(species_set - set([Species.RED_DEER, Species.ROE_DEER])) > 0
 
@@ -27,7 +27,7 @@ def get_parsing_function(prompt):
     elif prompt == "An animal running.":
 
         def check_file(video_id):
-            individual_tracks = get_tracks_from_json(video_id)
+            individual_tracks = get_tracks_from_id(video_id)
             return tracks_contain_action(
                 individual_tracks, action_name=Action.TROTTING_OR_RUNNING
             )
@@ -37,7 +37,7 @@ def get_parsing_function(prompt):
     elif prompt == "An animal bathing.":
 
         def check_file(video_id):
-            individual_tracks = get_tracks_from_json(video_id)
+            individual_tracks = get_tracks_from_id(video_id)
             return tracks_contain_action(individual_tracks, action_name=Action.BATHING)
 
         return check_file
@@ -45,7 +45,7 @@ def get_parsing_function(prompt):
     elif prompt == "A roe deer grazing.":
 
         def check_file(video_id):
-            individual_tracks = get_tracks_from_json(video_id)
+            individual_tracks = get_tracks_from_id(video_id)
             roe_deer_tracks = get_tracks_from_species(
                 individual_tracks, species_name=Species.ROE_DEER
             )
@@ -56,15 +56,15 @@ def get_parsing_function(prompt):
     elif prompt == "An animal browsing.":
 
         def check_file(video_id):
-            individual_tracks = get_tracks_from_json(video_id)
+            individual_tracks = get_tracks_from_id(video_id)
             return tracks_contain_action(individual_tracks, action_name=Action.BROWSING)
 
         return check_file
 
-    elif prompt == "A female adult roe deer sniffing.":
+    elif prompt == "An adult female roe deer sniffing.":
 
         def check_file(video_id):
-            individual_tracks = get_tracks_from_json(video_id)
+            individual_tracks = get_tracks_from_id(video_id)
             female_roe_deer_tracks = get_adult_deer_tracks_from_sex(
                 individual_tracks,
                 sex=DSex.FEMALE,
@@ -79,7 +79,7 @@ def get_parsing_function(prompt):
     elif prompt == "A juvenile red deer scratching its body.":
 
         def check_file(video_id):
-            individual_tracks = get_tracks_from_json(video_id)
+            individual_tracks = get_tracks_from_id(video_id)
             juvenile_red_deer_tracks = get_deer_tracks_from_age(
                 individual_tracks,
                 age=DAge.JUVENILE,
@@ -95,7 +95,7 @@ def get_parsing_function(prompt):
     elif prompt == "A juvenile roe deer preparing to suckle.":
 
         def check_file(video_id):
-            individual_tracks = get_tracks_from_json(video_id)
+            individual_tracks = get_tracks_from_id(video_id)
             juvenile_roe_deer_tracks = get_deer_tracks_from_age(
                 individual_tracks,
                 age=DAge.JUVENILE,
@@ -111,7 +111,7 @@ def get_parsing_function(prompt):
     elif prompt == "A chamois resting.":
 
         def check_file(video_id):
-            individual_tracks = get_tracks_from_json(video_id)
+            individual_tracks = get_tracks_from_id(video_id)
             chamois_tracks = get_tracks_from_species(
                 individual_tracks, species_name=Species.CHAMOIS
             )
@@ -124,7 +124,7 @@ def get_parsing_function(prompt):
     elif prompt == "An adult red deer reacting to a camera.":
 
         def check_file(video_id):
-            individual_tracks = get_tracks_from_json(video_id)
+            individual_tracks = get_tracks_from_id(video_id)
             adult_red_deer_tracks = get_deer_tracks_from_age(
                 individual_tracks,
                 age=DAge.ADULT,
@@ -137,10 +137,10 @@ def get_parsing_function(prompt):
 
         return check_file
 
-    elif prompt == "A male adult roe deer jumping.":
+    elif prompt == "An adult male roe deer jumping.":
 
         def check_file(video_id):
-            individual_tracks = get_tracks_from_json(video_id)
+            individual_tracks = get_tracks_from_id(video_id)
             male_roe_deer_tracks = get_adult_deer_tracks_from_sex(
                 individual_tracks,
                 sex=DSex.MALE,
@@ -152,10 +152,10 @@ def get_parsing_function(prompt):
 
         return check_file
 
-    elif prompt == "A male adult red deer rubbing its antlers on the ground.":
+    elif prompt == "An adult male red deer rubbing its antlers on the ground.":
 
         def check_file(video_id):
-            individual_tracks = get_tracks_from_json(video_id)
+            individual_tracks = get_tracks_from_id(video_id)
             male_red_deer_tracks = get_adult_deer_tracks_from_sex(
                 individual_tracks,
                 sex=DSex.MALE,
@@ -169,11 +169,12 @@ def get_parsing_function(prompt):
         return check_file
 
     elif (
-        prompt == "An adult red deer standing head up while participating in courtship."
+        prompt
+        == "An adult red deer standing with its head up while participating in courtship."
     ):
 
         def check_file(video_id):
-            individual_tracks = get_tracks_from_json(video_id)
+            individual_tracks = get_tracks_from_id(video_id)
             individual_courtship = get_tracks_from_activity(
                 individual_tracks, activity_name=Activity.COURTSHIP
             )
@@ -191,7 +192,7 @@ def get_parsing_function(prompt):
     elif prompt == "An adult red deer vocalizing while participating in courtship.":
 
         def check_file(video_id):
-            individual_tracks = get_tracks_from_json(video_id)
+            individual_tracks = get_tracks_from_id(video_id)
             individual_courtship = get_tracks_from_activity(
                 individual_tracks, activity_name=Activity.COURTSHIP
             )
@@ -212,7 +213,7 @@ def get_parsing_function(prompt):
     ):
 
         def check_file(video_id):
-            individual_tracks = get_tracks_from_json(video_id)
+            individual_tracks = get_tracks_from_id(video_id)
             individual_courtship = get_tracks_from_activity(
                 individual_tracks, activity_name=Activity.COURTSHIP
             )
@@ -230,10 +231,10 @@ def get_parsing_function(prompt):
 
         return check_file
 
-    elif prompt == "An adult red deer laying down while participating in courtship.":
+    elif prompt == "An adult red deer lying down while participating in courtship.":
 
         def check_file(video_id):
-            individual_tracks = get_tracks_from_json(video_id)
+            individual_tracks = get_tracks_from_id(video_id)
             individual_courtship = get_tracks_from_activity(
                 individual_tracks, activity_name=Activity.COURTSHIP
             )
@@ -251,7 +252,7 @@ def get_parsing_function(prompt):
     elif prompt == "A video of three or more red deer.":
 
         def check_file(video_id):
-            individual_tracks = get_tracks_from_json(video_id)
+            individual_tracks = get_tracks_from_id(video_id)
             return (
                 get_nb_tracks_species_in_video(
                     individual_tracks, species_name=Species.RED_DEER
@@ -264,7 +265,7 @@ def get_parsing_function(prompt):
     elif prompt == "A video of two red deer.":
 
         def check_file(video_id):
-            individual_tracks = get_tracks_from_json(video_id)
+            individual_tracks = get_tracks_from_id(video_id)
             return (
                 get_nb_tracks_species_in_video(
                     individual_tracks, species_name=Species.RED_DEER
@@ -277,7 +278,7 @@ def get_parsing_function(prompt):
     elif prompt == "A video of three or more red deer reacting to a camera.":
 
         def check_file(video_id):
-            individual_tracks = get_tracks_from_json(video_id)
+            individual_tracks = get_tracks_from_id(video_id)
             red_deer_tracks = get_tracks_from_species(
                 individual_tracks, species_name=Species.RED_DEER
             )
@@ -293,7 +294,7 @@ def get_parsing_function(prompt):
     elif prompt == "A video of three or more red deer escaping.":
 
         def check_file(video_id):
-            individual_tracks = get_tracks_from_json(video_id)
+            individual_tracks = get_tracks_from_id(video_id)
             red_deer_tracks = get_tracks_from_species(
                 individual_tracks, species_name=Species.RED_DEER
             )
@@ -306,10 +307,10 @@ def get_parsing_function(prompt):
 
         return check_file
 
-    elif prompt == "A juvenile red deer walking while in vigilance.":
+    elif prompt == "A juvenile red deer walking while being vigilant.":
 
         def check_file(video_id):
-            individual_tracks = get_tracks_from_json(video_id)
+            individual_tracks = get_tracks_from_id(video_id)
             juvenile_red_deer_tracks = get_deer_tracks_from_age(
                 individual_tracks,
                 age=DAge.JUVENILE,
@@ -325,10 +326,10 @@ def get_parsing_function(prompt):
 
         return check_file
 
-    elif prompt == "A video of two female adult red deer walking while foraging.":
+    elif prompt == "A video of two adult female red deer walking while foraging.":
 
         def check_file(video_id):
-            individual_tracks = get_tracks_from_json(video_id)
+            individual_tracks = get_tracks_from_id(video_id)
             female_deer_tracks = get_adult_deer_tracks_from_sex(
                 individual_tracks,
                 sex=DSex.FEMALE,
@@ -347,11 +348,11 @@ def get_parsing_function(prompt):
         return check_file
 
     elif (
-        prompt == "A video of three or more male adult red deer walking while foraging."
+        prompt == "A video of three or more adult male red deer walking while foraging."
     ):
 
         def check_file(video_id):
-            individual_tracks = get_tracks_from_json(video_id)
+            individual_tracks = get_tracks_from_id(video_id)
             male_deer_tracks = get_adult_deer_tracks_from_sex(
                 individual_tracks,
                 sex=DSex.MALE,
@@ -372,7 +373,7 @@ def get_parsing_function(prompt):
     elif prompt == "An adult roe deer reacting to a camera.":
 
         def check_file(video_id):
-            individual_tracks = get_tracks_from_json(video_id)
+            individual_tracks = get_tracks_from_id(video_id)
             cam_reaction_tracks = get_tracks_from_activity(
                 individual_tracks, activity_name=Activity.CAMERA_REACTION
             )
@@ -387,7 +388,7 @@ def get_parsing_function(prompt):
     elif prompt == "A juvenile roe deer reacting to a camera.":
 
         def check_file(video_id):
-            individual_tracks = get_tracks_from_json(video_id)
+            individual_tracks = get_tracks_from_id(video_id)
             cam_reaction_tracks = get_tracks_from_activity(
                 individual_tracks, activity_name=Activity.CAMERA_REACTION
             )
@@ -399,10 +400,10 @@ def get_parsing_function(prompt):
 
         return check_file
 
-    elif prompt == "A male adult red deer reacting to a camera.":
+    elif prompt == "An adult male red deer reacting to a camera.":
 
         def check_file(video_id):
-            individual_tracks = get_tracks_from_json(video_id)
+            individual_tracks = get_tracks_from_id(video_id)
             cam_reaction_tracks = get_tracks_from_activity(
                 individual_tracks, activity_name=Activity.CAMERA_REACTION
             )
@@ -417,7 +418,7 @@ def get_parsing_function(prompt):
     elif prompt == "A juvenile red deer reacting to a camera.":
 
         def check_file(video_id):
-            individual_tracks = get_tracks_from_json(video_id)
+            individual_tracks = get_tracks_from_id(video_id)
             cam_reaction_tracks = get_tracks_from_activity(
                 individual_tracks, activity_name=Activity.CAMERA_REACTION
             )
@@ -429,10 +430,10 @@ def get_parsing_function(prompt):
 
         return check_file
 
-    elif prompt == "A female adult roe deer reacting to a camera.":
+    elif prompt == "An adult female roe deer reacting to a camera.":
 
         def check_file(video_id):
-            individual_tracks = get_tracks_from_json(video_id)
+            individual_tracks = get_tracks_from_id(video_id)
             cam_reaction_tracks = get_tracks_from_activity(
                 individual_tracks, activity_name=Activity.CAMERA_REACTION
             )
@@ -447,7 +448,7 @@ def get_parsing_function(prompt):
     elif prompt == "A video of two adult roe deer sniffing while reacting to a camera.":
 
         def check_file(video_id):
-            individual_tracks = get_tracks_from_json(video_id)
+            individual_tracks = get_tracks_from_id(video_id)
             cam_reaction_tracks = get_tracks_from_activity(
                 individual_tracks, activity_name=Activity.CAMERA_REACTION
             )
@@ -465,10 +466,10 @@ def get_parsing_function(prompt):
 
         return check_file
 
-    elif prompt == "A female adult red deer reacting to a camera.":
+    elif prompt == "An adult female red deer reacting to a camera.":
 
         def check_file(video_id):
-            individual_tracks = get_tracks_from_json(video_id)
+            individual_tracks = get_tracks_from_id(video_id)
             cam_reaction_tracks = get_tracks_from_activity(
                 individual_tracks, activity_name=Activity.CAMERA_REACTION
             )
@@ -483,7 +484,7 @@ def get_parsing_function(prompt):
     elif prompt == "An adult male red deer running while participating in courtship.":
 
         def check_file(video_id):
-            individual_tracks = get_tracks_from_json(video_id)
+            individual_tracks = get_tracks_from_id(video_id)
             male_red_deer_tracks = get_adult_deer_tracks_from_sex(
                 individual_tracks,
                 sex=DSex.MALE,
@@ -502,7 +503,7 @@ def get_parsing_function(prompt):
     elif prompt == "An adult female red deer running while participating in courtship.":
 
         def check_file(video_id):
-            individual_tracks = get_tracks_from_json(video_id)
+            individual_tracks = get_tracks_from_id(video_id)
             female_red_deer_tracks = get_adult_deer_tracks_from_sex(
                 individual_tracks,
                 sex=DSex.FEMALE,
@@ -524,7 +525,7 @@ def get_parsing_function(prompt):
     ):
 
         def check_file(video_id):
-            individual_tracks = get_tracks_from_json(video_id)
+            individual_tracks = get_tracks_from_id(video_id)
             male_red_deer_tracks = get_adult_deer_tracks_from_sex(
                 individual_tracks,
                 sex=DSex.MALE,
@@ -556,7 +557,7 @@ def get_parsing_function(prompt):
     elif prompt == "An adult male roe deer running while participating in courtship.":
 
         def check_file(video_id):
-            individual_tracks = get_tracks_from_json(video_id)
+            individual_tracks = get_tracks_from_id(video_id)
             male_roe_deer_tracks = get_adult_deer_tracks_from_sex(
                 individual_tracks,
                 sex=DSex.MALE,
@@ -575,7 +576,7 @@ def get_parsing_function(prompt):
     elif prompt == "An adult female roe deer running while participating in courtship.":
 
         def check_file(video_id):
-            individual_tracks = get_tracks_from_json(video_id)
+            individual_tracks = get_tracks_from_id(video_id)
             female_roe_deer_tracks = get_adult_deer_tracks_from_sex(
                 individual_tracks,
                 sex=DSex.FEMALE,
@@ -597,7 +598,7 @@ def get_parsing_function(prompt):
     ):
 
         def check_file(video_id):
-            individual_tracks = get_tracks_from_json(video_id)
+            individual_tracks = get_tracks_from_id(video_id)
             male_roe_deer_tracks = get_adult_deer_tracks_from_sex(
                 individual_tracks,
                 sex=DSex.MALE,
@@ -629,7 +630,7 @@ def get_parsing_function(prompt):
     elif prompt == "A fox sniffing while foraging.":
 
         def check_file(video_id):
-            individual_tracks = get_tracks_from_json(video_id)
+            individual_tracks = get_tracks_from_id(video_id)
             fox_tracks = get_tracks_from_species(
                 individual_tracks, species_name=Species.FOX
             )
@@ -643,10 +644,10 @@ def get_parsing_function(prompt):
 
         return check_file
 
-    elif prompt == "A fox chasing.":
+    elif prompt == "A fox chasing prey.":
 
         def check_file(video_id):
-            individual_tracks = get_tracks_from_json(video_id)
+            individual_tracks = get_tracks_from_id(video_id)
             fox_tracks = get_tracks_from_species(
                 individual_tracks, species_name=Species.FOX
             )
@@ -655,10 +656,10 @@ def get_parsing_function(prompt):
 
         return check_file
 
-    elif prompt == "A wolf chasing.":
+    elif prompt == "A wolf chasing prey.":
 
         def check_file(video_id):
-            individual_tracks = get_tracks_from_json(video_id)
+            individual_tracks = get_tracks_from_id(video_id)
             wolf_tracks = get_tracks_from_species(
                 individual_tracks, species_name=Species.WOLF
             )
@@ -670,7 +671,7 @@ def get_parsing_function(prompt):
     elif prompt == "A hare.":
 
         def check_file(video_id):
-            individual_tracks = get_tracks_from_json(video_id)
+            individual_tracks = get_tracks_from_id(video_id)
 
             return tracks_contain_species(individual_tracks, species_name=Species.HARE)
 
@@ -679,7 +680,7 @@ def get_parsing_function(prompt):
     elif prompt == "A marten.":
 
         def check_file(video_id):
-            individual_tracks = get_tracks_from_json(video_id)
+            individual_tracks = get_tracks_from_id(video_id)
 
             return tracks_contain_species(
                 individual_tracks, species_name=Species.MARTEN
@@ -690,7 +691,7 @@ def get_parsing_function(prompt):
     elif prompt == "A juvenile red deer playing.":
 
         def check_file(video_id):
-            individual_tracks = get_tracks_from_json(video_id)
+            individual_tracks = get_tracks_from_id(video_id)
             juvenile_red_deer = get_deer_tracks_from_age(
                 individual_tracks,
                 age=DAge.JUVENILE,
@@ -706,7 +707,7 @@ def get_parsing_function(prompt):
     elif prompt == "An adult red deer browsing.":
 
         def check_file(video_id):
-            individual_tracks = get_tracks_from_json(video_id)
+            individual_tracks = get_tracks_from_id(video_id)
             adult_red_deer = get_deer_tracks_from_age(
                 individual_tracks,
                 age=DAge.ADULT,
@@ -720,7 +721,7 @@ def get_parsing_function(prompt):
     elif prompt == "An animal running while reacting to a camera.":
 
         def check_file(video_id):
-            individual_tracks = get_tracks_from_json(video_id)
+            individual_tracks = get_tracks_from_id(video_id)
             cam_reaction_tracks = get_tracks_from_activity(
                 individual_tracks, activity_name=Activity.CAMERA_REACTION
             )
@@ -734,7 +735,7 @@ def get_parsing_function(prompt):
     elif prompt == "An animal looking at a camera.":
 
         def check_file(video_id):
-            individual_tracks = get_tracks_from_json(video_id)
+            individual_tracks = get_tracks_from_id(video_id)
 
             return tracks_contain_action(
                 individual_tracks, action_name=Action.LOOKING_AT_CAMERA
@@ -745,7 +746,7 @@ def get_parsing_function(prompt):
     elif prompt == "A hare foraging.":
 
         def check_file(video_id):
-            individual_tracks = get_tracks_from_json(video_id)
+            individual_tracks = get_tracks_from_id(video_id)
 
             hare_tracks = get_tracks_from_species(
                 individual_tracks, species_name=Species.HARE
@@ -757,7 +758,7 @@ def get_parsing_function(prompt):
     elif prompt == "A chamois.":
 
         def check_file(video_id):
-            individual_tracks = get_tracks_from_json(video_id)
+            individual_tracks = get_tracks_from_id(video_id)
 
             return tracks_contain_species(
                 individual_tracks, species_name=Species.CHAMOIS
@@ -765,10 +766,10 @@ def get_parsing_function(prompt):
 
         return check_file
 
-    elif prompt == "A chamois in vigilance.":
+    elif prompt == "A chamois being vigilant.":
 
         def check_file(video_id):
-            individual_tracks = get_tracks_from_json(video_id)
+            individual_tracks = get_tracks_from_id(video_id)
 
             chamois_tracks = get_tracks_from_species(
                 individual_tracks, species_name=Species.CHAMOIS
@@ -782,7 +783,7 @@ def get_parsing_function(prompt):
     elif prompt == "A fox foraging.":
 
         def check_file(video_id):
-            individual_tracks = get_tracks_from_json(video_id)
+            individual_tracks = get_tracks_from_id(video_id)
 
             fox_tracks = get_tracks_from_species(
                 individual_tracks, species_name=Species.FOX
@@ -794,7 +795,7 @@ def get_parsing_function(prompt):
     elif prompt == "A wolf foraging.":
 
         def check_file(video_id):
-            individual_tracks = get_tracks_from_json(video_id)
+            individual_tracks = get_tracks_from_id(video_id)
 
             wolf_tracks = get_tracks_from_species(
                 individual_tracks, species_name=Species.WOLF
@@ -803,10 +804,10 @@ def get_parsing_function(prompt):
 
         return check_file
 
-    elif prompt == "A juvenile red deer shaking its head or its body.":
+    elif prompt == "A juvenile red deer shaking its head or body.":
 
         def check_file(video_id):
-            individual_tracks = get_tracks_from_json(video_id)
+            individual_tracks = get_tracks_from_id(video_id)
 
             juvenile_red_deer_tracks = get_deer_tracks_from_age(
                 individual_tracks,
@@ -823,7 +824,7 @@ def get_parsing_function(prompt):
     elif prompt == "A juvenile roe deer foraging.":
 
         def check_file(video_id):
-            individual_tracks = get_tracks_from_json(video_id)
+            individual_tracks = get_tracks_from_id(video_id)
 
             juvenile_roe_deer_tracks = get_deer_tracks_from_age(
                 individual_tracks,
@@ -839,7 +840,7 @@ def get_parsing_function(prompt):
     elif prompt == "A roe deer trotting while foraging.":
 
         def check_file(video_id):
-            individual_tracks = get_tracks_from_json(video_id)
+            individual_tracks = get_tracks_from_id(video_id)
 
             roe_deer_tracks = get_tracks_from_species(
                 individual_tracks, species_name=Species.ROE_DEER
@@ -853,10 +854,10 @@ def get_parsing_function(prompt):
 
         return check_file
 
-    elif prompt == "A mountain hare in vigilance.":
+    elif prompt == "A mountain hare being vigilant.":
 
         def check_file(video_id):
-            individual_tracks = get_tracks_from_json(video_id)
+            individual_tracks = get_tracks_from_id(video_id)
 
             hare_tracks = get_tracks_from_species(
                 individual_tracks, species_name=Species.HARE
@@ -870,7 +871,7 @@ def get_parsing_function(prompt):
     elif prompt == "A mountain hare grazing.":
 
         def check_file(video_id):
-            individual_tracks = get_tracks_from_json(video_id)
+            individual_tracks = get_tracks_from_id(video_id)
 
             mountain_hare_tracks = get_tracks_from_species(
                 individual_tracks, species_name=Species.HARE
@@ -884,7 +885,7 @@ def get_parsing_function(prompt):
     elif prompt == "An animal stretching its body.":
 
         def check_file(video_id):
-            individual_tracks = get_tracks_from_json(video_id)
+            individual_tracks = get_tracks_from_id(video_id)
 
             return tracks_contain_action(
                 individual_tracks, action_name=Action.STRETCHING_BODY
@@ -895,7 +896,7 @@ def get_parsing_function(prompt):
     elif prompt == "An animal bathing while grooming.":
 
         def check_file(video_id):
-            individual_tracks = get_tracks_from_json(video_id)
+            individual_tracks = get_tracks_from_id(video_id)
 
             bathing_tracks = get_tracks_from_action(
                 individual_tracks, action_name=Action.BATHING
@@ -909,7 +910,7 @@ def get_parsing_function(prompt):
     elif prompt == "An animal resting.":
 
         def check_file(video_id):
-            individual_tracks = get_tracks_from_json(video_id)
+            individual_tracks = get_tracks_from_id(video_id)
 
             return tracks_contain_activity(
                 individual_tracks, activity_name=Activity.RESTING
@@ -920,7 +921,7 @@ def get_parsing_function(prompt):
     elif prompt == "A red deer browsing.":
 
         def check_file(video_id):
-            individual_tracks = get_tracks_from_json(video_id)
+            individual_tracks = get_tracks_from_id(video_id)
 
             red_deer_tracks = get_tracks_from_species(
                 individual_tracks, species_name=Species.RED_DEER
@@ -932,7 +933,7 @@ def get_parsing_function(prompt):
     elif prompt == "An animal running while foraging.":
 
         def check_file(video_id):
-            individual_tracks = get_tracks_from_json(video_id)
+            individual_tracks = get_tracks_from_id(video_id)
 
             running_tracks = get_tracks_from_action(
                 individual_tracks, action_name=Action.TROTTING_OR_RUNNING
@@ -946,16 +947,16 @@ def get_parsing_function(prompt):
     elif prompt == "A video of an animal drinking.":
 
         def check_file(video_id):
-            individual_tracks = get_tracks_from_json(video_id)
+            individual_tracks = get_tracks_from_id(video_id)
 
             return tracks_contain_action(individual_tracks, action_name=Action.DRINKING)
 
         return check_file
 
-    elif prompt == "A video of an animal laying down while resting.":
+    elif prompt == "A video of an animal lying down while resting.":
 
         def check_file(video_id):
-            individual_tracks = get_tracks_from_json(video_id)
+            individual_tracks = get_tracks_from_id(video_id)
 
             laying_down_tracks = get_tracks_from_action(
                 individual_tracks, action_name=Action.LAYING_DOWN
@@ -965,10 +966,10 @@ def get_parsing_function(prompt):
             )
 
         return check_file
-    elif prompt == "A red deer resting while it is raining.":
+    elif prompt == "A red deer resting in rainy weather.":
 
         def check_file(video_id):
-            individual_tracks = get_tracks_from_json(video_id)
+            individual_tracks = get_tracks_from_id(video_id)
 
             red_deer_tracks = get_tracks_from_species(
                 individual_tracks, species_name=Species.RED_DEER
@@ -981,7 +982,7 @@ def get_parsing_function(prompt):
 
         return check_file
 
-    elif prompt == "A rainy weather.":
+    elif prompt == "Rainy weather.":
 
         def check_file(video_id):
 
@@ -994,7 +995,7 @@ def get_parsing_function(prompt):
     elif prompt == "An animal participating in courtship.":
 
         def check_file(video_id):
-            individual_tracks = get_tracks_from_json(video_id)
+            individual_tracks = get_tracks_from_id(video_id)
 
             return tracks_contain_activity(
                 individual_tracks, activity_name=Activity.COURTSHIP
@@ -1005,7 +1006,7 @@ def get_parsing_function(prompt):
     elif prompt == "An adult male red deer pawing the ground while wallowing.":
 
         def check_file(video_id):
-            individual_tracks = get_tracks_from_json(video_id)
+            individual_tracks = get_tracks_from_id(video_id)
 
             male_red_deer_tracks = get_adult_deer_tracks_from_sex(
                 individual_tracks,
@@ -1029,7 +1030,7 @@ def get_parsing_function(prompt):
     ):
 
         def check_file(video_id):
-            individual_tracks = get_tracks_from_json(video_id)
+            individual_tracks = get_tracks_from_id(video_id)
 
             male_red_deer_tracks = get_adult_deer_tracks_from_sex(
                 individual_tracks,
@@ -1053,7 +1054,7 @@ def get_parsing_function(prompt):
     elif prompt == "An adult male red deer bathing while wallowing.":
 
         def check_file(video_id):
-            individual_tracks = get_tracks_from_json(video_id)
+            individual_tracks = get_tracks_from_id(video_id)
 
             male_red_deer_tracks = get_adult_deer_tracks_from_sex(
                 individual_tracks,
@@ -1073,7 +1074,7 @@ def get_parsing_function(prompt):
     elif prompt == "An adult male red deer urinating while wallowing.":
 
         def check_file(video_id):
-            individual_tracks = get_tracks_from_json(video_id)
+            individual_tracks = get_tracks_from_id(video_id)
 
             male_red_deer_tracks = get_adult_deer_tracks_from_sex(
                 individual_tracks,
@@ -1090,10 +1091,10 @@ def get_parsing_function(prompt):
 
         return check_file
 
-    elif prompt == "An adult male red deer in vigilance after vocalizing.":
+    elif prompt == "An adult male red deer being vigilant after vocalizing.":
 
         def check_file(video_id):
-            individual_tracks = get_tracks_from_json(video_id)
+            individual_tracks = get_tracks_from_id(video_id)
 
             male_red_deer_tracks = get_adult_deer_tracks_from_sex(
                 individual_tracks,
@@ -1108,10 +1109,10 @@ def get_parsing_function(prompt):
             return False
 
         return check_file
-    elif prompt == "A red deer vocalizing while it is raining.":
+    elif prompt == "A red deer vocalizing in rainy weather.":
 
         def check_file(video_id):
-            individual_tracks = get_tracks_from_json(video_id)
+            individual_tracks = get_tracks_from_id(video_id)
 
             red_deer_tracks = get_tracks_from_species(
                 individual_tracks, species_name=Species.RED_DEER
@@ -1128,11 +1129,11 @@ def get_parsing_function(prompt):
         return check_file
     elif (
         prompt
-        == "A roe deer running in a rainy weather while participating in courtship."
+        == "A roe deer running in rainy weather while participating in courtship."
     ):
 
         def check_file(video_id):
-            individual_tracks = get_tracks_from_json(video_id)
+            individual_tracks = get_tracks_from_id(video_id)
 
             roe_deer_tracks = get_tracks_from_species(
                 individual_tracks, species_name=Species.ROE_DEER
@@ -1150,10 +1151,10 @@ def get_parsing_function(prompt):
             )
 
         return check_file
-    elif prompt == "A roe deer participating in courtship while it is raining.":
+    elif prompt == "A roe deer participating in courtship in rainy weather.":
 
         def check_file(video_id):
-            individual_tracks = get_tracks_from_json(video_id)
+            individual_tracks = get_tracks_from_id(video_id)
 
             roe_deer_tracks = get_tracks_from_species(
                 individual_tracks, species_name=Species.ROE_DEER
@@ -1168,10 +1169,10 @@ def get_parsing_function(prompt):
             )
 
         return check_file
-    elif prompt == "A red deer participating in courtship while it is raining.":
+    elif prompt == "A red deer participating in courtship in rainy weather.":
 
         def check_file(video_id):
-            individual_tracks = get_tracks_from_json(video_id)
+            individual_tracks = get_tracks_from_id(video_id)
 
             red_deer_tracks = get_tracks_from_species(
                 individual_tracks, species_name=Species.RED_DEER
@@ -1190,7 +1191,7 @@ def get_parsing_function(prompt):
     elif prompt == "A video of two or more animals.":
 
         def check_file(video_id):
-            individual_tracks = get_tracks_from_json(video_id)
+            individual_tracks = get_tracks_from_id(video_id)
 
             return len(individual_tracks) >= 2
 
@@ -1199,7 +1200,7 @@ def get_parsing_function(prompt):
     elif prompt == "A video of two or more wolves.":
 
         def check_file(video_id):
-            individual_tracks = get_tracks_from_json(video_id)
+            individual_tracks = get_tracks_from_id(video_id)
 
             return (
                 get_nb_tracks_species_in_video(
@@ -1215,7 +1216,7 @@ def get_parsing_function(prompt):
     ):
 
         def check_file(video_id):
-            individual_tracks = get_tracks_from_json(video_id)
+            individual_tracks = get_tracks_from_id(video_id)
 
             female_red_deer_tracks = get_adult_deer_tracks_from_sex(
                 individual_tracks,
@@ -1239,7 +1240,7 @@ def get_parsing_function(prompt):
     elif prompt == "A video showing individuals from at least two different species.":
 
         def check_file(video_id):
-            individual_tracks = get_tracks_from_json(video_id)
+            individual_tracks = get_tracks_from_id(video_id)
 
             species_set = get_unique_species_from_tracks(individual_tracks)
 
@@ -1250,7 +1251,7 @@ def get_parsing_function(prompt):
     elif prompt == "A juvenile red deer nursing.":
 
         def check_file(video_id):
-            individual_tracks = get_tracks_from_json(video_id)
+            individual_tracks = get_tracks_from_id(video_id)
 
             juvenile_red_deer_tracks = get_deer_tracks_from_age(
                 individual_tracks,
@@ -1267,7 +1268,7 @@ def get_parsing_function(prompt):
     elif prompt == "An adult female red deer nursing.":
 
         def check_file(video_id):
-            individual_tracks = get_tracks_from_json(video_id)
+            individual_tracks = get_tracks_from_id(video_id)
 
             female_deer_tracks = get_adult_deer_tracks_from_sex(
                 individual_tracks,
@@ -1280,10 +1281,10 @@ def get_parsing_function(prompt):
             )
 
         return check_file
-    elif prompt == "A wolf chasing in a clear weather.":
+    elif prompt == "A wolf chasing prey in clear weather.":
 
         def check_file(video_id):
-            individual_tracks = get_tracks_from_json(video_id)
+            individual_tracks = get_tracks_from_id(video_id)
             wolf_tracks = get_tracks_from_species(
                 individual_tracks, species_name=Species.WOLF
             )
@@ -1294,10 +1295,10 @@ def get_parsing_function(prompt):
             )
 
         return check_file
-    elif prompt == "A wolf chasing in an overcast weather.":
+    elif prompt == "A wolf chasing prey in overcast weather.":
 
         def check_file(video_id):
-            individual_tracks = get_tracks_from_json(video_id)
+            individual_tracks = get_tracks_from_id(video_id)
             wolf_tracks = get_tracks_from_species(
                 individual_tracks, species_name=Species.WOLF
             )
@@ -1308,10 +1309,10 @@ def get_parsing_function(prompt):
             )
 
         return check_file
-    elif prompt == "A fox chasing in a clear weather.":
+    elif prompt == "A fox chasing prey in clear weather.":
 
         def check_file(video_id):
-            individual_tracks = get_tracks_from_json(video_id)
+            individual_tracks = get_tracks_from_id(video_id)
             fox_tracks = get_tracks_from_species(
                 individual_tracks, species_name=Species.FOX
             )
@@ -1322,10 +1323,10 @@ def get_parsing_function(prompt):
             )
 
         return check_file
-    elif prompt == "A female adult roe deer running in a rainy weather.":
+    elif prompt == "An adult female roe deer running in rainy weather.":
 
         def check_file(video_id):
-            individual_tracks = get_tracks_from_json(video_id)
+            individual_tracks = get_tracks_from_id(video_id)
             female_roe_deer_tracks = get_adult_deer_tracks_from_sex(
                 individual_tracks,
                 sex=DSex.FEMALE,
@@ -1338,10 +1339,10 @@ def get_parsing_function(prompt):
             )
 
         return check_file
-    elif prompt == "A roe deer foraging in a sunny weather.":
+    elif prompt == "A roe deer foraging in sunny weather.":
 
         def check_file(video_id):
-            individual_tracks = get_tracks_from_json(video_id)
+            individual_tracks = get_tracks_from_id(video_id)
             roe_deer_tracks = get_tracks_from_species(
                 individual_tracks, species_name=Species.ROE_DEER
             )
@@ -1352,10 +1353,10 @@ def get_parsing_function(prompt):
             )
 
         return check_file
-    elif prompt == "A red deer foraging in a sunny weather.":
+    elif prompt == "A red deer foraging in sunny weather.":
 
         def check_file(video_id):
-            individual_tracks = get_tracks_from_json(video_id)
+            individual_tracks = get_tracks_from_id(video_id)
             red_deer_tracks = get_tracks_from_species(
                 individual_tracks, species_name=Species.RED_DEER
             )
@@ -1366,10 +1367,10 @@ def get_parsing_function(prompt):
             )
 
         return check_file
-    elif prompt == "A roe deer foraging in a rainy weather.":
+    elif prompt == "A roe deer foraging in rainy weather.":
 
         def check_file(video_id):
-            individual_tracks = get_tracks_from_json(video_id)
+            individual_tracks = get_tracks_from_id(video_id)
             roe_deer_tracks = get_tracks_from_species(
                 individual_tracks, species_name=Species.ROE_DEER
             )
@@ -1380,10 +1381,10 @@ def get_parsing_function(prompt):
             )
 
         return check_file
-    elif prompt == "A red deer foraging in a rainy weather.":
+    elif prompt == "A red deer foraging in rainy weather.":
 
         def check_file(video_id):
-            individual_tracks = get_tracks_from_json(video_id)
+            individual_tracks = get_tracks_from_id(video_id)
             red_deer_tracks = get_tracks_from_species(
                 individual_tracks, species_name=Species.RED_DEER
             )
@@ -1394,10 +1395,10 @@ def get_parsing_function(prompt):
             )
 
         return check_file
-    elif prompt == "A juvenile red deer playing in a clear weather.":
+    elif prompt == "A juvenile red deer playing in clear weather.":
 
         def check_file(video_id):
-            individual_tracks = get_tracks_from_json(video_id)
+            individual_tracks = get_tracks_from_id(video_id)
             juvenile_red_deer_tracks = get_deer_tracks_from_age(
                 individual_tracks,
                 age=DAge.JUVENILE,
@@ -1410,10 +1411,10 @@ def get_parsing_function(prompt):
             )
 
         return check_file
-    elif prompt == "A female adult red deer escaping in a sunny weather.":
+    elif prompt == "An adult female red deer escaping in sunny weather.":
 
         def check_file(video_id):
-            individual_tracks = get_tracks_from_json(video_id)
+            individual_tracks = get_tracks_from_id(video_id)
             female_red_deer_tracks = get_adult_deer_tracks_from_sex(
                 individual_tracks, sex=DSex.FEMALE, deer_species=Species.RED_DEER
             )
@@ -1424,10 +1425,10 @@ def get_parsing_function(prompt):
             )
 
         return check_file
-    elif prompt == "An animal in vigilance while the weather is rainy or overcast.":
+    elif prompt == "An animal being vigilant while the weather is rainy or overcast.":
 
         def check_file(video_id):
-            individual_tracks = get_tracks_from_json(video_id)
+            individual_tracks = get_tracks_from_id(video_id)
             return tracks_contain_activity(
                 individual_tracks, activity_name=Activity.VIGILANCE
             ) and (
@@ -1440,10 +1441,10 @@ def get_parsing_function(prompt):
             )
 
         return check_file
-    elif prompt == "An animal in vigilance while the weather is clear or sunny.":
+    elif prompt == "An animal being vigilant while the weather is clear or sunny.":
 
         def check_file(video_id):
-            individual_tracks = get_tracks_from_json(video_id)
+            individual_tracks = get_tracks_from_id(video_id)
             return tracks_contain_activity(
                 individual_tracks, activity_name=Activity.VIGILANCE
             ) and (
@@ -1459,7 +1460,7 @@ def get_parsing_function(prompt):
     elif prompt == "A juvenile red deer suckling.":
 
         def check_file(video_id):
-            individual_tracks = get_tracks_from_json(video_id)
+            individual_tracks = get_tracks_from_id(video_id)
 
             juvenile_red_deer_tracks = get_deer_tracks_from_age(
                 individual_tracks,
@@ -1476,7 +1477,7 @@ def get_parsing_function(prompt):
     elif prompt == "A juvenile roe deer suckling.":
 
         def check_file(video_id):
-            individual_tracks = get_tracks_from_json(video_id)
+            individual_tracks = get_tracks_from_id(video_id)
 
             juvenile_roe_deer_tracks = get_deer_tracks_from_age(
                 individual_tracks,
@@ -1493,7 +1494,7 @@ def get_parsing_function(prompt):
     elif prompt == "A video of two or more juvenile red deer.":
 
         def check_file(video_id):
-            individual_tracks = get_tracks_from_json(video_id)
+            individual_tracks = get_tracks_from_id(video_id)
 
             return (
                 get_nb_deer_tracks_age_in_video(
@@ -1509,7 +1510,7 @@ def get_parsing_function(prompt):
     elif prompt == "An animal reacting to a camera.":
 
         def check_file(video_id):
-            individual_tracks = get_tracks_from_json(video_id)
+            individual_tracks = get_tracks_from_id(video_id)
 
             return tracks_contain_activity(
                 individual_tracks, activity_name=Activity.CAMERA_REACTION
@@ -1520,7 +1521,7 @@ def get_parsing_function(prompt):
     elif prompt == "A fox reacting to a camera.":
 
         def check_file(video_id):
-            individual_tracks = get_tracks_from_json(video_id)
+            individual_tracks = get_tracks_from_id(video_id)
 
             fox_tracks = get_tracks_from_species(
                 individual_tracks, species_name=Species.FOX
@@ -1535,7 +1536,7 @@ def get_parsing_function(prompt):
     elif prompt == "A wolf reacting to a camera.":
 
         def check_file(video_id):
-            individual_tracks = get_tracks_from_json(video_id)
+            individual_tracks = get_tracks_from_id(video_id)
 
             wolf_tracks = get_tracks_from_species(
                 individual_tracks, species_name=Species.WOLF
@@ -1550,7 +1551,7 @@ def get_parsing_function(prompt):
     elif prompt == "An animal reacting to a camera and then foraging.":
 
         def check_file(video_id):
-            individual_tracks = get_tracks_from_json(video_id)
+            individual_tracks = get_tracks_from_id(video_id)
             sequence = [Activity.CAMERA_REACTION, Activity.FORAGING]
             for track in individual_tracks:
                 if check_track_contains_continuous_sequence(track, sequence):
@@ -1562,11 +1563,11 @@ def get_parsing_function(prompt):
 
     elif (
         prompt
-        == "An animal foraging, then reacting to a camera and then going back to foraging."
+        == "An animal foraging, then reacting to a camera, and then returning to foraging."
     ):
 
         def check_file(video_id):
-            individual_tracks = get_tracks_from_json(video_id)
+            individual_tracks = get_tracks_from_id(video_id)
             sequence = [Activity.FORAGING, Activity.CAMERA_REACTION, Activity.FORAGING]
             for track in individual_tracks:
                 if check_track_contains_continuous_sequence(track, sequence):
@@ -1579,7 +1580,7 @@ def get_parsing_function(prompt):
     elif prompt == "An animal reacting to a camera and then running away.":
 
         def check_file(video_id):
-            individual_tracks = get_tracks_from_json(video_id)
+            individual_tracks = get_tracks_from_id(video_id)
             sequence = [Activity.CAMERA_REACTION, Action.TROTTING_OR_RUNNING]
             for track in individual_tracks:
                 if check_track_contains_continuous_sequence(track, sequence):
@@ -1590,11 +1591,12 @@ def get_parsing_function(prompt):
         return check_file
 
     elif (
-        prompt == "An animal foraging, then reacting to a camera and then running away."
+        prompt
+        == "An animal foraging, then reacting to a camera, and then running away."
     ):
 
         def check_file(video_id):
-            individual_tracks = get_tracks_from_json(video_id)
+            individual_tracks = get_tracks_from_id(video_id)
             sequence = [
                 Activity.FORAGING,
                 Activity.CAMERA_REACTION,
@@ -1608,13 +1610,10 @@ def get_parsing_function(prompt):
             return False
 
         return check_file
-    elif (
-        prompt
-        == "An animal reacting to the camera while the weather is rainy or overcast."
-    ):
+    elif prompt == "An animal reacting to a camera in rainy or overcast weather.":
 
         def check_file(video_id):
-            individual_tracks = get_tracks_from_json(video_id)
+            individual_tracks = get_tracks_from_id(video_id)
             return tracks_contain_activity(
                 individual_tracks, activity_name=Activity.CAMERA_REACTION
             ) and (
@@ -1627,13 +1626,10 @@ def get_parsing_function(prompt):
             )
 
         return check_file
-    elif (
-        prompt
-        == "An animal reacting to the camera while the weather is clear or sunny."
-    ):
+    elif prompt == "An animal reacting to a camera in clear or sunny weather.":
 
         def check_file(video_id):
-            individual_tracks = get_tracks_from_json(video_id)
+            individual_tracks = get_tracks_from_id(video_id)
             return tracks_contain_activity(
                 individual_tracks, activity_name=Activity.CAMERA_REACTION
             ) and (
@@ -1648,11 +1644,11 @@ def get_parsing_function(prompt):
         return check_file
     elif (
         prompt
-        == "An animal escaping from another animal of the same species chasing it."
+        == "An animal escaping from another animal of the same species that is chasing it."
     ):
 
         def check_file(video_id):
-            individual_tracks = get_tracks_from_json(video_id)
+            individual_tracks = get_tracks_from_id(video_id)
 
             escaping_tracks = get_tracks_from_activity(
                 individual_tracks, activity_name=Activity.ESCAPING
@@ -1670,11 +1666,11 @@ def get_parsing_function(prompt):
 
     elif (
         prompt
-        == "An animal escaping from another animal of a different species chasing it."
+        == "An animal escaping from another animal of a different species that is chasing it."
     ):
 
         def check_file(video_id):
-            individual_tracks = get_tracks_from_json(video_id)
+            individual_tracks = get_tracks_from_id(video_id)
 
             escaping_tracks = get_tracks_from_activity(
                 individual_tracks, activity_name=Activity.ESCAPING
@@ -1696,11 +1692,11 @@ def get_parsing_function(prompt):
 
     elif (
         prompt
-        == "Two or more red deer foraging and at least one is also in vigilance at some point."
+        == "Two or more red deer foraging, with at least one also being vigilant at some point."
     ):
 
         def check_file(video_id):
-            individual_tracks = get_tracks_from_json(video_id)
+            individual_tracks = get_tracks_from_id(video_id)
             red_deer_tracks = get_tracks_from_species(
                 individual_tracks, species_name=Species.RED_DEER
             )
@@ -1725,7 +1721,7 @@ def get_parsing_function(prompt):
     ):
 
         def check_file(video_id):
-            individual_tracks = get_tracks_from_json(video_id)
+            individual_tracks = get_tracks_from_id(video_id)
 
             juvenile_red_deer_tracks = get_deer_tracks_from_age(
                 individual_tracks, age=DAge.JUVENILE, deer_species=Species.RED_DEER
@@ -1750,7 +1746,7 @@ def get_parsing_function(prompt):
     ):
 
         def check_file(video_id):
-            individual_tracks = get_tracks_from_json(video_id)
+            individual_tracks = get_tracks_from_id(video_id)
 
             juvenile_red_deer_tracks = get_deer_tracks_from_age(
                 individual_tracks, age=DAge.JUVENILE, deer_species=Species.RED_DEER
@@ -1775,7 +1771,7 @@ def get_parsing_function(prompt):
     ):
 
         def check_file(video_id):
-            individual_tracks = get_tracks_from_json(video_id)
+            individual_tracks = get_tracks_from_id(video_id)
 
             juvenile_red_deer_tracks = get_deer_tracks_from_age(
                 individual_tracks, age=DAge.JUVENILE, deer_species=Species.RED_DEER
@@ -1794,10 +1790,10 @@ def get_parsing_function(prompt):
 
         return check_file
 
-    elif prompt == "A single adult red deer only foraging.":
+    elif prompt == "A single adult red deer foraging only.":
 
         def check_file(video_id):
-            individual_tracks = get_tracks_from_json(video_id)
+            individual_tracks = get_tracks_from_id(video_id)
             if len(individual_tracks) != 1:
                 return False
             else:
@@ -1810,10 +1806,10 @@ def get_parsing_function(prompt):
                 return ("foraging" in activities) and (len(activities) == 1)
 
         return check_file
-    elif prompt == "A male adult red deer wallowing.":
+    elif prompt == "An adult male red deer wallowing.":
 
         def check_file(video_id):
-            individual_tracks = get_tracks_from_json(video_id)
+            individual_tracks = get_tracks_from_id(video_id)
             male_red_deer_tracks = get_adult_deer_tracks_from_sex(
                 individual_tracks,
                 sex=DSex.MALE,
@@ -1826,12 +1822,12 @@ def get_parsing_function(prompt):
         return check_file
     elif (
         prompt
-        == "A male adult red deer doing the same sequence of actions while wallowing as any individual of <vid>S3_C3_E545_V0406</vid>."
+        == "An adult male red deer doing the same sequence of actions while wallowing as any individual of <vid>S3_C3_E545_V0406</vid>."
     ):
 
         def check_file(video_id):
             video_ref = "S3_C3_E545_V0406"
-            individual_tracks_ref = get_tracks_from_json(video_ref)
+            individual_tracks_ref = get_tracks_from_id(video_ref)
             male_red_deer_tracks_ref = get_adult_deer_tracks_from_sex(
                 individual_tracks_ref,
                 sex=DSex.MALE,
@@ -1840,7 +1836,7 @@ def get_parsing_function(prompt):
             male_red_deer_tracks_ref_wallowing = get_tracks_from_activity(
                 male_red_deer_tracks_ref, activity_name=Activity.MARKING_OR_WALLOWING
             )
-            individual_tracks = get_tracks_from_json(video_id)
+            individual_tracks = get_tracks_from_id(video_id)
             male_red_deer_tracks = get_adult_deer_tracks_from_sex(
                 individual_tracks,
                 sex=DSex.MALE,
@@ -1860,12 +1856,12 @@ def get_parsing_function(prompt):
 
     elif (
         prompt
-        == "A male adult red deer doing the same sequence of actions while wallowing as any individual of <vid>S3_C3_E524_V0327</vid>."
+        == "An adult male red deer doing the same sequence of actions while wallowing as any individual of <vid>S3_C3_E524_V0327</vid>."
     ):
 
         def check_file(video_id):
             video_ref = "S3_C3_E524_V0327"
-            individual_tracks_ref = get_tracks_from_json(video_ref)
+            individual_tracks_ref = get_tracks_from_id(video_ref)
             male_red_deer_tracks_ref = get_adult_deer_tracks_from_sex(
                 individual_tracks_ref,
                 sex=DSex.MALE,
@@ -1874,7 +1870,7 @@ def get_parsing_function(prompt):
             male_red_deer_tracks_ref_wallowing = get_tracks_from_activity(
                 male_red_deer_tracks_ref, activity_name=Activity.MARKING_OR_WALLOWING
             )
-            individual_tracks = get_tracks_from_json(video_id)
+            individual_tracks = get_tracks_from_id(video_id)
             male_red_deer_tracks = get_adult_deer_tracks_from_sex(
                 individual_tracks,
                 sex=DSex.MALE,
@@ -1893,13 +1889,13 @@ def get_parsing_function(prompt):
         return check_file
     elif (
         prompt
-        == "A male adult red deer doing the same unique actions while wallowing as any individual of <vid>S3_C3_E524_V0327</vid>."
+        == "An adult male red deer doing the same unique actions while wallowing as any individual of <vid>S3_C3_E524_V0327</vid>."
     ):
 
         def check_file(video_id):
             video_ref = "S3_C3_E524_V0327"
-            individual_tracks_ref = get_tracks_from_json(video_ref)
-            individual_tracks = get_tracks_from_json(video_id)
+            individual_tracks_ref = get_tracks_from_id(video_ref)
+            individual_tracks = get_tracks_from_id(video_id)
             male_red_deer_tracks = get_adult_deer_tracks_from_sex(
                 individual_tracks,
                 sex=DSex.MALE,
@@ -1927,13 +1923,13 @@ def get_parsing_function(prompt):
         return check_file
     elif (
         prompt
-        == "A male adult red deer doing the same unique actions while wallowing as any individual of <vid>S3_C2_E524_V0087</vid>."
+        == "An adult male red deer doing the same unique actions while wallowing as any individual of <vid>S3_C2_E524_V0087</vid>."
     ):
 
         def check_file(video_id):
             video_ref = "S3_C2_E524_V0087"
-            individual_tracks_ref = get_tracks_from_json(video_ref)
-            individual_tracks = get_tracks_from_json(video_id)
+            individual_tracks_ref = get_tracks_from_id(video_ref)
+            individual_tracks = get_tracks_from_id(video_id)
             male_red_deer_tracks = get_adult_deer_tracks_from_sex(
                 individual_tracks,
                 sex=DSex.MALE,
@@ -1961,13 +1957,13 @@ def get_parsing_function(prompt):
         return check_file
     elif (
         prompt
-        == "A male adult red deer doing different actions while wallowing than any individual of <vid>S3_C3_E524_V0327</vid>."
+        == "An adult male red deer doing different actions while wallowing than any individual of <vid>S3_C3_E524_V0327</vid>."
     ):
 
         def check_file(video_id):
             video_ref = "S3_C3_E524_V0327"
-            individual_tracks_ref = get_tracks_from_json(video_ref)
-            individual_tracks = get_tracks_from_json(video_id)
+            individual_tracks_ref = get_tracks_from_id(video_ref)
+            individual_tracks = get_tracks_from_id(video_id)
             male_red_deer_tracks = get_adult_deer_tracks_from_sex(
                 individual_tracks,
                 sex=DSex.MALE,
@@ -1995,13 +1991,13 @@ def get_parsing_function(prompt):
         return check_file
     elif (
         prompt
-        == "A juvenile red deer doing at least one action in common while nursing as any individual of <vid>S1_C6_F404_V0330</vid>."
+        == "A juvenile red deer performing at least one action in common while nursing with any individual in <vid>S1_C6_F404_V0330</vid>."
     ):
 
         def check_file(video_id):
             video_ref = "S1_C6_F404_V0330"
-            individual_tracks_ref = get_tracks_from_json(video_ref)
-            individual_tracks = get_tracks_from_json(video_id)
+            individual_tracks_ref = get_tracks_from_id(video_ref)
+            individual_tracks = get_tracks_from_id(video_id)
             juvenile_red_deer_tracks = get_deer_tracks_from_age(
                 individual_tracks,
                 age=DAge.JUVENILE,
@@ -2030,13 +2026,13 @@ def get_parsing_function(prompt):
         return check_file
     elif (
         prompt
-        == "A juvenile red deer doing at least one action in common while nursing as any individual of <vid>S1_C6_F394_V0310</vid>."
+        == "A juvenile red deer performing at least one action in common while nursing with any individual in <vid>S1_C6_F394_V0310</vid>."
     ):
 
         def check_file(video_id):
             video_ref = "S1_C6_F394_V0310"
-            individual_tracks_ref = get_tracks_from_json(video_ref)
-            individual_tracks = get_tracks_from_json(video_id)
+            individual_tracks_ref = get_tracks_from_id(video_ref)
+            individual_tracks = get_tracks_from_id(video_id)
             juvenile_red_deer_tracks = get_deer_tracks_from_age(
                 individual_tracks,
                 age=DAge.JUVENILE,
@@ -2065,13 +2061,13 @@ def get_parsing_function(prompt):
         return check_file
     elif (
         prompt
-        == "A juvenile red deer doing at least one different action while nursing than any individual of <vid>S1_C6_F404_V0330</vid>."
+        == "A juvenile red deer performing at least one different action while nursing with any individual in <vid>S1_C6_F404_V0330</vid>."
     ):
 
         def check_file(video_id):
             video_ref = "S1_C6_F404_V0330"
-            individual_tracks_ref = get_tracks_from_json(video_ref)
-            individual_tracks = get_tracks_from_json(video_id)
+            individual_tracks_ref = get_tracks_from_id(video_ref)
+            individual_tracks = get_tracks_from_id(video_id)
             juvenile_red_deer_tracks = get_deer_tracks_from_age(
                 individual_tracks,
                 age=DAge.JUVENILE,
@@ -2099,13 +2095,13 @@ def get_parsing_function(prompt):
         return check_file
     elif (
         prompt
-        == "An individual doing the same sequence of actions while reacting to the camera as any individual of <vid>S1_C4_F173_V0137</vid>."
+        == "An individual doing the same sequence of actions while reacting to a camera as any individual of <vid>S1_C4_F173_V0137</vid>."
     ):
 
         def check_file(video_id):
             video_ref = "S1_C4_F173_V0137"
-            individual_tracks_ref = get_tracks_from_json(video_ref)
-            individual_tracks = get_tracks_from_json(video_id)
+            individual_tracks_ref = get_tracks_from_id(video_ref)
+            individual_tracks = get_tracks_from_id(video_id)
             camera_reaction_tracks = get_tracks_from_activity(
                 individual_tracks, activity_name=Activity.CAMERA_REACTION
             )
@@ -2124,13 +2120,13 @@ def get_parsing_function(prompt):
         return check_file
     elif (
         prompt
-        == "An individual doing the same sequence of actions while reacting to the camera as any individual of <vid>S1_C2_E8_V0021</vid>."
+        == "An individual doing the same sequence of actions while reacting to a camera as any individual of <vid>S1_C2_E8_V0021</vid>."
     ):
 
         def check_file(video_id):
             video_ref = "S1_C2_E8_V0021"
-            individual_tracks_ref = get_tracks_from_json(video_ref)
-            individual_tracks = get_tracks_from_json(video_id)
+            individual_tracks_ref = get_tracks_from_id(video_ref)
+            individual_tracks = get_tracks_from_id(video_id)
             camera_reaction_tracks = get_tracks_from_activity(
                 individual_tracks, activity_name=Activity.CAMERA_REACTION
             )
@@ -2149,14 +2145,14 @@ def get_parsing_function(prompt):
         return check_file
     elif (
         prompt
-        == "An individual doing the same unique actions while reacting to the camera as any individual of <vid>S1_C2_E8_V0021</vid>."
+        == "An individual doing the same unique actions while reacting to a camera as any individual of <vid>S1_C2_E8_V0021</vid>."
     ):
 
         def check_file(video_id):
 
             video_ref = "S1_C2_E8_V0021"
-            individual_tracks_ref = get_tracks_from_json(video_ref)
-            individual_tracks = get_tracks_from_json(video_id)
+            individual_tracks_ref = get_tracks_from_id(video_ref)
+            individual_tracks = get_tracks_from_id(video_id)
             camera_reaction_tracks = get_tracks_from_activity(
                 individual_tracks, activity_name=Activity.CAMERA_REACTION
             )
@@ -2174,14 +2170,14 @@ def get_parsing_function(prompt):
         return check_file
     elif (
         prompt
-        == "An individual doing the same unique actions while reacting to the camera as any individual of <vid>S1_C4_F173_V0137</vid>."
+        == "An individual doing the same unique actions while reacting to a camera as any individual of <vid>S1_C4_F173_V0137</vid>."
     ):
 
         def check_file(video_id):
 
             video_ref = "S1_C4_F173_V0137"
-            individual_tracks_ref = get_tracks_from_json(video_ref)
-            individual_tracks = get_tracks_from_json(video_id)
+            individual_tracks_ref = get_tracks_from_id(video_ref)
+            individual_tracks = get_tracks_from_id(video_id)
             camera_reaction_tracks = get_tracks_from_activity(
                 individual_tracks, activity_name=Activity.CAMERA_REACTION
             )
@@ -2199,13 +2195,13 @@ def get_parsing_function(prompt):
         return check_file
     elif (
         prompt
-        == "An individual doing different actions while reacting to the camera than any individual of <vid>S1_C2_E8_V0021</vid>."
+        == "An individual doing different actions while reacting to a camera than any individual of <vid>S1_C2_E8_V0021</vid>."
     ):
 
         def check_file(video_id):
             video_ref = "S1_C2_E8_V0021"
-            individual_tracks_ref = get_tracks_from_json(video_ref)
-            individual_tracks = get_tracks_from_json(video_id)
+            individual_tracks_ref = get_tracks_from_id(video_ref)
+            individual_tracks = get_tracks_from_id(video_id)
             camera_reaction_tracks = get_tracks_from_activity(
                 individual_tracks, activity_name=Activity.CAMERA_REACTION
             )
@@ -2223,13 +2219,13 @@ def get_parsing_function(prompt):
         return check_file
     elif (
         prompt
-        == "An individual doing different actions while reacting to the camera than any individual of <vid>S1_C4_F173_V0137</vid>."
+        == "An individual doing different actions while reacting to a camera than any individual of <vid>S1_C4_F173_V0137</vid>."
     ):
 
         def check_file(video_id):
             video_ref = "S1_C4_F173_V0137"
-            individual_tracks_ref = get_tracks_from_json(video_ref)
-            individual_tracks = get_tracks_from_json(video_id)
+            individual_tracks_ref = get_tracks_from_id(video_ref)
+            individual_tracks = get_tracks_from_id(video_id)
             camera_reaction_tracks = get_tracks_from_activity(
                 individual_tracks, activity_name=Activity.CAMERA_REACTION
             )
@@ -2247,16 +2243,16 @@ def get_parsing_function(prompt):
         return check_file
     elif (
         prompt
-        == "An animal being in vigilance in a different weather condition than in <vid>S2_C2_F536_V0066</vid>."
+        == "An animal being vigilant in a different weather condition from that in <vid>S2_C2_F536_V0066</vid>."
     ):
 
         def check_file(video_id):
             video_ref = "S2_C2_F536_V0066"
-            individual_tracks = get_tracks_from_json(video_id)
+            individual_tracks = get_tracks_from_id(video_id)
             vigilance_tracks = get_tracks_from_activity(
                 individual_tracks, activity_name=Activity.VIGILANCE
             )
-            individual_tracks_ref = get_tracks_from_json(video_ref)
+            individual_tracks_ref = get_tracks_from_id(video_ref)
             vigilance_tracks_ref = get_tracks_from_activity(
                 individual_tracks_ref, activity_name=Activity.VIGILANCE
             )
@@ -2269,12 +2265,12 @@ def get_parsing_function(prompt):
         return check_file
     elif (
         prompt
-        == "A wolf chasing in a different weather condition than in <vid>S2_C1_F573_V0093</vid>."
+        == "A wolf chasing prey in a different weather condition from that in <vid>S2_C1_F573_V0093</vid>."
     ):
 
         def check_file(video_id):
             video_ref = "S2_C1_F573_V0093"
-            individual_tracks = get_tracks_from_json(video_id)
+            individual_tracks = get_tracks_from_id(video_id)
             wolf_tracks = get_tracks_from_species(individual_tracks, Species.WOLF)
             wolf_chasing_tracks = get_tracks_from_activity(
                 wolf_tracks, activity_name=Activity.CHASING
@@ -2295,8 +2291,8 @@ def get_parsing_function(prompt):
             video_ref = "S2_C1_F573_V0093"
             if not video_ref:
                 return False
-            individual_tracks_ref = get_tracks_from_json(video_ref)
-            individual_tracks = get_tracks_from_json(video_id)
+            individual_tracks_ref = get_tracks_from_id(video_ref)
+            individual_tracks = get_tracks_from_id(video_id)
             for track in individual_tracks:
                 track_activities = get_unique_activities_from_tracks([track])
                 for ref_track in individual_tracks_ref:
@@ -2315,8 +2311,8 @@ def get_parsing_function(prompt):
 
         def check_file(video_id):
             video_ref = "S3_C2_E670_V0159"
-            individual_tracks_ref = get_tracks_from_json(video_ref)
-            individual_tracks = get_tracks_from_json(video_id)
+            individual_tracks_ref = get_tracks_from_id(video_ref)
+            individual_tracks = get_tracks_from_id(video_id)
             weather_condition = get_weather_conditions_from_videos(video_id)
             weather_condition_ref = get_weather_conditions_from_videos(video_ref)
             for track in individual_tracks:
@@ -2340,8 +2336,8 @@ def get_parsing_function(prompt):
 
         def check_file(video_id):
             video_ref = "S1_C4_F136_V0115"
-            individual_tracks_ref = get_tracks_from_json(video_ref)
-            individual_tracks = get_tracks_from_json(video_id)
+            individual_tracks_ref = get_tracks_from_id(video_ref)
+            individual_tracks = get_tracks_from_id(video_id)
             weather_condition = get_weather_conditions_from_videos(video_id)
             weather_condition_ref = get_weather_conditions_from_videos(video_ref)
             for track in individual_tracks:
@@ -2365,8 +2361,8 @@ def get_parsing_function(prompt):
 
         def check_file(video_id):
             video_ref = "S1_C1_E66_V0152"
-            individual_tracks_ref = get_tracks_from_json(video_ref)
-            individual_tracks = get_tracks_from_json(video_id)
+            individual_tracks_ref = get_tracks_from_id(video_ref)
+            individual_tracks = get_tracks_from_id(video_id)
             weather_condition = get_weather_conditions_from_videos(video_id)
             weather_condition_ref = get_weather_conditions_from_videos(video_ref)
             for track in individual_tracks:
@@ -2390,8 +2386,8 @@ def get_parsing_function(prompt):
 
         def check_file(video_id):
             video_ref = "S1_C2_E179_V0409"
-            individual_tracks_ref = get_tracks_from_json(video_ref)
-            individual_tracks = get_tracks_from_json(video_id)
+            individual_tracks_ref = get_tracks_from_id(video_ref)
+            individual_tracks = get_tracks_from_id(video_id)
             weather_condition = get_weather_conditions_from_videos(video_id)
             weather_condition_ref = get_weather_conditions_from_videos(video_ref)
             for track in individual_tracks:
@@ -2411,7 +2407,7 @@ def get_parsing_function(prompt):
     elif prompt == "An empty video.":
 
         def check_file(video_id):
-            individual_tracks = get_tracks_from_json(video_id)
+            individual_tracks = get_tracks_from_id(video_id)
             return len(individual_tracks) == 0
 
         return check_file
@@ -2440,7 +2436,7 @@ if __name__ == "__main__":
     args = parser.parse_args()
     json_folder = Path(args.json_folder)
 
-    with open("benchmark/queries_and_videos_empty_check.json", "r") as f:
+    with open("queries_and_videos_empty.json", "r") as f:
         queries_dict = json.load(f)
 
     # Initialize output dict with empty lists for each query
