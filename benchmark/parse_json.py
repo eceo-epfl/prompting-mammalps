@@ -89,7 +89,7 @@ class Meteo(StrEnum):
 # Global variable for JSON annotations folder
 # Necessary to avoid passing this as parameter to functions
 # which could be changed by the code agent
-JSON_FOLDER = Path("/media/EVO870/datasets/prompting-mammalps/annotations")
+JSON_FOLDER = Path("/media/EVO870/datasets/prompting-mammalps-v2/annotations")
 
 
 ### Basic functions
