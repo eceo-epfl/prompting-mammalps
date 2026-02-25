@@ -18,7 +18,7 @@ from parse_json_tools import (
     get_nb_tracks_species_in_video,
     get_tracks_from_action,
     get_tracks_from_activity,
-    get_tracks_from_json,
+    get_tracks_from_id,
     get_tracks_from_species,
     tracks_contain_species,
     tracks_contain_action,
@@ -43,7 +43,7 @@ from smolagents import CodeAgent, PromptTemplates, TransformersModel
 
 def main(args):
     tools = [
-        get_tracks_from_json,
+        get_tracks_from_id,
         get_tracks_from_species,
         get_tracks_from_action,
         get_tracks_from_activity,
@@ -73,7 +73,10 @@ def main(args):
     prompt_templates = PromptTemplates(prompts)
 
     # Load model and code agent
-    model_id = "Qwen/Qwen3-8B"  # "Qwen/Qwen3-Coder-Next"  # "meta-llama/Meta-Llama-3.1-8B-Instruct"
+    if args.llm == "qwen":
+        model_id = "Qwen/Qwen3-8B"  # "Qwen/Qwen3-Coder-Next"  # "meta-llama/Meta-Llama-3.1-8B-Instruct"
+    else:
+        raise NotImplementedError()
     model = TransformersModel(model_id, device_map="cuda", max_new_tokens=8096)
     agent = CodeAgent(
         tools=tools,
@@ -113,27 +116,27 @@ def main(args):
         q for q_cat in queries_dict.values() for q in q_cat if "<vid>" not in q
     ]
     output_queries_functions = {}
-    test_file = "./S1_C1_E16_V0040.json"
+    test_file_id = "S1_C1_E57_V0141"
 
     # For every query
     for query in queries_list:  # [31:]:
-        logger.info(f"Processing query {query}")
+        logger.info(f"################ Processing query {query} ################")
         message = (
-            "Verify if the content of the file matches the following prompt (return True or False):"
+            "Verify if the content of the json file id matches the following prompt (return True or False):"
             + f"'{query}'. Don't forget: always match elements from the prompt to the label space; save your implementation of the check_file function first as you will need it again."
         )
         agent.run(
             message,
-            return_full_result=False,
+            return_full_result=True,
             max_steps=10,
-            additional_args={"json_file": test_file},
+            additional_args={"file_id": test_file_id},
         )
 
         # Get the function that was created and apply it to all files
         try:
             check_file = agent.python_executor.custom_tools["check_file"]
             check_file_str = check_file.__source__
-            logging.info(check_file_str)
+            logging.info(f"\t {json.dumps(agent.memory.get_succinct_steps(), indent=2)}")
             output_queries_functions[query] = check_file_str
         except Exception as e:
             logging.warning(f"Could not apply check_file function for query: {query}")
@@ -155,9 +158,9 @@ if __name__ == "__main__":
         "--input_queries_videos",
         help="JSON file containing the queries of interest and associated ground truth videos",
     )
-    # parser.add_argument(
-    #     "--llm", choices=["apertus", "mistral", "qwen", "llama"], default="llama"
-    # )
+    parser.add_argument(
+         "--llm", choices=["qwen"], default="llama"
+    )
     parser.add_argument(
         "-O",
         "--output_folder",

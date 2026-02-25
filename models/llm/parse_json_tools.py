@@ -86,7 +86,7 @@ class Meteo(Enum):
 # Global variable for JSON annotations folder
 # Necessary to avoid passing this as parameter to functions
 # which could be changed by the code agent
-JSON_FOLDER = Path("/media/EVO870/datasets/prompting-mammalps-v2/annotations")
+JSON_FOLDER = Path("/home/eceo_scratch/datasets/prompting-mammalps-v2/annotations")
 
 
 ### Basic functions
@@ -127,41 +127,45 @@ def get_tracks_from_json(json_file: str) -> List[IndividualTrack]:
     return individual_tracks
 
 @tool
-def get_tracks_from_id(
-    video_id: Union[Path, str],
-) -> List[IndividualTrack]:
-    video_id_str = str(video_id)
-    json_file_path = str(next(JSON_FOLDER.rglob(f"*/{video_id_str}.json")))
+def get_tracks_from_id(file_id: str) -> List[IndividualTrack]:
+    """
+    Retrieves all individual tracks from a given JSON file id.
+    Args:
+        file_id (str): id corresponding to input json file
+
+    Returns:
+        List[IndividualTracks]: List of individual tracks present in the JSON file.
+    """
+    json_file_path = str(next(JSON_FOLDER.rglob(f"*/{file_id}.json")))
     video_detections = load_video_detections(json_file_path)
     individual_tracks = get_tracks_from_video_detections(video_detections)
     return individual_tracks
 
 ## Weather and time attributes
 @tool
-def get_weather_conditions_from_videos(video_id: Union[Path, str]) -> Meteo:
+def get_weather_conditions_from_videos(file_id: str) -> Meteo:
     """Retrieve weather from video info attributes weather conditions
     Args:
-        video_id (Union[Path, str]): The ID of the video.
+        file_id (str): id corresponding to input json file
     Returns:
         Meteo: The weather condition of the video.
     """
-    video_id_str = str(video_id)
-    json_file_path = str(next(JSON_FOLDER.rglob(f"*/{video_id_str}.json")))
+    json_file_path = str(next(JSON_FOLDER.rglob(f"*/{file_id}.json")))
     video_info = load_video_info(json_file_path)
     return video_info["attributes"]["weather"]
 
 @tool
 def check_contains_weather_condition(
-    video_id: Union[Path, str], weather_condition: Meteo
+    file_id: str, weather_condition: Meteo
 ) -> bool:
     """Check if the video contains the specified weather condition
     Args:
-        json_file (Union[Path, str]): The path to the JSON file.
+        file_id (str): id corresponding to input json file
         weather_condition (Meteo): The weather condition to check.
     Returns:
         bool: True if the video contains the specified weather condition, False otherwise.
     """
-    video_weather = get_weather_conditions_from_videos(video_id)
+    video_weather = get_weather_conditions_from_videos(file_id)
     return video_weather == weather_condition
 
 def get_tracks_from_video_detections(
