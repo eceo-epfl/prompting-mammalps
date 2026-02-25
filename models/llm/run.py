@@ -1,14 +1,22 @@
+import ast
+import inspect
 import json
+import logging
+import os
 from argparse import ArgumentParser
 from pathlib import Path
-import yaml
-import logging
-import inspect
-import ast
-import os
 
 import yaml
 from parse_json_tools import (
+    Action,
+    Activity,
+    DAge,
+    DSex,
+    Meteo,
+    Species,
+    check_contains_weather_condition,
+    check_track_contains_continuous_sequence,
+    get_action_sequences_from_tracks,
     get_adult_deer_tracks_from_sex,
     get_deer_tracks_from_age,
     get_nb_adult_deer_tracks_sex_in_video,
@@ -20,23 +28,14 @@ from parse_json_tools import (
     get_tracks_from_activity,
     get_tracks_from_id,
     get_tracks_from_species,
-    tracks_contain_species,
+    get_unique_actions_from_tracks,
+    get_unique_activities_from_tracks,
+    get_unique_species_from_tracks,
     tracks_contain_action,
     tracks_contain_activity,
     tracks_contain_adult_deer_sex,
     tracks_contain_deer_age,
-    get_unique_species_from_tracks,
-    get_unique_actions_from_tracks,
-    get_unique_activities_from_tracks,
-    check_track_contains_continuous_sequence,
-    check_contains_weather_condition,
-    get_action_sequences_from_tracks,
-    Species,
-    Action,
-    Activity,
-    DAge,
-    DSex,
-    Meteo,
+    tracks_contain_species,
 )
 from smolagents import CodeAgent, PromptTemplates, TransformersModel
 
@@ -64,7 +63,7 @@ def main(args):
         get_unique_activities_from_tracks,
         check_track_contains_continuous_sequence,
         check_contains_weather_condition,
-        get_action_sequences_from_tracks
+        get_action_sequences_from_tracks,
     ]
 
     with open("prompt.yaml", "r") as f:
@@ -112,9 +111,7 @@ def main(args):
     with open(args.input_queries_videos, "r") as f:
         queries_dict = json.load(f)
 
-    queries_list = [
-        q for q_cat in queries_dict.values() for q in q_cat if "<vid>" not in q
-    ]
+    queries_list = [q for q_cat in queries_dict.values()]
     output_queries_functions = {}
     test_file_id = "S1_C1_E57_V0141"
 
@@ -136,7 +133,9 @@ def main(args):
         try:
             check_file = agent.python_executor.custom_tools["check_file"]
             check_file_str = check_file.__source__
-            logging.info(f"\t {json.dumps(agent.memory.get_succinct_steps(), indent=2)}")
+            logging.info(
+                f"\t {json.dumps(agent.memory.get_succinct_steps(), indent=2)}"
+            )
             output_queries_functions[query] = check_file_str
         except Exception as e:
             logging.warning(f"Could not apply check_file function for query: {query}")
@@ -158,9 +157,7 @@ if __name__ == "__main__":
         "--input_queries_videos",
         help="JSON file containing the queries of interest and associated ground truth videos",
     )
-    parser.add_argument(
-         "--llm", choices=["qwen"], default="llama"
-    )
+    parser.add_argument("--llm", choices=["qwen"], default="llama")
     parser.add_argument(
         "-O",
         "--output_folder",
