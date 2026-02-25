@@ -46,8 +46,8 @@ def prepare_dataset(input_json_path, output_dir, video_folder, max_videos=None):
     ground_truth = {}
 
     for category, category_queries in data.items():
-        if not category_queries:
-            print(f"Skipping empty category: {category}")
+        if not category_queries or category == "VIDEO_COMPARISON":
+            print(f"Skipping category: {category}")
             continue
         for query_text, video_ids in category_queries.items():
             if not video_ids:
