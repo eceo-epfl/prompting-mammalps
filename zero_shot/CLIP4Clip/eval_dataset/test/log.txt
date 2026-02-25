@@ -1,0 +1,57 @@
+2026-02-25 11:23:00,247:INFO: Device: cuda, n_gpu: 1
+2026-02-25 11:23:01,369:INFO: loading archive file /home/jennifer/projects/prompting-mammalps-dev/models/CLIP4Clip/modules/cross-base
+2026-02-25 11:23:01,369:INFO: Model config {
+  "attention_probs_dropout_prob": 0.1,
+  "hidden_act": "gelu",
+  "hidden_dropout_prob": 0.1,
+  "hidden_size": 512,
+  "initializer_range": 0.02,
+  "intermediate_size": 2048,
+  "max_position_embeddings": 128,
+  "num_attention_heads": 8,
+  "num_hidden_layers": 4,
+  "type_vocab_size": 2,
+  "vocab_size": 512
+}
+
+2026-02-25 11:23:01,369:INFO: Weight doesn't exsits. /home/jennifer/projects/prompting-mammalps-dev/models/CLIP4Clip/modules/cross-base/cross_pytorch_model.bin
+2026-02-25 11:23:01,369:WARNING: Stage-One:True, Stage-Two:False
+2026-02-25 11:23:01,369:WARNING: Test retrieval by loose type.
+2026-02-25 11:23:01,369:WARNING: 	 embed_dim: 512
+2026-02-25 11:23:01,369:WARNING: 	 image_resolution: 224
+2026-02-25 11:23:01,369:WARNING: 	 vision_layers: 12
+2026-02-25 11:23:01,369:WARNING: 	 vision_width: 768
+2026-02-25 11:23:01,369:WARNING: 	 vision_patch_size: 32
+2026-02-25 11:23:01,369:WARNING: 	 context_length: 77
+2026-02-25 11:23:01,369:WARNING: 	 vocab_size: 49408
+2026-02-25 11:23:01,369:WARNING: 	 transformer_width: 512
+2026-02-25 11:23:01,370:WARNING: 	 transformer_heads: 8
+2026-02-25 11:23:01,370:WARNING: 	 transformer_layers: 12
+2026-02-25 11:23:01,370:WARNING: 	 cut_top_layer: 0
+2026-02-25 11:23:02,442:WARNING: 	 sim_header: meanP
+2026-02-25 11:23:05,097:INFO: --------------------
+2026-02-25 11:23:05,097:INFO: Weights from pretrained model not used in CLIP4Clip: 
+   clip.input_resolution
+   clip.context_length
+   clip.vocab_size
+2026-02-25 11:23:05,279:INFO: Model ViT-B/32 loaded successfully
+2026-02-25 11:23:05,279:INFO: Loading queries from zero_shot/CLIP4Clip/dataset/test/queries.txt
+2026-02-25 11:23:05,279:INFO: Loaded 100 queries
+2026-02-25 11:23:05,279:INFO: Discovering videos in /media/EVO870/datasets/prompting-mammalps-v2/videos/test
+2026-02-25 11:23:05,308:INFO: Discovered 775 videos
+2026-02-25 11:23:05,480:INFO:   Encoded batch 4/4
+2026-02-25 11:23:05,480:INFO: Encoding videos
+2026-02-25 11:40:43,112:INFO:   Encoded batch 10/25
+2026-02-25 11:55:21,976:INFO:   Encoded batch 20/25
+2026-02-25 12:11:27,418:INFO:   Encoded batch 25/25
+2026-02-25 12:11:27,418:INFO: Computing similarity matrix...
+2026-02-25 12:11:27,561:INFO: Similarity matrix shape: (100, 775)
+2026-02-25 12:11:27,561:INFO:   Queries: 100, Videos: 775
+2026-02-25 12:11:27,661:INFO: Saved similarity matrix CSV to similarity_matrix.csv
+2026-02-25 12:11:27,667:INFO: 
+Similarity statistics:
+2026-02-25 12:11:27,667:INFO:   Min: 15.2028
+2026-02-25 12:11:27,667:INFO:   Max: 35.5329
+2026-02-25 12:11:27,667:INFO:   Mean: 25.6865
+2026-02-25 12:11:27,670:INFO:   Median: 25.6511
+2026-02-25 12:11:27,670:INFO:   Std: 2.7490
