@@ -5,8 +5,37 @@ description = "Code for the development of the text to video retrieval benchmark
 readme = "README.md"
 requires-python = ">=3.12"
 dependencies = [
+    "audioread>=3.1.0",
+    "boto3>=1.42.55",
+    "clip4clip-local",
+    "decord>=0.6.0",
+    "easydict>=1.13",
+    "einops>=0.8.2",
+    "ffmpeg-python>=0.2.0",
+    "ftfy>=6.3.1",
+    "gram-local",
+    "h5py>=3.15.1",
+    "ipdb>=0.13.13",
+    "librosa>=0.11.0",
+    "matplotlib>=3.10.8",
+    "opencv-python>=4.13.0.92",
+    "pandas>=3.0.1",
+    "pillow>=12.1.1",
     "pre-commit==4.5.1",
+    "regex>=2026.2.19",
+    "requests>=2.32.5",
+    "scikit-learn>=1.8.0",
+    "seaborn>=0.13.2",
+    "sentencepiece>=0.2.1",
+    "toolz>=1.1.0",
+    "torch>=2.10.0",
+    "torchaudio>=2.10.0",
+    "torchvision>=0.25.0",
     "tqdm>=4.67.1",
+    "wandb>=0.25.0",
+    "webdataset>=1.0.2",
+    "xformers>=0.0.35",
+    "yacs>=0.1.8",
 ]
 
 [tool.setuptools]
@@ -25,6 +54,16 @@ line-length = 88
 [tool.isort]
 profile = "black"
 line_length = 88
+
+[tool.uv.workspace]
+members = [
+    "models/CLIP4Clip",
+    "models/GRAM",
+]
+
+[tool.uv.sources]
+clip4clip-local = { workspace = true }
+gram-local = { workspace = true }
 
 [build-system]
 requires = ["setuptools>=61"]
