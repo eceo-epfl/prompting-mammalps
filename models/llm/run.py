@@ -30,6 +30,7 @@ from parse_json_tools import (
     get_unique_activities_from_tracks,
     check_track_contains_continuous_sequence,
     check_contains_weather_condition,
+    get_action_sequences_from_tracks,
     Species,
     Action,
     Activity,
@@ -63,6 +64,7 @@ def main(args):
         get_unique_activities_from_tracks,
         check_track_contains_continuous_sequence,
         check_contains_weather_condition,
+        get_action_sequences_from_tracks
     ]
 
     with open("prompt.yaml", "r") as f:

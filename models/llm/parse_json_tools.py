@@ -13,13 +13,6 @@ InfoDict = Dict
 BehaviorSegment = List[Dict]
 IndividualTrack = List[BehaviorSegment]
 
-Point = Tuple[int]
-BBox = Tuple[Point]
-Mask = List[Point]
-
-
-# TODO: Ideally, we also give this to the LLM coding context
-# https://github.com/huggingface/smolagents/issues/1194
 class Species(Enum):
     RED_DEER = "red_deer"
     ROE_DEER = "roe_deer"
@@ -78,6 +71,7 @@ class DAge(Enum):
 
 class DSex(Enum):
     "Sex for adult deers"
+
     MALE = "male"
     FEMALE = "female"
 
@@ -89,8 +83,21 @@ class Meteo(Enum):
     RAINY = "rainy"
 
 
+# Global variable for JSON annotations folder
+# Necessary to avoid passing this as parameter to functions
+# which could be changed by the code agent
+JSON_FOLDER = Path("/media/EVO870/datasets/prompting-mammalps-v2/annotations")
+
+
 ### Basic functions
 def load_video_detections(json_file: Union[Path, str]) -> VideoDict:
+    """
+    Loads video detections from a JSON file.
+    Args:
+        json_file (Union[Path, str]): The path to the JSON file.
+    Returns:
+        VideoDict: A dictionary containing video frame detections.
+    """
     with open(json_file, "r") as f:
         content = json.load(f)
 
@@ -104,7 +111,6 @@ def load_video_info(json_file: Union[Path, str]) -> InfoDict:
     return content["info"]
 
 
-@tool
 def get_tracks_from_json(json_file: str) -> List[IndividualTrack]:
     """
     Retrieves all individual tracks from a given JSON file.
@@ -120,6 +126,43 @@ def get_tracks_from_json(json_file: str) -> List[IndividualTrack]:
 
     return individual_tracks
 
+@tool
+def get_tracks_from_id(
+    video_id: Union[Path, str],
+) -> List[IndividualTrack]:
+    video_id_str = str(video_id)
+    json_file_path = str(next(JSON_FOLDER.rglob(f"*/{video_id_str}.json")))
+    video_detections = load_video_detections(json_file_path)
+    individual_tracks = get_tracks_from_video_detections(video_detections)
+    return individual_tracks
+
+## Weather and time attributes
+@tool
+def get_weather_conditions_from_videos(video_id: Union[Path, str]) -> Meteo:
+    """Retrieve weather from video info attributes weather conditions
+    Args:
+        video_id (Union[Path, str]): The ID of the video.
+    Returns:
+        Meteo: The weather condition of the video.
+    """
+    video_id_str = str(video_id)
+    json_file_path = str(next(JSON_FOLDER.rglob(f"*/{video_id_str}.json")))
+    video_info = load_video_info(json_file_path)
+    return video_info["attributes"]["weather"]
+
+@tool
+def check_contains_weather_condition(
+    video_id: Union[Path, str], weather_condition: Meteo
+) -> bool:
+    """Check if the video contains the specified weather condition
+    Args:
+        json_file (Union[Path, str]): The path to the JSON file.
+        weather_condition (Meteo): The weather condition to check.
+    Returns:
+        bool: True if the video contains the specified weather condition, False otherwise.
+    """
+    video_weather = get_weather_conditions_from_videos(video_id)
+    return video_weather == weather_condition
 
 def get_tracks_from_video_detections(
     video_detections: VideoDict,
@@ -770,42 +813,38 @@ def check_track_contains_continuous_sequence(
 
     return False
 
-## Weather and time attributes
-def get_weather_conditions_from_videos(json_file: Union[Path, str]) -> Meteo:
-    """Retrieve weather from video info attributes weather conditions
-    Args:
-        json_file (Union[Path, str]): The path to the JSON file.
-    Returns:
-        Meteo: The weather condition of the video.
-    """
-    video_info = load_video_info(json_file)
-    return video_info["attributes"]["weather"]
-
 @tool
-def check_contains_weather_condition(
-    json_file: Union[Path, str], weather_condition: Literal[Meteo]
-) -> bool:
-    """Check if the video contains the specified weather condition
-    Args:
-        json_file (Union[Path, str]): The path to the JSON file.
-        weather_condition (Meteo): The weather condition to check.
-    Returns:
-        bool: True if the video contains the specified weather condition, False otherwise.
+def get_action_sequences_from_tracks(
+    individual_tracks: List[IndividualTrack],
+) -> set:
     """
-    check_enum_type(weather_condition, Meteo)
-    video_weather = get_weather_conditions_from_videos(json_file)
-    expected_weather = (
-        weather_condition.value if isinstance(weather_condition, Enum) else weather_condition
-    )
-    return video_weather == expected_weather
+    Returns the set of unique action sequences present in the individual tracks
 
-if __name__ == "__main__":
+    Args:
+        individual_tracks (List[IndividualTrack]): List of individual tracks, each organized by segments.
 
-    parser = argparse.ArgumentParser(description="Parse video detection JSON file.")
-    parser.add_argument("--input_json", type=str, help="Path to the input JSON file")
-    args = parser.parse_args()
-
-    video_detections = load_video_detections(args.input_json)
-    video_info = load_video_info(args.input_json)
-
-    tracks = get_tracks_from_video_detections(video_detections)
+    Returns:
+        set: the unique action sequences present in the individual tracks
+    """
+    action_sequence_tracks = []
+    for track in individual_tracks:
+        track_actions = []
+        for segment in track:
+            if "attributes" in segment[0]:
+                if "Action" in segment[0]["attributes"]:
+                    if (
+                        len(track_actions) == 0
+                        or track_actions[-1] != segment[0]["attributes"]["Action"]
+                    ):
+                        track_actions.append(segment[0]["attributes"]["Action"])
+                if (
+                    "Action2" in segment[0]["attributes"]
+                    and segment[0]["attributes"]["Action2"] != "none"
+                ):
+                    if (
+                        len(track_actions) == 0
+                        or track_actions[-1] != segment[0]["attributes"]["Action2"]
+                    ):
+                        track_actions.append(segment[0]["attributes"]["Action2"])
+        action_sequence_tracks.append(track_actions)
+    return action_sequence_tracks
