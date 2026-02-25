@@ -119,7 +119,7 @@
     "An animal reacting to a camera in clear or sunny weather."
   ],
   "VIDEO_COMPARISON": [
-    "An adult male red deer doing the same sequence of actions while wallowing as any individual of <vid>S3_C3_E545_V0406</vid>.",
+    "An adult male red deer doing the same sequence of actions while wallowing as any individual of <vid>S3_C2_E769_V0436</vid>.",
     "An adult male red deer doing the same sequence of actions while wallowing as any individual of <vid>S3_C3_E524_V0327</vid>.",
     "An adult male red deer doing the same unique actions while wallowing as any individual of <vid>S3_C3_E524_V0327</vid>.",
     "An adult male red deer doing the same unique actions while wallowing as any individual of <vid>S3_C2_E524_V0087</vid>.",
@@ -128,18 +128,19 @@
     "A juvenile red deer performing at least one action in common while nursing with any individual in <vid>S1_C6_F404_V0330</vid>.",
     "A juvenile red deer performing at least one different action while nursing than with any individual in <vid>S1_C6_F404_V0330</vid>.",
     "An individual doing the same sequence of actions while reacting to a camera as any individual of <vid>S1_C4_F173_V0137</vid>.",
-    "An individual doing the same sequence of actions while reacting to a camera as any individual of <vid>S1_C2_E8_V0021</vid>.",
+    "An individual doing the same sequence of actions while reacting to a camera as any individual of <vid>S1_C3_E144_V0060</vid>.",
     "An individual doing the same unique actions while reacting to a camera as any individual of <vid>S1_C4_F173_V0137</vid>.",
-    "An individual doing the same unique actions while reacting to a camera as any individual of <vid>S1_C2_E8_V0021</vid>.",
+    "An individual doing the same unique actions while reacting to a camera as any individual of <vid>S1_C3_E144_V0060</vid>.",
+    "An individual doing the same sequence of actions as the individual of <vid>S2_C1_E323_V0074</vid>.",
     "An individual doing at least one different action while reacting to a camera than with any individual of <vid>S1_C4_F173_V0137</vid>.",
-    "An individual doing at least one different action while reacting to a camera than with any individual of <vid>S1_C2_E8_V0021</vid>.",
+    "An individual doing at least one different action while reacting to a camera than with any individual of <vid>S1_C3_E144_V0060</vid>.",
     "An animal being vigilant in a different weather condition from that in <vid>S2_C2_F536_V0066</vid>.",
     "A wolf chasing prey in a different weather condition from that in <vid>S2_C1_F573_V0093</vid>.",
     "An individual sharing at least one activity with any individual from <vid>S2_C1_F573_V0093</vid>.",
     "An individual sharing at least one activity with any individual from <vid>S3_C2_E670_V0159</vid> but in a different weather condition.",
     "An individual sharing at least one activity with any individual of the same species from <vid>S1_C4_F136_V0115</vid> but in a different weather condition.",
     "An individual sharing at least one activity with any individual from <vid>S1_C1_E66_V0152</vid> but of a different species.",
-    "An individual performing the same activities as any individual from <vid>S1_C2_E179_V0409</vid> but in a different weather condition."
+    "An individual performing the same activities as any individual from <vid>S2_C2_E351_V0099</vid> but in a different weather condition."
   ],
   "COMMON": [
     "A single adult red deer foraging only.",

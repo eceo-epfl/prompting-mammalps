@@ -1822,11 +1822,11 @@ def get_parsing_function(prompt):
         return check_file
     elif (
         prompt
-        == "An adult male red deer doing the same sequence of actions while wallowing as any individual of <vid>S3_C3_E545_V0406</vid>."
+        == "An adult male red deer doing the same sequence of actions while wallowing as any individual of <vid>S3_C2_E769_V0436</vid>."
     ):
 
         def check_file(video_id):
-            video_ref = "S3_C3_E545_V0406"
+            video_ref = "S3_C2_E769_V0436"
             individual_tracks_ref = get_tracks_from_id(video_ref)
             male_red_deer_tracks_ref = get_adult_deer_tracks_from_sex(
                 individual_tracks_ref,
@@ -2122,11 +2122,11 @@ def get_parsing_function(prompt):
         return check_file
     elif (
         prompt
-        == "An individual doing the same sequence of actions while reacting to a camera as any individual of <vid>S1_C2_E8_V0021</vid>."
+        == "An individual doing the same sequence of actions while reacting to a camera as any individual of <vid>S1_C3_E144_V0060</vid>."
     ):
 
         def check_file(video_id):
-            video_ref = "S1_C2_E8_V0021"
+            video_ref = "S1_C3_E144_V0060"
             individual_tracks_ref = get_tracks_from_id(video_ref)
             individual_tracks = get_tracks_from_id(video_id)
             camera_reaction_tracks = get_tracks_from_activity(
@@ -2147,12 +2147,12 @@ def get_parsing_function(prompt):
         return check_file
     elif (
         prompt
-        == "An individual doing the same unique actions while reacting to a camera as any individual of <vid>S1_C2_E8_V0021</vid>."
+        == "An individual doing the same unique actions while reacting to a camera as any individual of <vid>S1_C3_E144_V0060</vid>."
     ):
 
         def check_file(video_id):
 
-            video_ref = "S1_C2_E8_V0021"
+            video_ref = "S1_C3_E144_V0060"
             individual_tracks_ref = get_tracks_from_id(video_ref)
             individual_tracks = get_tracks_from_id(video_id)
             camera_reaction_tracks = get_tracks_from_activity(
@@ -2197,11 +2197,11 @@ def get_parsing_function(prompt):
         return check_file
     elif (
         prompt
-        == "An individual doing at least one different action while reacting to a camera than with any individual of <vid>S1_C2_E8_V0021</vid>."
+        == "An individual doing at least one different action while reacting to a camera than with any individual of <vid>S1_C3_E144_V0060</vid>."
     ):
 
         def check_file(video_id):
-            video_ref = "S1_C2_E8_V0021"
+            video_ref = "S1_C3_E144_V0060"
             individual_tracks_ref = get_tracks_from_id(video_ref)
             individual_tracks = get_tracks_from_id(video_id)
             camera_reaction_tracks = get_tracks_from_activity(
@@ -2389,11 +2389,11 @@ def get_parsing_function(prompt):
         return check_file
     elif (
         prompt
-        == "An individual performing the same activities as any individual from <vid>S1_C2_E179_V0409</vid> but in a different weather condition."
+        == "An individual performing the same activities as any individual from <vid>S2_C2_E351_V0099</vid> but in a different weather condition."
     ):
 
         def check_file(video_id):
-            video_ref = "S1_C2_E179_V0409"
+            video_ref = "S2_C2_E351_V0099"
             individual_tracks_ref = get_tracks_from_id(video_ref)
             individual_tracks = get_tracks_from_id(video_id)
             weather_condition = get_weather_conditions_from_videos(video_id)
@@ -2412,6 +2412,26 @@ def get_parsing_function(prompt):
             return False
 
         return check_file
+    elif (
+        prompt
+        == "An individual doing the same sequence of actions as the individual of <vid>S2_C1_E323_V0074</vid>."
+    ):
+
+        def check_file(video_id):
+            video_ref = "S2_C1_E323_V0074"
+            individual_tracks_ref = get_tracks_from_id(video_ref)
+            individual_tracks = get_tracks_from_id(video_id)
+            for track in individual_tracks:
+                for ref_track in individual_tracks_ref:
+                    ref_sequences = get_action_sequences_from_tracks([ref_track])
+                    if check_track_contains_continuous_sequence(
+                        track, ref_sequences[0]
+                    ):
+                        return True
+            return False
+
+        return check_file
+
     elif prompt == "An empty video.":
 
         def check_file(video_id):
