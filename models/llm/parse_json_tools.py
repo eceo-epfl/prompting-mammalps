@@ -1,8 +1,8 @@
 import argparse
 import json
-from enum import Enum
+from enum import StrEnum
 from pathlib import Path
-from typing import Dict, List, Optional, Tuple, Union, Literal
+from typing import Dict, List, Literal, Optional, Tuple, Union
 
 from smolagents import tool
 
@@ -13,7 +13,8 @@ InfoDict = Dict
 BehaviorSegment = List[Dict]
 IndividualTrack = List[BehaviorSegment]
 
-class Species(Enum):
+
+class Species(StrEnum):
     RED_DEER = "red_deer"
     ROE_DEER = "roe_deer"
     FOX = "fox"
@@ -23,7 +24,7 @@ class Species(Enum):
     CHAMOIS = "chamois"
 
 
-class Action(Enum):
+class Action(StrEnum):
     WALKING = "walking"
     STANDING_HEAD_UP = "standing_head_up"
     STANDING_HEAD_DOWN = "standing_head_down"
@@ -48,7 +49,7 @@ class Action(Enum):
     PREPARING_TO_SUCKLE = "preparing_to_suckle"
 
 
-class Activity(Enum):
+class Activity(StrEnum):
     FORAGING = "foraging"
     VIGILANCE = "vigilance"
     COURTSHIP = "courtship"
@@ -62,21 +63,21 @@ class Activity(Enum):
     MARKING_OR_WALLOWING = "marking_or_wallowing"
 
 
-class DAge(Enum):
+class DAge(StrEnum):
     """Deer age"""
 
     ADULT = "adult"
     JUVENILE = "juvenile"
 
 
-class DSex(Enum):
+class DSex(StrEnum):
     "Sex for adult deers"
 
     MALE = "male"
     FEMALE = "female"
 
 
-class Meteo(Enum):
+class Meteo(StrEnum):
     SUNNY = "sunny"
     CLEAR = "clear"
     OVERCAST = "overcast"
@@ -86,7 +87,10 @@ class Meteo(Enum):
 # Global variable for JSON annotations folder
 # Necessary to avoid passing this as parameter to functions
 # which could be changed by the code agent
-JSON_FOLDER = Path("/home/eceo_scratch/datasets/prompting-mammalps-v2/annotations")
+if Path("/home/eceo_scratch/datasets/prompting-mammalps-v2/annotations").exists():
+    JSON_FOLDER = Path("/home/eceo_scratch/datasets/prompting-mammalps-v2/annotations")
+else:
+    JSON_FOLDER = Path("/media/EVO870/datasets/prompting-mammalps-v2/annotations")
 
 
 ### Basic functions
@@ -126,6 +130,7 @@ def get_tracks_from_json(json_file: str) -> List[IndividualTrack]:
 
     return individual_tracks
 
+
 @tool
 def get_tracks_from_id(file_id: str) -> List[IndividualTrack]:
     """
@@ -141,6 +146,7 @@ def get_tracks_from_id(file_id: str) -> List[IndividualTrack]:
     individual_tracks = get_tracks_from_video_detections(video_detections)
     return individual_tracks
 
+
 ## Weather and time attributes
 @tool
 def get_weather_conditions_from_videos(file_id: str) -> Meteo:
@@ -154,10 +160,9 @@ def get_weather_conditions_from_videos(file_id: str) -> Meteo:
     video_info = load_video_info(json_file_path)
     return video_info["attributes"]["weather"]
 
+
 @tool
-def check_contains_weather_condition(
-    file_id: str, weather_condition: Meteo
-) -> bool:
+def check_contains_weather_condition(file_id: str, weather_condition: Meteo) -> bool:
     """Check if the video contains the specified weather condition
     Args:
         file_id (str): id corresponding to input json file
@@ -167,6 +172,7 @@ def check_contains_weather_condition(
     """
     video_weather = get_weather_conditions_from_videos(file_id)
     return video_weather == weather_condition
+
 
 def get_tracks_from_video_detections(
     video_detections: VideoDict,
@@ -246,7 +252,9 @@ def check_segment_contains_attribute(
 ):
     # Checks if the first element of the segment has the given attribute name and value
     expected_value = (
-        attribute_value.value if isinstance(attribute_value, Enum) else attribute_value
+        attribute_value.value
+        if isinstance(attribute_value, StrEnum)
+        else attribute_value
     )
     return (
         "attributes" in segment[0]
@@ -356,6 +364,7 @@ def get_segments_from_attribute_as_tracks(
 
     return attr_tracks
 
+
 def check_enum_type(value, enumType, allow_none: bool = False):
     if allow_none and value is None:
         return
@@ -363,6 +372,7 @@ def check_enum_type(value, enumType, allow_none: bool = False):
         print(f"{value} must be an element from {enumType}")
         print(f"Available {enumType} are:", [e for e in enumType])
         raise AttributeError
+
 
 @tool
 def get_tracks_from_species(
@@ -778,7 +788,9 @@ def check_track_contains_continuous_sequence(
         elif isinstance(attribute, Activity):
             check_enum_type(attribute, Activity)
         else:
-            raise AttributeError(f"{attribute} must be an element from either an Action or an Activity")
+            raise AttributeError(
+                f"{attribute} must be an element from either an Action or an Activity"
+            )
 
     # Get anchor segment matching first sequence element
     for bs_id, behavior_segment in enumerate(single_track):
@@ -816,6 +828,7 @@ def check_track_contains_continuous_sequence(
                 return True
 
     return False
+
 
 @tool
 def get_action_sequences_from_tracks(
