@@ -3,7 +3,7 @@ name = "prompting-mammalps"
 version = "0.1.0"
 description = "Code for the development of the text to video retrieval benchmark on MammAlps"
 readme = "README.md"
-requires-python = ">=3.12"
+requires-python = ">=3.11,<3.12"
 dependencies = [
     "audioread>=3.1.0",
     "boto3>=1.42.55",
@@ -32,6 +32,7 @@ dependencies = [
     "torchaudio>=2.10.0",
     "torchvision>=0.25.0",
     "tqdm>=4.67.1",
+    "transformers>=4.28.0,<4.31",
     "wandb>=0.25.0",
     "webdataset>=1.0.2",
     "xformers>=0.0.35",
@@ -71,5 +72,5 @@ build-backend = "setuptools.build_meta"
 
 [dependency-groups]
 dev = [
-    "ipykernel>=6.29.5",
+    "ipykernel>=7.2.0",
 ]

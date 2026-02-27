@@ -7,8 +7,8 @@ ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 cd "$ROOT"
 mkdir -p logs
 
-VIDEOS_TRAIN="/media/EVO870/datasets/prompting-mammalps/videos/train"
-VIDEOS_TEST="/media/EVO870/datasets/prompting-mammalps/videos/test"
+VIDEOS_TRAIN="/media/EVO870/datasets/prompting-mammalps-v2/videos/train"
+VIDEOS_TEST="/media/EVO870/datasets/prompting-mammalps-v2/videos/test"
 
 BENCH_TRAIN="benchmark/queries_and_videos_train.json"
 BENCH_TEST="benchmark/queries_and_videos_test.json"
