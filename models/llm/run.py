@@ -74,9 +74,15 @@ def main(args):
     # Load model and code agent
     if args.llm == "qwen":
         model_id = "Qwen/Qwen3-8B"  # "Qwen/Qwen3-Coder-Next"  # "meta-llama/Meta-Llama-3.1-8B-Instruct"
+    elif args.llm == "llama":
+        model_id = "meta-llama/Meta-Llama-3.1-8B-Instruct"
+    elif args.llm == "mistral":
+        model_id = "mistralai/Mistral-7B-Instruct-v0.3"
+    elif args.llm == "apertus":
+        model_id = "swiss-ai/Apertus-8B-Instruct-2509"
     else:
         raise NotImplementedError()
-    model = TransformersModel(model_id, device_map="cuda", max_new_tokens=8096)
+    model = TransformersModel(model_id, device_map="cuda", max_new_tokens=8096, do_sample=False)
     agent = CodeAgent(
         tools=tools,
         model=model,
@@ -111,7 +117,8 @@ def main(args):
     with open(args.input_queries_videos, "r") as f:
         queries_dict = json.load(f)
 
-    queries_list = [q for q_cat in queries_dict.values() for q in q_cat]
+    # queries_list = [q for q_cat in queries_dict.values() for q in q_cat]
+    queries_list = [q for (cat, q_cat) in queries_dict.items() for q in q_cat if cat=="VIDEO_COMPARISON"]
     output_queries_functions = {}
     test_file_id = "S1_C1_E57_V0141"
 
@@ -157,7 +164,7 @@ if __name__ == "__main__":
         "--input_queries_videos",
         help="JSON file containing the queries of interest and associated ground truth videos",
     )
-    parser.add_argument("--llm", choices=["qwen"], default="llama")
+    parser.add_argument("--llm", choices=["qwen", "llama", "mistral", "apertus"], default="llama")
     parser.add_argument(
         "-O",
         "--output_folder",
