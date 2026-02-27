@@ -1,5 +1,3 @@
-import ast
-import inspect
 import json
 import logging
 import os
@@ -14,6 +12,7 @@ from parse_json_tools import (
     DSex,
     Meteo,
     Species,
+    get_weather_condition_from_file_id,
     check_contains_weather_condition,
     check_track_contains_continuous_sequence,
     get_action_sequences_from_tracks,
@@ -26,44 +25,45 @@ from parse_json_tools import (
     get_nb_tracks_species_in_video,
     get_tracks_from_action,
     get_tracks_from_activity,
-    get_tracks_from_id,
+    get_tracks_from_file_id,
     get_tracks_from_species,
     get_unique_actions_from_tracks,
     get_unique_activities_from_tracks,
     get_unique_species_from_tracks,
-    tracks_contain_action,
-    tracks_contain_activity,
-    tracks_contain_adult_deer_sex,
-    tracks_contain_deer_age,
-    tracks_contain_species,
+    check_tracks_contain_action,
+    check_tracks_contain_activity,
+    check_tracks_contain_adult_deer_sex,
+    check_tracks_contain_deer_age,
+    check_tracks_contain_species,
 )
 from smolagents import CodeAgent, PromptTemplates, TransformersModel
 
 
 def main(args):
     tools = [
-        get_tracks_from_id,
-        get_tracks_from_species,
+        get_tracks_from_file_id,
+        get_weather_condition_from_file_id,
         get_tracks_from_action,
         get_tracks_from_activity,
+        get_tracks_from_species,
+        get_unique_actions_from_tracks,
+        get_unique_activities_from_tracks,
+        get_unique_species_from_tracks,
+        get_action_sequences_from_tracks,
         get_adult_deer_tracks_from_sex,
         get_deer_tracks_from_age,
-        tracks_contain_species,
-        tracks_contain_action,
-        tracks_contain_activity,
-        tracks_contain_adult_deer_sex,
-        tracks_contain_deer_age,
         get_nb_adult_deer_tracks_sex_in_video,
         get_nb_deer_tracks_age_in_video,
         get_nb_tracks_action_in_video,
         get_nb_tracks_activity_in_video,
         get_nb_tracks_species_in_video,
-        get_unique_species_from_tracks,
-        get_unique_actions_from_tracks,
-        get_unique_activities_from_tracks,
-        check_track_contains_continuous_sequence,
         check_contains_weather_condition,
-        get_action_sequences_from_tracks,
+        check_track_contains_continuous_sequence,
+        check_tracks_contain_action,
+        check_tracks_contain_activity,
+        check_tracks_contain_adult_deer_sex,
+        check_tracks_contain_deer_age,
+        check_tracks_contain_species,
     ]
 
     with open("prompt.yaml", "r") as f:
@@ -111,7 +111,7 @@ def main(args):
     with open(args.input_queries_videos, "r") as f:
         queries_dict = json.load(f)
 
-    queries_list = [q for q_cat in queries_dict.values()]
+    queries_list = [q for q_cat in queries_dict.values() for q in q_cat]
     output_queries_functions = {}
     test_file_id = "S1_C1_E57_V0141"
 
