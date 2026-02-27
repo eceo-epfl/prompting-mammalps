@@ -3,17 +3,15 @@ name = "prompting-mammalps"
 version = "0.1.0"
 description = "Code for the development of the text to video retrieval benchmark on MammAlps"
 readme = "README.md"
-requires-python = ">=3.12"
+requires-python = ">=3.11,<3.12"
 dependencies = [
     "audioread>=3.1.0",
     "boto3>=1.42.55",
-    "clip4clip-local",
     "decord>=0.6.0",
     "easydict>=1.13",
     "einops>=0.8.2",
     "ffmpeg-python>=0.2.0",
     "ftfy>=6.3.1",
-    "gram-local",
     "h5py>=3.15.1",
     "ipdb>=0.13.13",
     "librosa>=0.11.0",
@@ -32,6 +30,7 @@ dependencies = [
     "torchaudio>=2.10.0",
     "torchvision>=0.25.0",
     "tqdm>=4.67.1",
+    "transformers>=4.36.0",
     "wandb>=0.25.0",
     "webdataset>=1.0.2",
     "xformers>=0.0.35",
@@ -55,15 +54,6 @@ line-length = 88
 profile = "black"
 line_length = 88
 
-[tool.uv.workspace]
-members = [
-    "models/CLIP4Clip",
-    "models/GRAM",
-]
-
-[tool.uv.sources]
-clip4clip-local = { workspace = true }
-gram-local = { workspace = true }
 
 [build-system]
 requires = ["setuptools>=61"]
@@ -71,5 +61,5 @@ build-backend = "setuptools.build_meta"
 
 [dependency-groups]
 dev = [
-    "ipykernel>=6.29.5",
+    "ipykernel>=7.2.0",
 ]
