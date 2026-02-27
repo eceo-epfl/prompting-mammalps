@@ -1,11 +1,14 @@
 import argparse
 import json
 from pathlib import Path
-from tqdm import tqdm
 
 # Create a safe environment for the check_file functions
 import parse_json_tools
+from parse_json_tools import JSON_FOLDER
+from tqdm import tqdm
+
 env = parse_json_tools.__dict__.copy()
+
 
 def get_parsing_function(query, query_functions):
     function_source = query_functions[query]
@@ -19,9 +22,12 @@ def get_parsing_function(query, query_functions):
         return None
 
     if "check_file" not in env or not callable(env["check_file"]):
-        raise ValueError("The provided source did not define a callable 'check_file' function")
+        raise ValueError(
+            "The provided source did not define a callable 'check_file' function"
+        )
 
     return env["check_file"]
+
 
 def evaluate_llm_functions(opt):
     input_json_folder = Path(opt.input_json_folder)
@@ -29,22 +35,27 @@ def evaluate_llm_functions(opt):
 
     with open(opt.input_query_functions, "r") as f:
         query_functions = json.load(f)
-    
+
     # Initialize output dict with empty lists for each query
-    out_queries_dict = {
-        q: [] for q in query_functions
-    }
+    out_queries_dict = {q: [] for q in query_functions}
 
     # Precompute parsing functions for all queries
     parsing_functions = {}
     for q in query_functions:
         parsing_functions[q] = get_parsing_function(q, query_functions)
+        try:
+            parsing_functions[q](next(Path(JSON_FOLDER).rglob("*.json")).stem)
+        except Exception as e:
+            print(f"Skiping evaluation for {q}")
+            print(e)
+            print(query_functions[q])
+            parsing_functions.pop(q)
 
     # Iterate over all files once, check all queries for each file
     for f in tqdm(json_files):
-        for q in out_queries_dict:
+        for q in list(out_queries_dict.keys()):
             try:
-                if parsing_functions[q](f):
+                if q in parsing_functions and parsing_functions[q](f.stem):
                     out_queries_dict[q].append(f.stem)
             except Exception as e:
                 print(f"Could not parse {f} for {q}")
@@ -53,10 +64,9 @@ def evaluate_llm_functions(opt):
 
     with open(opt.output_retrieval_json, "w") as f:
         json.dump(out_queries_dict, f, indent=2)
-            
 
 
-if __name__ == "__main__": 
+if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("-IQF", "--input_query_functions")
     parser.add_argument("-IJ", "--input_json_folder")
