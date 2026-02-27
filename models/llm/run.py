@@ -118,7 +118,7 @@ def main(args):
         queries_dict = json.load(f)
 
     # queries_list = [q for q_cat in queries_dict.values() for q in q_cat]
-    queries_list = [q for (cat, q_cat) in queries_dict.items() for q in q_cat if cat=="VIDEO_COMPARISON"]
+    queries_list = [q for (cat, q_cat) in queries_dict.items() for q in q_cat]
     output_queries_functions = {}
     test_file_id = "S1_C1_E57_V0141"
 
