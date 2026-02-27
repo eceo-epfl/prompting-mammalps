@@ -96,14 +96,14 @@ system_prompt: |-
 
   Thought: The task requires to parse the json file_id and assess whether it contains information about a roe deer playing. Let's first interpret the prompt. We need the occurence of at least one animal, which is of the species 'roe deer'. This same animal needs to be 'playing'. 
   The 'roe deer' is part of the Species label space, but is listed as 'roe_deer'. 'playing' has a direct equivalent in the Activity label space, so we can use 'playing' directly.
-  Now, which tool can I use to retrieve informations about the species and the activities. It seems like there is not one function that checks for the presence of a species and an activity at the same time, so I need to chain tool function calls. `get_tracks_from_species` returns a list of IndividualTracks matching a given species and is therefore appropriate to retrieve the roe deer tracks. 
+  Now, which tool can I use to retrieve information about the species and the activities. It seems like there is not one function that checks for the presence of a species and an activity at the same time, so I need to chain tool function calls. `get_tracks_from_species` returns a list of IndividualTracks matching a given species and is therefore appropriate to retrieve the roe deer tracks. 
   `get_tracks_from_activity` returns a list of IndividualTracks matching a given activity, and is then relevant to retrieve tracks matching the activity 'playing'.
   But I need to return a boolean. This is what the 'tracks_contain_activity' does. Instead of calling `get_tracks_from_activity`, I can directly return the output from 'tracks_contain_activity'
   Ok I know the sequence of tools I need to call to parse the JSON file for the query. Let's implement the check_file functions:
 
   {{code_block_opening_tag}}
   def check_file(file_id):
-      individual_tracks = get_tracks_from_id(file_id)
+      individual_tracks = get_tracks_from_file_id(file_id)
       roe_deer_tracks = get_tracks_from_species(individual_tracks, species_name=Species.ROE_DEER)
 
       return tracks_contain_activity(
@@ -130,7 +130,7 @@ system_prompt: |-
   
   {{code_block_opening_tag}}
   def check_file(file_id):
-      individual_tracks = get_tracks_from_id(file_id)
+      individual_tracks = get_tracks_from_file_id(file_id)
 
       return tracks_contain_action(
           individual_tracks, action_name=Action.GRAZING
@@ -151,7 +151,7 @@ system_prompt: |-
 
   Thought: The task requires to parse the json file_id and assess whether it contains a fox that is doing the same sequence of actions as any individual from another video, which has the id S1_C1_E28_V0032. 
   Let's first interpret the prompt. We need to check if the file_id contains a fox and if so, extract its sequence of actions. Then, we need to extract the sequence of actions of all individuals in S1_C1_E28_V0032, so we also need to load information from this file. Then we iteratively test if the sequence of actions of the fox matches any action sequences of the reference individuals.
-  'fox' has a direct equivalent in the Action label space, so we can call it 'fox' directly.
+  'fox' has a direct equivalent in the Species label space, so we can call it 'fox' directly.
   Now, which tool can I use achieve this. First to retrieve the fox tracks, it seems that `get_tracks_from_species` is appropriate since returns a list of IndividualTracks matching a given species
   `get_tracks_from_species` returns a list of IndividualTracks matching a given species and is therefore appropriate to retrieve the fox tracks. 
   `get_action_sequences_from_tracks` returns the set of unique action sequences present in the individual tracks. Ok this is a set because there might be multiple individual tracks, or multiple foxes in our case. But this also is the appropriate function to use.
@@ -165,10 +165,10 @@ system_prompt: |-
 
       # Reference video mentioned in the prompt
       reference_video = "S1_C1_E28_V0032"
-      individual_tracks_ref = get_tracks_from_id(video_ref)
+      individual_tracks_ref = get_tracks_from_file_id(reference_video)
 
       # Our target video
-      individual_tracks = get_tracks_from_id(file_id)
+      individual_tracks = get_tracks_from_file_id(file_id)
       fox_tracks = get_tracks_from_species(
           individual_tracks, species_name=Species.FOX
       )
