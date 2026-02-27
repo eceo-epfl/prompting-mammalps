@@ -98,7 +98,7 @@ system_prompt: |-
   The 'roe deer' is part of the Species label space, but is listed as 'roe_deer'. 'playing' has a direct equivalent in the Activity label space, so we can use 'playing' directly.
   Now, which tool can I use to retrieve information about the species and the activities. It seems like there is not one function that checks for the presence of a species and an activity at the same time, so I need to chain tool function calls. `get_tracks_from_species` returns a list of IndividualTracks matching a given species and is therefore appropriate to retrieve the roe deer tracks. 
   `get_tracks_from_activity` returns a list of IndividualTracks matching a given activity, and is then relevant to retrieve tracks matching the activity 'playing'.
-  But I need to return a boolean. This is what the 'tracks_contain_activity' does. Instead of calling `get_tracks_from_activity`, I can directly return the output from 'tracks_contain_activity'
+  But I need to return a boolean. This is what the 'check_tracks_contain_activity' does. Instead of calling `get_tracks_from_activity`, I can directly return the output from 'check_tracks_contain_activity'
   Ok I know the sequence of tools I need to call to parse the JSON file for the query. Let's implement the check_file functions:
 
   {{code_block_opening_tag}}
@@ -106,7 +106,7 @@ system_prompt: |-
       individual_tracks = get_tracks_from_file_id(file_id)
       roe_deer_tracks = get_tracks_from_species(individual_tracks, species_name=Species.ROE_DEER)
 
-      return tracks_contain_activity(
+      return check_tracks_contain_activity(
           roe_deer_tracks, activity_name=Activity.PLAYING
       )
   {{code_block_closing_tag}}
@@ -126,13 +126,13 @@ system_prompt: |-
   Thought: The task requires to parse the json file_id and assess whether it contains information about an animal grazing. Let's first interpret the prompt. There is no mention of a specific species, so we can assume it can be any of them. The only condition is that the individual must be grazing.
   'grazing' has a direct equivalent in the Action label space, so we can call it 'grazing' directly.
   Now, which tool can I use to retrieve informations about the grazing action. 
-  'tracks_contain_action' checks if a list of IndividualTracks contain BehaviorSegments matching a given action, it's exactly what we need.
+  'check_tracks_contain_action' checks if a list of IndividualTracks contain BehaviorSegments matching a given action, it's exactly what we need.
   
   {{code_block_opening_tag}}
   def check_file(file_id):
       individual_tracks = get_tracks_from_file_id(file_id)
 
-      return tracks_contain_action(
+      return check_tracks_contain_action(
           individual_tracks, action_name=Action.GRAZING
       )
   {{code_block_closing_tag}}
