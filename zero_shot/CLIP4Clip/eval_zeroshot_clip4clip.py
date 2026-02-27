@@ -8,6 +8,7 @@ import argparse
 import json
 import os
 import random
+import sys
 from pathlib import Path
 
 import numpy as np
@@ -15,10 +16,13 @@ import pandas as pd
 import torch
 import torch.utils.data as data_utils
 import tqdm
+
+sys.path.insert(0, str(Path(__file__).resolve().parents[2] / "models" / "CLIP4Clip"))
 from dataloaders.rawvideo_util import RawVideoExtractor
 from modules.file_utils import PYTORCH_PRETRAINED_BERT_CACHE
 from modules.modeling import CLIP4Clip
 from modules.tokenization_clip import SimpleTokenizer as ClipTokenizer
+from transformers import AutoTokenizer, SiglipTokenizer
 from util import get_logger
 
 torch.backends.cudnn.enabled = False
@@ -156,9 +160,9 @@ class VideoOnlyDataLoader(data_utils.Dataset):
                 # Sample frames
                 if self.max_frames < raw_video_slice.shape[0]:
                     if self.slice_framepos == 0:
-                        video_slice = raw_video_slice[: self.max_frames, ...]
+                        video_slice = raw_video_slice[: self.max_frames,]
                     elif self.slice_framepos == 1:
-                        video_slice = raw_video_slice[-self.max_frames :, ...]
+                        video_slice = raw_video_slice[-self.max_frames :,]
                     else:  # uniform sampling
                         sample_indx = np.linspace(
                             0,
@@ -166,7 +170,7 @@ class VideoOnlyDataLoader(data_utils.Dataset):
                             num=self.max_frames,
                             dtype=int,
                         )
-                        video_slice = raw_video_slice[sample_indx, ...]
+                        video_slice = raw_video_slice[sample_indx,]
                 else:
                     video_slice = raw_video_slice
 
@@ -186,7 +190,7 @@ class VideoOnlyDataLoader(data_utils.Dataset):
                     ),
                     dtype=np.float32,
                 )
-                video[:slice_len, ...] = video_slice
+                video[:slice_len,] = video_slice
 
                 video_mask = np.zeros(self.max_frames, dtype=np.int64)
                 video_mask[:slice_len] = 1
@@ -223,6 +227,129 @@ class VideoOnlyDataLoader(data_utils.Dataset):
             return video, video_mask
 
 
+class SigLIPTextDataLoader(data_utils.Dataset):
+    """Text dataloader for SigLIP using HuggingFace tokenizer."""
+
+    def __init__(self, queries, tokenizer, max_words=64):
+        self.queries = queries
+        self.tokenizer = tokenizer
+        self.max_words = max_words
+        self.pad_token_id = tokenizer.pad_token_id
+
+    def __len__(self):
+        return len(self.queries)
+
+    def __getitem__(self, idx):
+        encoding = self.tokenizer(
+            self.queries[idx],
+            padding="max_length",
+            max_length=self.max_words,
+            truncation=True,
+            return_tensors="pt",
+        )
+        input_ids = encoding["input_ids"].squeeze(0)
+        # SiglipTokenizer does not return attention_mask  derive it from padding
+        if "attention_mask" in encoding:
+            attention_mask = encoding["attention_mask"].squeeze(0)
+        else:
+            attention_mask = (input_ids != self.pad_token_id).long()
+        return input_ids, attention_mask
+
+
+class SigLIPWrapper(torch.nn.Module):
+    """Wraps HuggingFace SigLIP with a CLIP4Clip-compatible interface.
+
+    RawVideoExtractor normalises frames with OpenAI CLIP's mean/std.
+    This wrapper undoes that normalisation and re-applies SigLIP's before
+    passing frames through the vision encoder.
+    """
+
+    # OpenAI CLIP normalisation used by RawVideoExtractorCV2
+    _CLIP_MEAN = [0.48145466, 0.4578275, 0.40821073]
+    _CLIP_STD = [0.26862954, 0.26130258, 0.27577711]
+    # SigLIP normalisation
+    _SIGLIP_MEAN = [0.5, 0.5, 0.5]
+    _SIGLIP_STD = [0.5, 0.5, 0.5]
+
+    def __init__(self, model_name):
+        super().__init__()
+        from transformers import SiglipModel
+
+        self.siglip = SiglipModel.from_pretrained(model_name)
+        # Normalisation tensors — moved to device in .to()
+        self._clip_mean = torch.tensor(self._CLIP_MEAN).view(1, 3, 1, 1)
+        self._clip_std = torch.tensor(self._CLIP_STD).view(1, 3, 1, 1)
+        self._siglip_mean = torch.tensor(self._SIGLIP_MEAN).view(1, 3, 1, 1)
+        self._siglip_std = torch.tensor(self._SIGLIP_STD).view(1, 3, 1, 1)
+
+    def to(self, device):
+        self.siglip = self.siglip.to(device)
+        self._clip_mean = self._clip_mean.to(device)
+        self._clip_std = self._clip_std.to(device)
+        self._siglip_mean = self._siglip_mean.to(device)
+        self._siglip_std = self._siglip_std.to(device)
+        return self
+
+    def eval(self):
+        self.siglip.eval()
+        return self
+
+    def _renorm(self, frames):
+        """Convert frames from CLIP normalisation to SigLIP normalisation."""
+        raw = frames * self._clip_std + self._clip_mean  # undo CLIP norm
+        return (raw - self._siglip_mean) / self._siglip_std
+
+    def get_sequence_output(self, input_ids, attention_mask):
+        """Encode text. Returns [batch, 1, embed_dim]."""
+        out = self.siglip.get_text_features(
+            input_ids=input_ids,
+            attention_mask=attention_mask,
+        )
+        # transformers>=5.0 returns BaseModelOutputWithPooling; older returns tensor
+        text_features = out.pooler_output if hasattr(out, "pooler_output") else out
+        text_features = torch.nn.functional.normalize(text_features, dim=-1)
+        return text_features.unsqueeze(1)  # [batch, 1, embed_dim]
+
+    def get_visual_output(self, video, video_mask):
+        """Encode video frames. Returns [batch, max_frames, embed_dim].
+
+        video:      [batch, 1, 1, max_frames, 3, h, w]  (CLIP-normalised)
+        video_mask: [batch, max_frames]
+        """
+        batch_size = video.shape[0]
+        max_frames = video.shape[3]
+
+        # [batch * max_frames, 3, h, w]
+        frames = video.view(
+            batch_size * max_frames, 3, video.shape[-2], video.shape[-1]
+        )
+        frames = self._renorm(frames)
+
+        out = self.siglip.get_image_features(pixel_values=frames)
+        # transformers>=5.0 returns BaseModelOutputWithPooling; older returns tensor
+        image_features = out.pooler_output if hasattr(out, "pooler_output") else out
+        image_features = image_features.view(batch_size, max_frames, -1)
+        image_features = torch.nn.functional.normalize(image_features, dim=-1)
+        return image_features  # [batch, max_frames, embed_dim]
+
+    def get_similarity_logits(
+        self, sequence_output, visual_output, input_mask, video_mask, loose_type=True
+    ):
+        """Cosine similarity between text and mean-pooled video embeddings.
+
+        Returns (logits [batch_t, batch_v], None) to match CLIP4Clip's signature.
+        """
+        text_embeds = sequence_output.squeeze(1)  # [batch_t, embed_dim]
+
+        # Mean-pool over valid frames
+        vmask = video_mask.float().unsqueeze(-1)  # [batch_v, max_frames, 1]
+        video_embeds = (visual_output * vmask).sum(1) / vmask.sum(1).clamp(min=1e-6)
+        video_embeds = torch.nn.functional.normalize(video_embeds, dim=-1)
+
+        logits = torch.matmul(text_embeds, video_embeds.T)  # [batch_t, batch_v]
+        return logits, None
+
+
 def get_args():
     parser = argparse.ArgumentParser(
         description="CLIP4Clip Zero-shot Retrieval (Optimized)"
@@ -257,12 +384,28 @@ def get_args():
         help="Limit to the first N discovered videos (useful for smoke-testing)",
     )
 
-    # Model parameters
+    # Encoder selection
+    parser.add_argument(
+        "--encoder_type",
+        type=str,
+        default="clip",
+        choices=["clip", "siglip"],
+        help="Encoder backend: 'clip' uses the CLIP4Clip pipeline (default), "
+        "'siglip' uses google/siglip-so400m-patch14-384 (or --siglip_model_name)",
+    )
+    parser.add_argument(
+        "--siglip_model_name",
+        type=str,
+        default="google/siglip-so400m-patch14-384",
+        help="HuggingFace model ID for SigLIP (used when --encoder_type siglip)",
+    )
+
+    # Model parameters (CLIP4Clip only)
     parser.add_argument(
         "--pretrained_clip_name",
         type=str,
         default="ViT-B/32",
-        help="CLIP pretrained model name",
+        help="CLIP pretrained model name (used when --encoder_type clip)",
     )
     parser.add_argument(
         "--cross_model", type=str, default="cross-base", help="Cross module"
@@ -392,7 +535,7 @@ def eval_and_save_similarities(args, model, query_dataloader, video_dataloader, 
     model.eval()
 
     with torch.no_grad():
-        # Step 1: Encode all queries
+        # Encode all queries
         batch_sequence_output_list = []
         batch_list_t = []
 
@@ -409,7 +552,7 @@ def eval_and_save_similarities(args, model, query_dataloader, video_dataloader, 
             if (bid + 1) % 10 == 0 or bid == len(query_dataloader) - 1:
                 logger.info(f"  Encoded batch {bid + 1}/{len(query_dataloader)}")
 
-        # Step 2: Encode all videos
+        # Encode all videos
         logger.info("Encoding videos")
         batch_visual_output_list = []
         batch_list_v = []
@@ -443,8 +586,7 @@ def eval_and_save_similarities(args, model, query_dataloader, video_dataloader, 
             if (bid + 1) % 10 == 0 or bid == len(video_dataloader) - 1:
                 logger.info(f"  Encoded batch {bid + 1}/{len(video_dataloader)}")
 
-        # Step 3: Compute similarity matrix
-        logger.info("Computing similarity matrix...")
+        logger.info("Computing similarity matrix")
         sim_matrix = _run_on_single_gpu(
             model,
             batch_list_t,
@@ -455,6 +597,81 @@ def eval_and_save_similarities(args, model, query_dataloader, video_dataloader, 
         )
         sim_matrix = np.concatenate(tuple(sim_matrix), axis=0)
 
+        logger.info(f"Similarity matrix shape: {sim_matrix.shape}")
+        logger.info(f"  Queries: {sim_matrix.shape[0]}, Videos: {sim_matrix.shape[1]}")
+
+    return sim_matrix
+
+
+def eval_and_save_similarities_siglip(
+    args, model, query_dataloader, video_dataloader, device
+):
+    """Evaluate SigLIP model and return the similarity matrix.
+
+    Mirrors eval_and_save_similarities but handles the 2-tuple text batches
+    produced by SigLIPTextDataLoader (input_ids, attention_mask).
+    """
+    model.eval()
+
+    with torch.no_grad():
+        # Encode all queries
+        logger.info("Encoding queries")
+        batch_sequence_output_list = []
+        batch_list_t = []
+
+        for bid, batch in enumerate(query_dataloader):
+            input_ids, attention_mask = [t.to(device) for t in batch]
+            sequence_output = model.get_sequence_output(input_ids, attention_mask)
+            batch_sequence_output_list.append(sequence_output)
+            batch_list_t.append((attention_mask,))
+
+            if (bid + 1) % 10 == 0 or bid == len(query_dataloader) - 1:
+                logger.info(f"  Encoded text batch {bid + 1}/{len(query_dataloader)}")
+
+        # Encode all videos
+        logger.info("Encoding videos")
+        batch_visual_output_list = []
+        batch_list_v = []
+
+        for bid, batch in tqdm.tqdm(
+            enumerate(video_dataloader), total=len(video_dataloader)
+        ):
+            video, video_mask = [t.to(device) for t in batch]
+            batch_size = video.shape[0]
+            max_frames = video.shape[1]
+
+            video = video.view(
+                batch_size,
+                1,
+                1,
+                max_frames,
+                video.shape[-3],
+                video.shape[-2],
+                video.shape[-1],
+            )
+            visual_output = model.get_visual_output(video, video_mask)
+            batch_visual_output_list.append(visual_output)
+            batch_list_v.append((video_mask,))
+
+            if (bid + 1) % 10 == 0 or bid == len(video_dataloader) - 1:
+                logger.info(f"  Encoded video batch {bid + 1}/{len(video_dataloader)}")
+
+        # Compute similarity matrix
+        logger.info("Computing similarity matrix")
+        sim_matrix = []
+        for idx1, seq_out in enumerate(batch_sequence_output_list):
+            (attn_mask,) = batch_list_t[idx1]
+            each_row = []
+            for idx2, vis_out in enumerate(batch_visual_output_list):
+                (vmask,) = batch_list_v[idx2]
+                logits, _ = model.get_similarity_logits(
+                    seq_out, vis_out, attn_mask, vmask
+                )
+                each_row.append(logits.cpu().detach().numpy())
+            each_row = np.concatenate(each_row, axis=-1)
+            sim_matrix.append(each_row)
+
+        sim_matrix = np.concatenate(sim_matrix, axis=0)
         logger.info(f"Similarity matrix shape: {sim_matrix.shape}")
         logger.info(f"  Queries: {sim_matrix.shape[0]}, Videos: {sim_matrix.shape[1]}")
 
@@ -503,11 +720,6 @@ def main():
     args = set_seed_logger(args)
     device, n_gpu = init_device(args)
 
-    tokenizer = (
-        ClipTokenizer()
-    )  # tokenizer used for text-only dataloader from text to vector
-    model = init_model(args, device)
-
     # Load queries from text file
     logger.info(f"Loading queries from {args.queries_file}")
     with open(args.queries_file, "r") as f:
@@ -519,10 +731,37 @@ def main():
     video_ids, video_paths = discover_videos(args.features_path, args.max_videos)
     logger.info(f"Discovered {len(video_ids)} videos")
 
-    # Create TEXT-ONLY dataloader
-    query_dataset = TextOnlyDataLoader(
-        queries=queries, tokenizer=tokenizer, max_words=args.max_words
-    )
+    # ------------------------------------------------------------------ #
+    #  Encoder-specific setup                                              #
+    # ------------------------------------------------------------------ #
+    if args.encoder_type == "siglip":
+
+        logger.info(f"Loading SigLIP model: {args.siglip_model_name}")
+        tokenizer = SiglipTokenizer.from_pretrained(args.siglip_model_name)
+        model = SigLIPWrapper(args.siglip_model_name)
+        model.to(device)
+        model.eval()
+        logger.info("SigLIP model loaded successfully")
+
+        # SigLIP expects 384×384 input and max 64 tokens
+        image_resolution = 384
+        max_words = min(args.max_words, 64)
+
+        query_dataset = SigLIPTextDataLoader(
+            queries=queries, tokenizer=tokenizer, max_words=max_words
+        )
+        eval_fn = eval_and_save_similarities_siglip
+
+    else:  # clip (default)
+        tokenizer = ClipTokenizer()
+        model = init_model(args, device)
+        image_resolution = 224
+        query_dataset = TextOnlyDataLoader(
+            queries=queries, tokenizer=tokenizer, max_words=args.max_words
+        )
+        eval_fn = lambda a, m, qd, vd, dev: eval_and_save_similarities(
+            a, m, qd, vd, dev
+        )
 
     query_dataloader = data_utils.DataLoader(
         query_dataset,
@@ -537,6 +776,7 @@ def main():
         video_paths=video_paths,
         max_frames=args.max_frames,
         feature_framerate=args.feature_framerate,
+        image_resolution=image_resolution,
     )
 
     video_dataloader = data_utils.DataLoader(
@@ -551,9 +791,7 @@ def main():
     with open(args.ground_truth, "r") as f:
         ground_truth = json.load(f)
 
-    sim_matrix = eval_and_save_similarities(
-        args, model, query_dataloader, video_dataloader, device
-    )
+    sim_matrix = eval_fn(args, model, query_dataloader, video_dataloader, device)
     save_similarities(sim_matrix, queries, video_ids, args.output_dir, ground_truth)
 
 
