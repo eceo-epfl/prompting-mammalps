@@ -123,7 +123,19 @@ def main(args):
     test_file_id = "S1_C1_E57_V0141"
 
     # For every query
+    output_json_file = Path(args.output_folder) / (
+            model_id.split("/")[1] + "_generated_functions.json"
+    )
+    if os.path.exists(output_json_file):
+        with open(output_json_file, "r") as f:
+            output_queries_functions = json.load(f)
+
     for query in queries_list:  # [31:]:
+        if query in output_queries_functions:
+            print("Skipping already processed query:", query)
+            continue
+        if query == "An individual doing the same sequence of actions while reacting to a camera as any individual of <vid>S1_C4_F173_V0137</vid>.":
+            continue
         logger.info(f"################ Processing query {query} ################")
         message = (
             "Verify if the content of the json file id matches the following prompt (return True or False):"
@@ -149,9 +161,6 @@ def main(args):
             logging.warning(e)
 
         # Save results at every step
-        output_json_file = Path(args.output_folder) / (
-            model_id.split("/")[1] + "_generated_functions.json"
-        )
         with open(output_json_file, "w") as f:
             json.dump(output_queries_functions, f, indent=2)
 
