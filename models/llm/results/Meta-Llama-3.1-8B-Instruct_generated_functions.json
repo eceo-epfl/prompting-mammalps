@@ -1,4 +1,0 @@
-{
-  "An animal doing any other activity than foraging.": "def check_file(json_file):\n    individual_tracks = get_tracks_from_json(json_file)\n    activities = get_unique_activities_from_tracks(individual_tracks)\n    return 'foraging' not in activities",
-  "An animal that is neither a red deer nor a roe deer.": "def check_file(json_file):\n    individual_tracks = get_tracks_from_json(json_file)\n    red_deer_tracks = get_nb_tracks_species_in_video(individual_tracks, species_name=Species.RED_DEER)\n    roe_deer_tracks = get_nb_tracks_species_in_video(individual_tracks, species_name=Species.ROE_DEER)\n    return len(individual_tracks) - red_deer_tracks - roe_deer_tracks > 0"
-}
