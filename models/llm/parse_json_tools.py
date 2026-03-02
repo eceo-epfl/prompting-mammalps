@@ -1,11 +1,13 @@
 import json
+
 try:
     from enum import StrEnum
 except ImportError:
     from enum import Enum
+
     StrEnum = Enum
 from pathlib import Path
-from typing import Dict, List, Optional, Union, Set, Literal
+from typing import Dict, List, Literal, Optional, Set, Union
 
 from smolagents import tool
 
@@ -27,6 +29,7 @@ class Species(StrEnum):
     CHAMOIS = "chamois"
     UNKNOWN = "unknown"
 
+
 class Action(StrEnum):
     WALKING = "walking"
     STANDING_HEAD_UP = "standing_head_up"
@@ -38,7 +41,7 @@ class Action(StrEnum):
     SCRATCHING_OWN_HEAD_OR_BODY = "scratching_own_head_or_body"
     RUBBING_ANTLERS_ON_GROUND = "rubbing_antlers_on_ground"
     PAWING_GROUND = "pawing_ground"
-    SHAKING_HEAD_OR_BODY = "shaking_head_or_body"
+    SHAKING_HEAD_OR_BODY = "shaking_head_or_fur"
     VOCALIZING = "vocalizing"
     BATHING = "bathing"
     JUMPING = "jumping"
@@ -51,6 +54,7 @@ class Action(StrEnum):
     SUCKLING = "suckling"
     PREPARING_TO_SUCKLE = "preparing_to_suckle"
     UNKNOWN = "unknown"
+
 
 class Activity(StrEnum):
     FORAGING = "foraging"
@@ -66,12 +70,14 @@ class Activity(StrEnum):
     MARKING_OR_WALLOWING = "marking_or_wallowing"
     UNKNOWN = "unknown"
 
+
 class DAge(StrEnum):
     """Deer age"""
 
     ADULT = "adult"
     JUVENILE = "juvenile"
     UNKNOWN = "unknown"
+
 
 class DSex(StrEnum):
     "Sex for adult deers"
@@ -80,6 +86,7 @@ class DSex(StrEnum):
     FEMALE = "female"
     UNKNOWN = "unknown"
 
+
 class Meteo(StrEnum):
     SUNNY = "sunny"
     CLEAR = "clear"
@@ -87,13 +94,18 @@ class Meteo(StrEnum):
     RAINY = "rainy"
     UNKNOWN = "unknown"
 
+
 # Global variable for JSON annotations folder
 # Necessary to avoid passing this as parameter to functions
 # which could be changed by the code agent
 if Path("/home/eceo_scratch/datasets/prompting-mammalps-v2/annotations").exists():
-    JSON_FOLDER = Path("/home/eceo_scratch/datasets/prompting-mammalps-v2/annotations") #ECEO Machine
+    JSON_FOLDER = Path(
+        "/home/eceo_scratch/datasets/prompting-mammalps-v2/annotations"
+    )  # ECEO Machine
 else:
-    JSON_FOLDER = Path("/media/EVO870/datasets/prompting-mammalps-v2/annotations") #RCP
+    JSON_FOLDER = Path(
+        "/media/EVO870/datasets/prompting-mammalps-v2/annotations"
+    )  # RCP
 
 
 ### Basic functions
@@ -166,7 +178,9 @@ def get_weather_condition_from_file_id(file_id: str) -> Literal[Meteo]:
 
 
 @tool
-def check_contains_weather_condition(file_id: str, weather_condition: Literal[Meteo]) -> bool:
+def check_contains_weather_condition(
+    file_id: str, weather_condition: Literal[Meteo]
+) -> bool:
     """
     Check if the file_id contains the specified weather condition
     Args:
@@ -253,7 +267,14 @@ def get_tracks_from_video_detections(
 def check_segment_contains_attribute(
     segment: BehaviorSegment,
     attribute_name: str,
-    attribute_value: Literal[Species] | Literal[Action] | Literal[Activity] | Literal[DSex] | Literal[DAge] | Literal[Meteo],
+    attribute_value: (
+        Literal[Species]
+        | Literal[Action]
+        | Literal[Activity]
+        | Literal[DSex]
+        | Literal[DAge]
+        | Literal[Meteo]
+    ),
 ):
     # Checks if the first element of the segment has the given attribute name and value
     expected_value = (
@@ -269,7 +290,14 @@ def check_segment_contains_attribute(
 
 def check_segment_contains_any_attribute_value(
     segment: BehaviorSegment,
-    attribute_value: Literal[Species] | Literal[Action] | Literal[Activity] | Literal[DSex] | Literal[DAge] | Literal[Meteo],
+    attribute_value: (
+        Literal[Species]
+        | Literal[Action]
+        | Literal[Activity]
+        | Literal[DSex]
+        | Literal[DAge]
+        | Literal[Meteo]
+    ),
 ):
     # Checks if the first element of the segment has the given attribute value for Action, Action2, or Activity
     return (
@@ -282,7 +310,14 @@ def check_segment_contains_any_attribute_value(
 def get_tracks_from_attribute(
     individual_tracks: List[IndividualTrack],
     attribute_name: str,
-    attribute_value: Literal[Species] | Literal[Action] | Literal[Activity] | Literal[DSex] | Literal[DAge] | Literal[Meteo],
+    attribute_value: (
+        Literal[Species]
+        | Literal[Action]
+        | Literal[Activity]
+        | Literal[DSex]
+        | Literal[DAge]
+        | Literal[Meteo]
+    ),
 ):
     """
     Retrieve tracks corresponding to a given attribute name and value.
@@ -315,7 +350,14 @@ def get_tracks_from_attribute(
 def get_segments_from_attribute(
     individual_tracks: List[IndividualTrack],
     attribute_name: str,
-    attribute_value: Union[Literal[Species], Literal[Action], Literal[Activity], Literal[DSex], Literal[DAge], Literal[Meteo]],
+    attribute_value: Union[
+        Literal[Species],
+        Literal[Action],
+        Literal[Activity],
+        Literal[DSex],
+        Literal[DAge],
+        Literal[Meteo],
+    ],
 ):
     """
     Retrieve behavior segments corresponding to a given attribute name and value.
@@ -340,7 +382,14 @@ def get_segments_from_attribute(
 def get_segments_from_attribute_as_tracks(
     individual_tracks: List[IndividualTrack],
     attribute_name: str,
-    attribute_value: Union[Literal[Species], Literal[Action], Literal[Activity], Literal[DSex], Literal[DAge], Literal[Meteo]],
+    attribute_value: Union[
+        Literal[Species],
+        Literal[Action],
+        Literal[Activity],
+        Literal[DSex],
+        Literal[DAge],
+        Literal[Meteo],
+    ],
 ):
     """
     Retrieve tracks corresponding to a given attribute name and value.
@@ -774,7 +823,9 @@ def get_unique_activities_from_tracks(
 @tool
 def check_track_contains_continuous_sequence(
     single_track: IndividualTrack,
-    attributes_sequence: List[Literal[Action] | Literal[Activity]] | List[Action] | List[Activity]
+    attributes_sequence: (
+        List[Literal[Action] | Literal[Activity]] | List[Action] | List[Activity]
+    ),
 ) -> bool:
     """
     Checks if a given individual track contains a continuous series of behavior segments that contain attributes matching the sequence of interest
@@ -868,6 +919,8 @@ def get_action_sequences_from_tracks(
                         len(track_actions) == 0
                         or track_actions[-1] != segment[0]["attributes"]["Action2"]
                     ):
-                        track_actions.append(Action(segment[0]["attributes"]["Action2"]))
+                        track_actions.append(
+                            Action(segment[0]["attributes"]["Action2"])
+                        )
         action_sequence_tracks.append(track_actions)
     return action_sequence_tracks

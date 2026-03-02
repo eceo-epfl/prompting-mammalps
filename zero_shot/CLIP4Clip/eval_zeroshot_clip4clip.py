@@ -335,7 +335,10 @@ class SigLIPWrapper(torch.nn.Module):
     def get_similarity_logits(
         self, sequence_output, visual_output, input_mask, video_mask, loose_type=True
     ):
-        """Cosine similarity between text and mean-pooled video embeddings.
+        """Scaled similarity between text and mean-pooled video embeddings.
+
+        Applies SigLIP's learned logit_scale and logit_bias so the score range
+        matches the contrastive training objective (same as SiglipModel.forward).
 
         Returns (logits [batch_t, batch_v], None) to match CLIP4Clip's signature.
         """
@@ -346,7 +349,9 @@ class SigLIPWrapper(torch.nn.Module):
         video_embeds = (visual_output * vmask).sum(1) / vmask.sum(1).clamp(min=1e-6)
         video_embeds = torch.nn.functional.normalize(video_embeds, dim=-1)
 
-        logits = torch.matmul(text_embeds, video_embeds.T)  # [batch_t, batch_v]
+        logit_scale = self.siglip.logit_scale.exp()
+        logit_bias = self.siglip.logit_bias
+        logits = torch.matmul(text_embeds, video_embeds.T) * logit_scale + logit_bias
         return logits, None
 
 
