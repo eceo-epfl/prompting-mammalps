@@ -32,36 +32,32 @@ def mean_average_precision_score(gt_queries_videos, sim_matrix_df):
         return np.nan, APi
 
 
-def F1_score_from_sim(
-    gt_queries_videos,
-    sim_matrix_df,
-    best_thresholds: Optional[Union[dict, float]] = None,
-):
+def F1_score_from_sim(gt_queries_videos, sim_matrix_df, all_videos, best_thresholds):
+    base_threshold = np.median(sim_matrix_df.values)
     F1i = {}
-    if isinstance(best_thresholds, float):
-        base_threshold = best_thresholds
-    else:
-        base_threshold = np.median(sim_matrix_df.values)
-
     for q in gt_queries_videos.keys():
         if q not in sim_matrix_df.columns:
-            print(f"Query {q} has not been processed")
             continue
-        if isinstance(best_thresholds, dict) and q in best_thresholds:
-            t_q = best_thresholds[q]
-        else:
+        t_q = (
+            best_thresholds.get(q)
+            if isinstance(best_thresholds, dict)
+            else base_threshold
+        )
+        if t_q is None:
             t_q = base_threshold
         gt_videos_q = list(gt_queries_videos[q]["videos"])
         ass_videos_q = list(sim_matrix_df.index[sim_matrix_df[q] >= t_q])
-
+        if len(gt_videos_q) == 0:  # Empty query: measure the opposite
+            gt_videos_q = all_videos
+            ass_videos_q = list(set(all_videos) - set(ass_videos_q))
         F1i[q] = F1_score_q(gt_videos_q, ass_videos_q)
-
     return np.nanmean(list(F1i.values())), F1i
 
 
 def IoU_from_sim(
     gt_queries_videos,
     sim_matrix_df,
+    all_videos,
     best_thresholds: Optional[Union[dict, float]] = None,
 ):
     IoUi = {}
@@ -80,7 +76,9 @@ def IoU_from_sim(
             t_q = base_threshold
         gt_videos_q = list(gt_queries_videos[q]["videos"])
         ass_videos_q = list(sim_matrix_df.index[sim_matrix_df[q] >= t_q])
-
+        if len(gt_videos_q) == 0:  # Empty query: measure the opposite
+            gt_videos_q = all_videos
+            ass_videos_q = list(set(all_videos) - set(ass_videos_q))
         IoUi[q] = IoU_q(gt_videos_q, ass_videos_q)
 
     return np.nanmean(list(IoUi.values())), IoUi
@@ -109,26 +107,40 @@ def IoU_q(gt_videos, pred_videos) -> float:
         return np.nan
 
 
-def F1_score(gt_queries_videos, pred_queries_videos) -> tuple:
+def F1_score(gt_queries_videos, pred_queries_videos, all_videos) -> tuple:
 
     F1i = {}
 
     for q in gt_queries_videos.keys():
+        if q not in pred_queries_videos:
+            F1i[q] = 0
+            continue
         gt_videos_q = list(gt_queries_videos[q])
         ass_videos_q = list(pred_queries_videos[q])
+
+        if len(gt_videos_q) == 0:  # Empty query: we measure the opposite
+            gt_videos_q = all_videos
+            ass_videos_q = list(set(all_videos) - set(ass_videos_q))
 
         F1i[q] = F1_score_q(gt_videos_q, ass_videos_q)
 
     return np.nanmean(list(F1i.values())), F1i
 
 
-def IoU(gt_queries_videos, pred_queries_videos) -> tuple:
+def IoU(gt_queries_videos, pred_queries_videos, all_videos) -> tuple:
 
     IoUi = {}
 
     for q in gt_queries_videos.keys():
+        if q not in pred_queries_videos:
+            IoUi[q] = 0
+            continue
         gt_videos_q = list(gt_queries_videos[q])
         ass_videos_q = list(pred_queries_videos[q])
+
+        if len(gt_videos_q) == 0:  # Empty query: we measure the opposite
+            gt_videos_q = all_videos
+            ass_videos_q = list(set(all_videos) - set(ass_videos_q))
 
         IoUi[q] = IoU_q(gt_videos_q, ass_videos_q)
 
