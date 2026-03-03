@@ -1,5 +1,3 @@
-import ast
-import inspect
 import json
 import logging
 import os
@@ -14,6 +12,7 @@ from parse_json_tools import (
     DSex,
     Meteo,
     Species,
+    get_weather_condition_from_file_id,
     check_contains_weather_condition,
     check_track_contains_continuous_sequence,
     get_action_sequences_from_tracks,
@@ -26,44 +25,45 @@ from parse_json_tools import (
     get_nb_tracks_species_in_video,
     get_tracks_from_action,
     get_tracks_from_activity,
-    get_tracks_from_id,
+    get_tracks_from_file_id,
     get_tracks_from_species,
     get_unique_actions_from_tracks,
     get_unique_activities_from_tracks,
     get_unique_species_from_tracks,
-    tracks_contain_action,
-    tracks_contain_activity,
-    tracks_contain_adult_deer_sex,
-    tracks_contain_deer_age,
-    tracks_contain_species,
+    check_tracks_contain_action,
+    check_tracks_contain_activity,
+    check_tracks_contain_adult_deer_sex,
+    check_tracks_contain_deer_age,
+    check_tracks_contain_species,
 )
 from smolagents import CodeAgent, PromptTemplates, TransformersModel
 
 
 def main(args):
     tools = [
-        get_tracks_from_id,
-        get_tracks_from_species,
+        get_tracks_from_file_id,
+        get_weather_condition_from_file_id,
         get_tracks_from_action,
         get_tracks_from_activity,
+        get_tracks_from_species,
+        get_unique_actions_from_tracks,
+        get_unique_activities_from_tracks,
+        get_unique_species_from_tracks,
+        get_action_sequences_from_tracks,
         get_adult_deer_tracks_from_sex,
         get_deer_tracks_from_age,
-        tracks_contain_species,
-        tracks_contain_action,
-        tracks_contain_activity,
-        tracks_contain_adult_deer_sex,
-        tracks_contain_deer_age,
         get_nb_adult_deer_tracks_sex_in_video,
         get_nb_deer_tracks_age_in_video,
         get_nb_tracks_action_in_video,
         get_nb_tracks_activity_in_video,
         get_nb_tracks_species_in_video,
-        get_unique_species_from_tracks,
-        get_unique_actions_from_tracks,
-        get_unique_activities_from_tracks,
-        check_track_contains_continuous_sequence,
         check_contains_weather_condition,
-        get_action_sequences_from_tracks,
+        check_track_contains_continuous_sequence,
+        check_tracks_contain_action,
+        check_tracks_contain_activity,
+        check_tracks_contain_adult_deer_sex,
+        check_tracks_contain_deer_age,
+        check_tracks_contain_species,
     ]
 
     with open("prompt.yaml", "r") as f:
@@ -74,9 +74,15 @@ def main(args):
     # Load model and code agent
     if args.llm == "qwen":
         model_id = "Qwen/Qwen3-8B"  # "Qwen/Qwen3-Coder-Next"  # "meta-llama/Meta-Llama-3.1-8B-Instruct"
+    elif args.llm == "llama":
+        model_id = "meta-llama/Meta-Llama-3.1-8B-Instruct"
+    elif args.llm == "mistral":
+        model_id = "mistralai/Mistral-7B-Instruct-v0.3"
+    elif args.llm == "apertus":
+        model_id = "swiss-ai/Apertus-8B-Instruct-2509"
     else:
         raise NotImplementedError()
-    model = TransformersModel(model_id, device_map="cuda", max_new_tokens=8096)
+    model = TransformersModel(model_id, device_map="cuda", max_new_tokens=8096, do_sample=False)
     agent = CodeAgent(
         tools=tools,
         model=model,
@@ -111,12 +117,25 @@ def main(args):
     with open(args.input_queries_videos, "r") as f:
         queries_dict = json.load(f)
 
-    queries_list = [q for q_cat in queries_dict.values()]
+    # queries_list = [q for q_cat in queries_dict.values() for q in q_cat]
+    queries_list = [q for (cat, q_cat) in queries_dict.items() for q in q_cat]
     output_queries_functions = {}
     test_file_id = "S1_C1_E57_V0141"
 
     # For every query
+    output_json_file = Path(args.output_folder) / (
+            model_id.split("/")[1] + "_generated_functions.json"
+    )
+    if os.path.exists(output_json_file):
+        with open(output_json_file, "r") as f:
+            output_queries_functions = json.load(f)
+
     for query in queries_list:  # [31:]:
+        if query in output_queries_functions:
+            print("Skipping already processed query:", query)
+            continue
+        if query == "An individual doing the same sequence of actions while reacting to a camera as any individual of <vid>S1_C4_F173_V0137</vid>.":
+            continue
         logger.info(f"################ Processing query {query} ################")
         message = (
             "Verify if the content of the json file id matches the following prompt (return True or False):"
@@ -142,9 +161,6 @@ def main(args):
             logging.warning(e)
 
         # Save results at every step
-        output_json_file = Path(args.output_folder) / (
-            model_id.split("/")[1] + "_generated_functions.json"
-        )
         with open(output_json_file, "w") as f:
             json.dump(output_queries_functions, f, indent=2)
 
@@ -157,7 +173,7 @@ if __name__ == "__main__":
         "--input_queries_videos",
         help="JSON file containing the queries of interest and associated ground truth videos",
     )
-    parser.add_argument("--llm", choices=["qwen"], default="llama")
+    parser.add_argument("--llm", choices=["qwen", "llama", "mistral", "apertus"], default="llama")
     parser.add_argument(
         "-O",
         "--output_folder",

@@ -4,13 +4,10 @@ from pathlib import Path
 
 # Create a safe environment for the check_file functions
 import parse_json_tools
-from parse_json_tools import JSON_FOLDER
 from tqdm import tqdm
 
-env = parse_json_tools.__dict__.copy()
 
-
-def get_parsing_function(query, query_functions):
+def get_parsing_function(query, query_functions, env):
     function_source = query_functions[query]
     try:
         exec(function_source, env)
@@ -30,8 +27,11 @@ def get_parsing_function(query, query_functions):
 
 
 def evaluate_llm_functions(opt):
-    input_json_folder = Path(opt.input_json_folder)
-    json_files = [f for f in input_json_folder.rglob("*.json")]
+
+    parse_json_tools.JSON_FOLDER = Path(opt.input_json_folder)
+    env = parse_json_tools.__dict__.copy()
+    JSON_FOLDER = parse_json_tools.JSON_FOLDER
+    json_files = [f for f in JSON_FOLDER.rglob("*.json")]
 
     with open(opt.input_query_functions, "r") as f:
         query_functions = json.load(f)
@@ -42,13 +42,13 @@ def evaluate_llm_functions(opt):
     # Precompute parsing functions for all queries
     parsing_functions = {}
     for q in query_functions:
-        parsing_functions[q] = get_parsing_function(q, query_functions)
+        parsing_functions[q] = get_parsing_function(q, query_functions, env)
         try:
             parsing_functions[q](next(Path(JSON_FOLDER).rglob("*.json")).stem)
         except Exception as e:
             print(f"Skiping evaluation for {q}")
             print(e)
-            print(query_functions[q])
+            # print(query_functions[q])
             parsing_functions.pop(q)
 
     # Iterate over all files once, check all queries for each file
@@ -60,7 +60,6 @@ def evaluate_llm_functions(opt):
             except Exception as e:
                 print(f"Could not parse {f} for {q}")
                 print(e)
-                continue
 
     with open(opt.output_retrieval_json, "w") as f:
         json.dump(out_queries_dict, f, indent=2)
