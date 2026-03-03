@@ -15,7 +15,10 @@ import io
 import json
 import os
 import subprocess
+import sys
 from pathlib import Path
+
+sys.path.insert(0, str(Path(__file__).resolve().parents[2] / "models" / "GRAM"))
 
 import cv2
 import numpy as np
@@ -154,10 +157,21 @@ def _load_audio_fbank(video_path, sample_num, target_length, melbins, mean, std)
         # Decode audio via ffmpeg → 16kHz mono WAV in memory
         result = subprocess.run(
             [
-                "ffmpeg", "-i", str(video_path),
-                "-f", "wav", "-acodec", "pcm_s16le",
-                "-ar", "16000", "-ac", "1",
-                "-", "-nostdin", "-loglevel", "error",
+                "ffmpeg",
+                "-i",
+                str(video_path),
+                "-f",
+                "wav",
+                "-acodec",
+                "pcm_s16le",
+                "-ar",
+                "16000",
+                "-ac",
+                "1",
+                "-",
+                "-nostdin",
+                "-loglevel",
+                "error",
             ],
             capture_output=True,
             timeout=30,
@@ -378,7 +392,7 @@ def main():
         type=str,
         default=default_gram_root,
         help="Path to the GRAM model root directory (used as working directory so that "
-             "./pretrained_weights/... relative paths resolve correctly)",
+        "./pretrained_weights/... relative paths resolve correctly)",
     )
     parser.add_argument(
         "--model_cfg",
