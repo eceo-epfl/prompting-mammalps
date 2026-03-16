@@ -50,9 +50,6 @@ def prepare_dataset(input_json_path, output_dir, video_folder, max_videos=None):
             print(f"Skipping category: {category}")
             continue
         for query_text, video_ids in category_queries.items():
-            if not video_ids:
-                print(f"Skipping empty query: {query_text}")
-                continue
             queries.append(query_text)
             ground_truth[query_text] = {"videos": video_ids, "category": category}
 

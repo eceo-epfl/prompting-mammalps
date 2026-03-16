@@ -526,6 +526,10 @@
     ],
     "category": "RARE"
   },
+  "A juvenile roe deer preparing to suckle.": {
+    "videos": [],
+    "category": "RARE"
+  },
   "A chamois trotting.": {
     "videos": [
       "S1_C5_F168_V0221",
@@ -577,6 +581,14 @@
       "S1_C2_E118_V0179",
       "S1_C2_E118_V0178"
     ],
+    "category": "RARE"
+  },
+  "A fox sniffing.": {
+    "videos": [],
+    "category": "RARE"
+  },
+  "A fox chasing prey.": {
+    "videos": [],
     "category": "RARE"
   },
   "A wolf chasing prey.": {
@@ -658,6 +670,14 @@
       "S2_C3_F574_V0121",
       "S2_C1_F574_V0094"
     ],
+    "category": "RARE"
+  },
+  "A juvenile red deer shaking its head or body.": {
+    "videos": [],
+    "category": "RARE"
+  },
+  "A juvenile roe deer.": {
+    "videos": [],
     "category": "RARE"
   },
   "A roe deer trotting while foraging.": {
@@ -1178,6 +1198,10 @@
     ],
     "category": "COURTSHIP"
   },
+  "A video of two adult red deer vocalizing while participating in courtship.": {
+    "videos": [],
+    "category": "COURTSHIP"
+  },
   "An adult red deer lying down while participating in courtship.": {
     "videos": [
       "S3_C2_E769_V0436"
@@ -1353,6 +1377,10 @@
       "S2_C1_F604_V0112",
       "S2_C2_F604_V0104"
     ],
+    "category": "COURTSHIP"
+  },
+  "A roe deer participating in courtship in rainy weather.": {
+    "videos": [],
     "category": "COURTSHIP"
   },
   "A red deer participating in courtship in rainy weather.": {
@@ -1599,6 +1627,10 @@
     ],
     "category": "SOCIAL"
   },
+  "A video of three or more adult male red deer walking while foraging.": {
+    "videos": [],
+    "category": "SOCIAL"
+  },
   "A video of two or more wolves.": {
     "videos": [
       "S2_C3_E292_V0061"
@@ -1685,6 +1717,10 @@
     "videos": [
       "S1_C6_F394_V0310"
     ],
+    "category": "SOCIAL"
+  },
+  "A juvenile roe deer suckling.": {
+    "videos": [],
     "category": "SOCIAL"
   },
   "An animal escaping from another animal of the same species that is chasing it.": {
@@ -1885,6 +1921,10 @@
     ],
     "category": "SOCIAL"
   },
+  "A fox chasing prey in clear weather.": {
+    "videos": [],
+    "category": "SOCIAL"
+  },
   "A roe deer foraging in sunny weather.": {
     "videos": [
       "S1_C5_F136_V0181",
@@ -2021,6 +2061,10 @@
       "S2_C2_F494_V0047",
       "S2_C2_E351_V0097"
     ],
+    "category": "SOCIAL"
+  },
+  "An adult female red deer escaping in sunny weather.": {
+    "videos": [],
     "category": "SOCIAL"
   },
   "An animal being vigilant while the weather is rainy or overcast.": {
@@ -2422,6 +2466,14 @@
       "S2_C2_E323_V0073",
       "S2_C2_E334_V0080"
     ],
+    "category": "CAMERA_REACTION"
+  },
+  "A fox reacting to a camera.": {
+    "videos": [],
+    "category": "CAMERA_REACTION"
+  },
+  "A wolf reacting to a camera.": {
+    "videos": [],
     "category": "CAMERA_REACTION"
   },
   "An animal reacting to a camera and then foraging.": {

@@ -2392,8 +2392,6 @@ def get_parsing_function(prompt):
             video_ref = "S1_C1_E66_V0152"
             individual_tracks_ref = get_tracks_from_file_id(video_ref)
             individual_tracks = get_tracks_from_file_id(video_id)
-            weather_condition = get_weather_condition_from_file_id(video_id)
-            weather_condition_ref = get_weather_condition_from_file_id(video_ref)
             for track in individual_tracks:
                 track_activities = get_unique_activities_from_tracks([track])
                 species_vid = get_unique_species_from_tracks([track])
@@ -2404,7 +2402,6 @@ def get_parsing_function(prompt):
                     )
                     if (
                         len(track_activities.intersection(ref_track_activities)) > 0
-                        and weather_condition != weather_condition_ref
                         and species_vid != species_ref
                     ):
                         return True
