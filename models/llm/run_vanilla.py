@@ -5,65 +5,21 @@ from argparse import ArgumentParser
 from pathlib import Path
 
 import yaml
-from parse_json_tools import (
+from parse_json_tools_no_label_constrain import (
     Action,
     Activity,
     DAge,
     DSex,
     Meteo,
     Species,
-    get_weather_condition_from_file_id,
-    check_contains_weather_condition,
-    check_track_contains_continuous_sequence,
-    get_action_sequences_from_tracks,
-    get_adult_deer_tracks_from_sex,
-    get_deer_tracks_from_age,
-    get_nb_adult_deer_tracks_sex_in_video,
-    get_nb_deer_tracks_age_in_video,
-    get_nb_tracks_action_in_video,
-    get_nb_tracks_activity_in_video,
-    get_nb_tracks_species_in_video,
-    get_tracks_from_action,
-    get_tracks_from_activity,
-    get_tracks_from_file_id,
-    get_tracks_from_species,
-    get_unique_actions_from_tracks,
-    get_unique_activities_from_tracks,
-    get_unique_species_from_tracks,
-    check_tracks_contain_action,
-    check_tracks_contain_activity,
-    check_tracks_contain_adult_deer_sex,
-    check_tracks_contain_deer_age,
-    check_tracks_contain_species,
+    load_json_from_id,
 )
 from smolagents import CodeAgent, PromptTemplates, TransformersModel
 
 
 def main(args):
     tools = [
-        get_tracks_from_file_id,
-        get_weather_condition_from_file_id,
-        get_tracks_from_action,
-        get_tracks_from_activity,
-        get_tracks_from_species,
-        get_unique_actions_from_tracks,
-        get_unique_activities_from_tracks,
-        get_unique_species_from_tracks,
-        get_action_sequences_from_tracks,
-        get_adult_deer_tracks_from_sex,
-        get_deer_tracks_from_age,
-        get_nb_adult_deer_tracks_sex_in_video,
-        get_nb_deer_tracks_age_in_video,
-        get_nb_tracks_action_in_video,
-        get_nb_tracks_activity_in_video,
-        get_nb_tracks_species_in_video,
-        check_contains_weather_condition,
-        check_track_contains_continuous_sequence,
-        check_tracks_contain_action,
-        check_tracks_contain_activity,
-        check_tracks_contain_adult_deer_sex,
-        check_tracks_contain_deer_age,
-        check_tracks_contain_species,
+        load_json_from_id,
     ]
 
     with open(args.yaml, "r") as f:
@@ -101,6 +57,7 @@ def main(args):
         }
     )
 
+
     os.makedirs(args.output_folder, exist_ok=True)
     # Logger
     output_log = Path(args.output_folder) / (model_id.split("/")[1] + "_process.log")
@@ -120,7 +77,7 @@ def main(args):
     # queries_list = [q for q_cat in queries_dict.values() for q in q_cat]
     queries_list = [q for (cat, q_cat) in queries_dict.items() for q in q_cat]
     output_queries_functions = {}
-    test_file_id = "S1_C1_E57_V0141"
+    test_file_id = "S3_C3_E692_V0698"
 
     # For every query
     output_json_file = Path(args.output_folder) / (
@@ -139,7 +96,6 @@ def main(args):
             "Verify if the content of the json file id matches the following prompt (return True or False):"
             + f"'{query}'. Don't forget: always match elements from the prompt to the label space; save your implementation of the check_file function first as you will need it again."
         )
-
         try:
             agent.run(
                 message,
@@ -148,8 +104,7 @@ def main(args):
                 additional_args={"file_id": test_file_id},
             )
 
-        # Get the function that was created and apply it to all files
-        
+            # Get the function that was created and apply it to all files
             check_file = agent.python_executor.custom_tools["check_file"]
             check_file_str = check_file.__source__
             logging.info(
