@@ -17,8 +17,11 @@ Loss Function:
 from __future__ import absolute_import, division, print_function, unicode_literals
 
 import argparse
+import math
 import os
 import random
+from collections import Counter
+from typing import Iterator
 
 import numpy as np
 import torch
@@ -29,15 +32,221 @@ from modules.file_utils import PYTORCH_PRETRAINED_BERT_CACHE
 from modules.modeling import CLIP4Clip
 from modules.optimization import BertAdam
 from modules.tokenization_clip import SimpleTokenizer as ClipTokenizer
+from PIL import Image, ImageDraw, ImageFont
 from torch.nn.utils import clip_grad_norm_
+from torch.utils.data.distributed import DistributedSampler
+from torch.utils.tensorboard import SummaryWriter
 from util import get_logger
 
-# NOTE: Cannot import from main_task_retrieval.py directly because it calls
-# torch.distributed.init_process_group() at module level, which fails in single-GPU mode.
-# We'll initialize distributed training here first if needed, then define our own versions
-# of the helper functions (they're simple wrappers anyway).
-
 global logger
+global tb_writer
+
+
+class BalancedDistributedSampler(DistributedSampler):
+    """
+    Distributed sampler with balanced/weighted sampling to handle caption imbalance.
+
+    Strategy:
+    1. Count frequency of each caption in the dataset
+    2. Compute weight for each sample as 1 / caption_frequency
+    3. Use torch.multinomial to sample indices proportional to weights
+    """
+
+    def __init__(
+        self,
+        dataset,
+        num_replicas=None,
+        rank=None,
+        shuffle=True,
+        seed=0,
+        drop_last=False,
+        replacement=True,
+    ):
+        """
+        Args:
+            dataset: Dataset with .pairs attribute containing {'query': str, 'video_id': str}
+            num_replicas: Number of processes (GPUs)
+            rank: Rank of current process
+            shuffle: Whether to use random sampling (always True for balanced sampling)
+            seed: Random seed
+            drop_last: Whether to drop incomplete batch
+            replacement: Whether to allow replacement in multinomial sampling
+        """
+        super().__init__(
+            dataset,
+            num_replicas=num_replicas,
+            rank=rank,
+            shuffle=shuffle,
+            seed=seed,
+            drop_last=drop_last,
+        )
+
+        self.replacement = replacement
+
+        # Compute weights for balanced sampling
+        self.sample_weights = self._compute_sample_weights(dataset)
+
+        logger.info(f"BalancedDistributedSampler initialized:")
+        logger.info(f"  Total samples: {len(dataset)}")
+        logger.info(f"  Sample weights computed from caption frequencies")
+        logger.info(f"  Min weight: {self.sample_weights.min().item():.6f}")
+        logger.info(f"  Max weight: {self.sample_weights.max().item():.6f}")
+        logger.info(f"  Mean weight: {self.sample_weights.mean().item():.6f}")
+
+    def _compute_sample_weights(self, dataset):
+        """
+        Compute inverse frequency weights for each sample.
+
+        Process:
+        1. Count frequency of each unique caption
+        2. Assign weight = 1 / frequency to each sample
+        3. Normalize weights to sum to 1.0
+
+        Returns:
+            torch.Tensor: Weights for each sample in [0, 1]
+        """
+        # Extract captions from dataset pairs
+        captions = [pair["query"] for pair in dataset.pairs]
+
+        # Count caption frequencies
+        caption_counts = Counter(captions)
+
+        # Compute inverse frequency weights
+        # weight[i] = 1 / count[caption[i]]
+        sample_weights = torch.zeros(len(captions), dtype=torch.float32)
+        for i, caption in enumerate(captions):
+            sample_weights[i] = 1.0 / caption_counts[caption]
+
+        # Normalize weights to sum to 1 (required for multinomial)
+        sample_weights = sample_weights / sample_weights.sum()
+
+        return sample_weights
+
+    def __iter__(self) -> Iterator[int]:
+        """
+        Build a random iterator with balanced/weighted sampling.
+
+        Uses torch.multinomial to sample indices proportional to inverse
+        caption frequencies. This ensures each caption is equally represented.
+
+        Returns:
+            Iterator[int]: Iterator over sample indices.
+        """
+        g = torch.Generator()
+        g.manual_seed(self.seed + self.epoch)
+
+        # Sample indices according to caption frequencies (with or without replacement)
+        indices = torch.multinomial(
+            self.sample_weights, len(self.dataset), self.replacement, generator=g
+        ).tolist()
+
+        if not self.drop_last:
+            # Add extra samples to make it evenly divisible by num_replicas
+            padding_size = self.total_size - len(indices)
+            if padding_size <= len(indices):
+                indices += indices[:padding_size]
+            else:
+                indices += (indices * math.ceil(padding_size / len(indices)))[
+                    :padding_size
+                ]
+        else:
+            # Remove tail of data to make it evenly divisible
+            indices = indices[: self.total_size]
+
+        assert (
+            len(indices) == self.total_size
+        ), f"Indices length {len(indices)} != total_size {self.total_size}"
+
+        # Subsample to give each GPU its portion
+        indices = indices[self.rank : self.total_size : self.num_replicas]
+        assert (
+            len(indices) == self.num_samples
+        ), f"Subsampled indices length {len(indices)} != num_samples {self.num_samples}"
+
+        return iter(indices)
+
+
+def custom_collate_fn(batch):
+    """
+    Custom collate function that handles mixed types (tensors and strings).
+    Keeps strings as lists instead of trying to stack them.
+    """
+    # Separate tensors from metadata
+    input_ids_list = [item[0] for item in batch]
+    input_mask_list = [item[1] for item in batch]
+    segment_ids_list = [item[2] for item in batch]
+    video_list = [item[3] for item in batch]
+    video_mask_list = [item[4] for item in batch]
+    video_ids = [item[5] for item in batch]  # Keep as list
+    queries = [item[6] for item in batch]  # Keep as list
+
+    # Stack tensors
+    return (
+        torch.stack(input_ids_list),
+        torch.stack(input_mask_list),
+        torch.stack(segment_ids_list),
+        torch.stack(video_list),
+        torch.stack(video_mask_list),
+        video_ids,
+        queries,
+    )
+
+
+def save_frame_with_text(frame_tensor, video_id, caption, output_dir, frame_idx=0):
+    """
+    Save a video frame as JPG with text overlay showing frame_id and caption.
+
+    Args:
+        frame_tensor: Tensor of shape [3, H, W] with normalized values
+        video_id: Video ID string
+        caption: Caption string
+        output_dir: Directory to save the frame
+        frame_idx: Frame index in the video
+    """
+    # Inverse normalization (CLIP normalization values)
+    # Original normalization: (img - mean) / std
+    # Inverse: img * std + mean
+    mean = torch.tensor([0.48145466, 0.4578275, 0.40821073]).view(3, 1, 1)
+    std = torch.tensor([0.26862954, 0.26130258, 0.27577711]).view(3, 1, 1)
+
+    frame_denorm = frame_tensor * std + mean
+    frame_denorm = torch.clamp(frame_denorm, 0, 1)  # Clamp to [0, 1]
+
+    # Convert tensor to numpy and denormalize
+    frame_np = frame_denorm.cpu().numpy()  # [3, H, W]
+    frame_np = np.transpose(frame_np, (1, 2, 0))  # [H, W, 3]
+    frame_np = (frame_np * 255).astype(np.uint8)
+
+    # Create PIL image
+    img = Image.fromarray(frame_np)
+
+    # Add text overlay
+    draw = ImageDraw.Draw(img)
+    text = f"{caption}_frame_{frame_idx}"
+
+    # Try to use a reasonable font size, fallback to default
+    try:
+        font = ImageFont.truetype("/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf", 8)
+    except:
+        font = ImageFont.load_default()
+
+    # Add text with background for readability
+    text_bbox = draw.textbbox((0, 0), text, font=font)
+    text_width = text_bbox[2] - text_bbox[0]
+    text_height = text_bbox[3] - text_bbox[1]
+
+    # Draw background rectangle
+    margin = 5
+    draw.rectangle(
+        [(0, 0), (text_width + 2 * margin, text_height + 2 * margin)], fill=(0, 0, 0)
+    )
+    # Draw text
+    draw.text((margin, margin), text, fill=(255, 255, 255), font=font)
+
+    # Save as JPG
+    filename = f"{video_id}_frame_{frame_idx}.jpg"
+    filepath = os.path.join(output_dir, filename)
+    img.save(filepath, "JPEG", quality=95)
 
 
 class MammAlpsDataLoader(data_utils.Dataset):
@@ -179,13 +388,15 @@ class MammAlpsDataLoader(data_utils.Dataset):
             )
             video_mask = np.zeros(self.max_frames, dtype=np.int64)
 
-        # Convert to tensors
+        # Convert to tensors and include metadata
         return (
             torch.from_numpy(input_ids),
             torch.from_numpy(input_mask),
             torch.from_numpy(segment_ids),
             torch.from_numpy(video),
             torch.from_numpy(video_mask),
+            video_id,  # Keep as string
+            query,  # Keep as string
         )
 
     def _get_text(self, query):
@@ -460,6 +671,14 @@ def get_args():
     )
     parser.add_argument("--n_gpu", type=int, default=1, help="Number of GPUs to use")
 
+    # Debug option
+    parser.add_argument(
+        "--debug",
+        action="store_true",
+        default=False,
+        help="Enable debug mode: print batch info (video IDs, captions) at every step",
+    )
+
     # Distributed training parameter
     parser.add_argument(
         "--local_rank",
@@ -568,6 +787,56 @@ def init_model(args, device, n_gpu, local_rank):
 
     model.to(device)
 
+    for param in model.clip.transformer.parameters():
+        param.requires_grad = False
+
+    # Verify CLIP weights are loaded
+    if args.local_rank == 0:
+        logger.info("\n=== CLIP Weight Verification ===")
+
+        # Count parameters
+        total_params = sum(p.numel() for p in model.parameters())
+        clip_params = sum(p.numel() for p in model.clip.parameters())
+        cross_params = sum(p.numel() for p in model.cross.parameters())
+
+        logger.info(f"Total model parameters: {total_params:,}")
+        logger.info(
+            f"CLIP (visual + text encoders) parameters: {clip_params:,} ({100*clip_params/total_params:.1f}%)"
+        )
+        logger.info(
+            f"Cross-attention parameters: {cross_params:,} ({100*cross_params/total_params:.1f}%)"
+        )
+
+        # Check for CLIP-specific components
+        if hasattr(model.clip, "visual"):
+            logger.info(f"Visual encoder loaded: {type(model.clip.visual).__name__}")
+        if hasattr(model.clip, "transformer"):
+            logger.info(
+                f"Text encoder loaded: Transformer with {model.clip.transformer.layers} layers"
+            )
+        if hasattr(model.clip, "token_embedding"):
+            logger.info(
+                f"Token embedding loaded: vocabulary size {model.clip.token_embedding.num_embeddings}"
+            )
+        if hasattr(model.clip, "positional_embedding"):
+            logger.info(
+                f"Positional embedding loaded: shape {model.clip.positional_embedding.shape}"
+            )
+        if hasattr(model.clip, "logit_scale"):
+            logger.info(
+                f"Logit scale parameter loaded: {model.clip.logit_scale.item():.4f}"
+            )
+
+        # Verify trainable parameters in CLIP
+        clip_trainable = sum(
+            p.numel() for p in model.clip.parameters() if p.requires_grad
+        )
+        logger.info(
+            f"\nCLIP trainable parameters: {clip_trainable:,} ({100*clip_trainable/clip_params:.1f}%)"
+        )
+
+        logger.info("=== END VERIFICATION ===\n")
+
     return model
 
 
@@ -644,14 +913,22 @@ def prep_optimizer(
         logger.info(f"  Warmup proportion: {args.warmup_proportion}")
         logger.info(f"  Total optimization steps: {num_train_optimization_steps}")
 
-    # Wrap model in DistributedDataParallel if using multiple GPUs
-    if n_gpu > 1:
-        model = torch.nn.parallel.DistributedDataParallel(
-            model,
-            device_ids=[local_rank],
-            output_device=local_rank,
-            find_unused_parameters=True,
-        )
+        # Detailed optimizer configuration
+        logger.info(f"\nOptimizer groups:")
+        for i, group in enumerate(optimizer_grouped_parameters):
+            group_lr = group.get("lr", args.lr)
+            group_wd = group.get("weight_decay", 0)
+            num_params = sum(p.numel() for p in group["params"])
+            logger.info(
+                f"  Group {i}: {num_params:,} params, lr={group_lr:.2e}, weight_decay={group_wd}"
+            )
+
+        logger.info(f"\n✓ CLIP layers will train at SLOW rate: {args.lr * coef_lr:.2e}")
+        logger.info(f"✓ Cross-attention layers will train at FAST rate: {args.lr:.2e}")
+
+    # NOTE: DDP wrapping is now done in main() BEFORE optimizer creation
+    # This ensures the optimizer references the correct DDP-wrapped parameters
+    # We do NOT wrap here to avoid double-wrapping
 
     return optimizer, scheduler, model
 
@@ -689,7 +966,16 @@ def save_model(epoch, args, model, optimizer, tr_loss, type_name=""):
 
 
 def train_epoch(
-    epoch, args, model, train_dataloader, val_dataloader, device, optimizer, global_step
+    epoch,
+    args,
+    model,
+    train_dataloader,
+    val_dataloader,
+    device,
+    optimizer,
+    global_step,
+    tb_writer=None,
+    debug=False,
 ):
     """
     Train for one epoch.
@@ -720,9 +1006,50 @@ def train_epoch(
     ):
         start_time.record()
 
+        # Unpack batch (last two items are lists of strings, not tensors)
+        input_ids, input_mask, segment_ids, video, video_mask, video_ids, queries = (
+            batch
+        )
+
+        # Debug output
+        if debug and step % args.n_display == 0:
+            logger.info(f"\n=== DEBUG INFO (Step {step}) ===")
+            logger.info(f"Batch size: {len(video_ids)}")
+            logger.info(f"Video frames shape: {video.shape}")
+            logger.info(f"Text tokens shape: {input_ids.shape}")
+
+            # Create debug frames directory if it doesn't exist
+            debug_frames_dir = os.path.join(args.output_dir, "debug_frames")
+            os.makedirs(debug_frames_dir, exist_ok=True)
+
+            # Save frames with text overlay
+            for idx in range(len(video_ids)):
+                logger.info(
+                    f"  [{idx}] Video ID: {video_ids[idx]}, Caption: {queries[idx]}"
+                )
+
+                # Extract frames for this sample
+                # video shape: [batch, max_frames, 1, 3, H, W]
+                sample_video = video[idx, :, 0, :, :, :]  # [max_frames, 3, H, W]
+
+                # Save first, middle, and last frames
+                num_frames = sample_video.shape[0]
+
+                for frame_idx in range(num_frames):
+                    frame = sample_video[frame_idx]  # [3, H, W]
+                    save_frame_with_text(
+                        frame, video_ids[idx], queries[idx], debug_frames_dir, frame_idx
+                    )
+
+            logger.info(f"Frames saved to {debug_frames_dir}")
+            logger.info(f"=== END DEBUG ===")
+
         # Move batch to device
-        batch = tuple(t.to(device) for t in batch)
-        input_ids, input_mask, segment_ids, video, video_mask = batch
+        input_ids = input_ids.to(device)
+        input_mask = input_mask.to(device)
+        segment_ids = segment_ids.to(device)
+        video = video.to(device)
+        video_mask = video_mask.to(device)
 
         # Reshape video for model input
         # DataLoader stacks: [batch, 1, max_frames, 1, 3, H, W]
@@ -743,12 +1070,15 @@ def train_epoch(
         loss = model(input_ids, segment_ids, input_mask, video, video_mask)
 
         # Handle gradient accumulation
+        # DDP automatically averages gradients across GPUs during backward pass
+        # We only scale by gradient_accumulation_steps, not by world_size
         if args.gradient_accumulation_steps > 1:
             loss = loss / args.gradient_accumulation_steps
 
         # Backward pass
         loss.backward()
 
+        # Accumulate true loss (not scaled) for logging
         total_loss += float(loss)
 
         # Update weights every gradient_accumulation_steps
@@ -787,15 +1117,43 @@ def train_epoch(
                     f"Time/step: {elapsed_time / args.n_display:.3f}s"
                 )
 
+                # Log to tensorboard (only from rank 0 to avoid duplicate logs)
+                if tb_writer is not None and args.rank == 0:
+                    tb_writer.add_scalar("train/loss", float(loss), global_step)
+                    tb_writer.add_scalar("train/lr", optimizer.get_lr()[0], global_step)
+                    tb_writer.add_scalar(
+                        "train/time_per_step",
+                        elapsed_time / args.n_display,
+                        global_step,
+                    )
+
                 start_time.record()
 
     avg_loss = total_loss / len(train_dataloader)
-    logger.info(f"\nEpoch {epoch + 1} finished. Average loss: {avg_loss:.4f}")
+
+    # Synchronize average loss across all processes
+    if args.world_size > 1:
+        avg_loss_tensor = torch.tensor(avg_loss, device=device, dtype=torch.float32)
+        torch.distributed.all_reduce(avg_loss_tensor, op=torch.distributed.ReduceOp.SUM)
+        avg_loss = (avg_loss_tensor / args.world_size).item()
+
+    if args.local_rank == 0:
+        logger.info(f"\nEpoch {epoch + 1} finished. Average loss: {avg_loss:.4f}")
+
+    # Log epoch average loss to tensorboard (only from rank 0)
+    if tb_writer is not None and args.rank == 0:
+        tb_writer.add_scalar("train/epoch_avg_loss", avg_loss, epoch)
 
     # Validation
     if val_dataloader is not None:
         val_loss = validate(args, model, val_dataloader, device)
-        logger.info(f"Validation loss: {val_loss:.4f}")
+
+        if args.local_rank == 0:
+            logger.info(f"Validation loss: {val_loss:.4f}")
+
+        # Log validation loss to tensorboard (only from rank 0)
+        if tb_writer is not None and args.rank == 0:
+            tb_writer.add_scalar("val/loss", val_loss, epoch)
 
     return avg_loss, global_step
 
@@ -852,6 +1210,12 @@ def validate(args, model, val_dataloader, device):
         logger.warning("No valid validation batches!")
         avg_loss = 0.0
 
+    # Synchronize validation loss across all processes
+    if args.world_size > 1:
+        avg_loss_tensor = torch.tensor(avg_loss, device=device, dtype=torch.float32)
+        torch.distributed.all_reduce(avg_loss_tensor, op=torch.distributed.ReduceOp.SUM)
+        avg_loss = (avg_loss_tensor / args.world_size).item()
+
     # Keep in training mode for next epoch
     # (train_epoch will be called next)
 
@@ -860,10 +1224,16 @@ def validate(args, model, val_dataloader, device):
 
 def main():
     global logger
+    global tb_writer
 
     # Parse arguments
     args = get_args()
     args = set_seed_logger(args)
+
+    # Initialize tensorboard writer
+    tb_log_dir = os.path.join(args.output_dir, "tensorboard")
+    os.makedirs(tb_log_dir, exist_ok=True)
+    tb_writer = SummaryWriter(tb_log_dir)
 
     # Get local_rank from args for distributed training
     local_rank = args.local_rank
@@ -888,6 +1258,7 @@ def main():
         max_frames=args.max_frames,
         feature_framerate=args.feature_framerate,
         image_resolution=args.image_resolution,
+        slice_framepos=2,
     )
 
     # Load test/validation dataset (if provided)
@@ -904,6 +1275,7 @@ def main():
             max_frames=args.max_frames,
             feature_framerate=args.feature_framerate,
             image_resolution=args.image_resolution,
+            slice_framepos=2,
         )
 
     if local_rank == 0:
@@ -914,37 +1286,85 @@ def main():
         else:
             logger.info(f"  Validation: None (no test data provided)")
 
-    # Create dataloaders
+    # Create dataloaders with BalancedDistributedSampler for balanced multi-GPU data distribution
+    if local_rank == 0:
+        logger.info(f"\nDistributed Training Setup (with Balanced Sampling):")
+        logger.info(f"  World size (total GPUs): {args.world_size}")
+        logger.info(f"  Global rank: {args.rank}")
+        logger.info(f"  Local rank: {args.local_rank}")
+
+    train_sampler = BalancedDistributedSampler(
+        train_dataset,
+        num_replicas=args.world_size,
+        rank=args.rank,
+        shuffle=True,
+        seed=args.seed,
+        drop_last=True,
+        replacement=True,  # Allow sampling the same index multiple times to balance captions
+    )
+
     train_dataloader = data_utils.DataLoader(
         train_dataset,
         batch_size=args.batch_size,
-        shuffle=True,
+        sampler=train_sampler,
         num_workers=0,
-        drop_last=True,
+        collate_fn=custom_collate_fn,
     )
 
-    val_dataloader = (
-        data_utils.DataLoader(
+    if local_rank == 0:
+        logger.info(f"\nDataLoader Configuration:")
+        logger.info(f"  Batch size per GPU: {args.batch_size}")
+        logger.info(
+            f"  Effective batch size (all GPUs): {args.batch_size * args.world_size}"
+        )
+        logger.info(f"  Training samples per GPU per epoch: {len(train_sampler)}")
+        logger.info(
+            f"  Total training samples processed per epoch: {len(train_sampler) * args.world_size}"
+        )
+        logger.info(
+            f"  ✓ Balanced sampling: Videos with rare captions sampled more often"
+        )
+
+    val_dataloader = None
+    if val_dataset is not None:
+        val_sampler = DistributedSampler(
             val_dataset,
-            batch_size=args.batch_size,
+            num_replicas=args.world_size,
+            rank=args.rank,
             shuffle=False,
-            num_workers=0,
+            seed=args.seed,
             drop_last=False,
         )
-        if val_dataset is not None
-        else None
-    )
+        val_dataloader = data_utils.DataLoader(
+            val_dataset,
+            batch_size=args.batch_size,
+            sampler=val_sampler,
+            num_workers=0,
+            collate_fn=custom_collate_fn,
+        )
 
     model = init_model(args, device, n_gpu, local_rank)
+    print(model)
 
-    # Prepare optimizer with distributed training support
+    # IMPORTANT: Wrap model in DDP BEFORE creating optimizer
+    # This ensures optimizer references the DDP-wrapped parameters
+    if args.world_size > 1:
+        model = torch.nn.parallel.DistributedDataParallel(
+            model,
+            device_ids=[local_rank],
+            output_device=local_rank,
+            find_unused_parameters=True,
+        )
+        if local_rank == 0:
+            logger.info(f"✓ Model wrapped in DistributedDataParallel")
+
+    # Now create optimizer (after DDP wrapping)
     num_train_optimization_steps = (
         int(len(train_dataloader) + args.gradient_accumulation_steps - 1)
         / args.gradient_accumulation_steps
     ) * args.epochs
 
     # prep_optimizer returns (optimizer, scheduler, model)
-    # The model is wrapped in DistributedDataParallel if using multiple GPUs
     optimizer, scheduler, model = prep_optimizer(
         args,
         model,
@@ -956,17 +1376,30 @@ def main():
     )
 
     # Training loop
+    # Barrier: wait for all processes after model/optimizer setup
+    if args.world_size > 1:
+        torch.distributed.barrier()
+
     if local_rank == 0:
         logger.info(f"\nTraining configuration:")
         logger.info(f"  Epochs: {args.epochs}")
         logger.info(f"  Batch size: {args.batch_size}")
+        logger.info(
+            f"  Effective batch size (all GPUs): {args.batch_size * args.world_size}"
+        )
         logger.info(f"  Steps per epoch: {len(train_dataloader)}")
         logger.info(f"  Total optimization steps: {num_train_optimization_steps}")
         logger.info(f"  Local rank: {local_rank}")
         logger.info(f"  World size: {args.world_size}")
+        logger.info(f"  DDP enabled: {args.world_size > 1}")
 
     global_step = 0
     for epoch in tqdm.tqdm(range(args.epochs), desc="Training Epochs"):
+        # Set epoch for sampler (ensures different data order each epoch in distributed mode)
+        train_sampler.set_epoch(epoch)
+        if val_dataloader is not None and hasattr(val_dataloader.sampler, "set_epoch"):
+            val_dataloader.sampler.set_epoch(epoch)
+
         train_loss, global_step = train_epoch(
             epoch,
             args,
@@ -976,11 +1409,21 @@ def main():
             device,
             optimizer,
             global_step,
+            tb_writer,
+            debug=args.debug,
         )
+
+        # Synchronize all processes to ensure checkpoint is written before next epoch
+        if args.world_size > 1:
+            torch.distributed.barrier()
 
         # Save checkpoint after each epoch (only from main process)
         if local_rank == 0:
             save_model(epoch, args, model, optimizer, train_loss)
+
+    # Close tensorboard writer
+    if tb_writer is not None:
+        tb_writer.close()
 
 
 if __name__ == "__main__":

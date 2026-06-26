@@ -29,15 +29,15 @@ S3_C3_E524_V0329,An animal engaged in any activity other than foraging.
 S3_C3_E634_V0611,An animal engaged in any activity other than foraging.
 S3_C5_F719_V0155,An animal engaged in any activity other than foraging.
 S3_C5_F719_V0152,An animal engaged in any activity other than foraging.
-S3_C1_F722_V0092,An animal engaged in any activity other than foraging.
-S3_C1_F976_V0547,An animal engaged in any activity other than foraging.
-S3_C1_F972_V0541,An animal engaged in any activity other than foraging.
-S3_C1_F981_V0557,An animal engaged in any activity other than foraging.
-S3_C1_F967_V0532,An animal engaged in any activity other than foraging.
 S3_C4_F720_V0085,An animal engaged in any activity other than foraging.
 S3_C4_F720_V0086,An animal engaged in any activity other than foraging.
+S3_C4_F967_V0532,An animal engaged in any activity other than foraging.
+S3_C4_F981_V0557,An animal engaged in any activity other than foraging.
+S3_C4_F976_V0547,An animal engaged in any activity other than foraging.
 S3_C4_F719_V0079,An animal engaged in any activity other than foraging.
+S3_C4_F722_V0092,An animal engaged in any activity other than foraging.
 S3_C4_F720_V0089,An animal engaged in any activity other than foraging.
+S3_C4_F972_V0541,An animal engaged in any activity other than foraging.
 S3_C4_F874_V0496,An animal engaged in any activity other than foraging.
 S3_C2_E764_V0423,An animal engaged in any activity other than foraging.
 S3_C2_E616_V0129,An animal engaged in any activity other than foraging.
@@ -138,12 +138,10 @@ S3_C2_E792_V0524,An animal engaged in any activity other than foraging.
 S3_C2_E725_V0308,An animal engaged in any activity other than foraging.
 S3_C2_E718_V0263,An animal engaged in any activity other than foraging.
 S3_C2_E765_V0426,An animal engaged in any activity other than foraging.
-S1_C3_F177_V0103,An animal engaged in any activity other than foraging.
 S1_C3_E61_V0029,An animal engaged in any activity other than foraging.
 S1_C3_E200_V0084,An animal engaged in any activity other than foraging.
 S1_C3_E198_V0082,An animal engaged in any activity other than foraging.
 S1_C3_E192_V0081,An animal engaged in any activity other than foraging.
-S1_C3_F298_V0260,An animal engaged in any activity other than foraging.
 S1_C3_E144_V0060,An animal engaged in any activity other than foraging.
 S1_C5_F165_V0214,An animal engaged in any activity other than foraging.
 S1_C5_F163_V0208,An animal engaged in any activity other than foraging.
@@ -169,7 +167,6 @@ S1_C5_F165_V0211,An animal engaged in any activity other than foraging.
 S1_C5_F165_V0212,An animal engaged in any activity other than foraging.
 S1_C1_E121_V0407,An animal engaged in any activity other than foraging.
 S1_C1_E193_V0832,An animal engaged in any activity other than foraging.
-S1_C1_F178_V0138,An animal engaged in any activity other than foraging.
 S1_C1_E194_V0833,An animal engaged in any activity other than foraging.
 S1_C1_E194_V0834,An animal engaged in any activity other than foraging.
 S1_C1_E192_V0831,An animal engaged in any activity other than foraging.
@@ -183,16 +180,17 @@ S1_C1_E66_V0152,An animal engaged in any activity other than foraging.
 S1_C1_E195_V0836,An animal engaged in any activity other than foraging.
 S1_C1_E195_V0838,An animal engaged in any activity other than foraging.
 S1_C1_E117_V0365,An animal engaged in any activity other than foraging.
-S1_C1_F281_V0298,An animal engaged in any activity other than foraging.
 S1_C1_E139_V0706,An animal engaged in any activity other than foraging.
 S1_C1_E57_V0141,An animal engaged in any activity other than foraging.
-S1_C1_F144_V0123,An animal engaged in any activity other than foraging.
+S1_C4_F178_V0138,An animal engaged in any activity other than foraging.
 S1_C4_F268_V0258,An animal engaged in any activity other than foraging.
 S1_C4_F270_V0277,An animal engaged in any activity other than foraging.
 S1_C4_F287_V0307,An animal engaged in any activity other than foraging.
 S1_C4_F269_V0267,An animal engaged in any activity other than foraging.
 S1_C4_F268_V0257,An animal engaged in any activity other than foraging.
+S1_C4_F144_V0123,An animal engaged in any activity other than foraging.
 S1_C4_F269_V0270,An animal engaged in any activity other than foraging.
+S1_C4_F281_V0298,An animal engaged in any activity other than foraging.
 S1_C4_F288_V0374,An animal engaged in any activity other than foraging.
 S1_C4_F179_V0139,An animal engaged in any activity other than foraging.
 S1_C4_F271_V0292,An animal engaged in any activity other than foraging.
@@ -210,6 +208,7 @@ S1_C6_F394_V0320,An animal engaged in any activity other than foraging.
 S1_C6_F164_V0094,An animal engaged in any activity other than foraging.
 S1_C6_F168_V0097,An animal engaged in any activity other than foraging.
 S1_C6_F288_V0237,An animal engaged in any activity other than foraging.
+S1_C6_F298_V0260,An animal engaged in any activity other than foraging.
 S1_C6_F289_V0256,An animal engaged in any activity other than foraging.
 S1_C6_F404_V0343,An animal engaged in any activity other than foraging.
 S1_C6_F268_V0178,An animal engaged in any activity other than foraging.
@@ -219,6 +218,7 @@ S1_C6_F269_V0183,An animal engaged in any activity other than foraging.
 S1_C6_F405_V0359,An animal engaged in any activity other than foraging.
 S1_C6_F261_V0176,An animal engaged in any activity other than foraging.
 S1_C6_F269_V0193,An animal engaged in any activity other than foraging.
+S1_C6_F177_V0103,An animal engaged in any activity other than foraging.
 S1_C6_F173_V0100,An animal engaged in any activity other than foraging.
 S1_C6_F179_V0104,An animal engaged in any activity other than foraging.
 S1_C6_F404_V0330,An animal engaged in any activity other than foraging.
@@ -555,6 +555,8 @@ S2_C3_E385_V0126,A fox foraging.
 S2_C3_F464_V0034,A fox foraging.
 S2_C3_F574_V0121,A wolf foraging.
 S2_C1_F574_V0094,A wolf foraging.
+S3_C3_E693_V0704,A juvenile red deer shaking its head or body.
+S3_C3_E693_V0703,A juvenile red deer shaking its head or body.
 S2_C3_F495_V0070,A roe deer trotting while foraging.
 S2_C3_F536_V0095,A roe deer trotting while foraging.
 S2_C1_F536_V0069,A roe deer trotting while foraging.
@@ -2400,20 +2402,20 @@ S3_C3_E507_V0292,An empty video.
 S3_C3_E508_V0293,An empty video.
 S3_C3_E504_V0288,An empty video.
 S3_C3_E634_V0611,An empty video.
-S3_C1_F722_V0092,An empty video.
-S3_C1_F976_V0547,An empty video.
-S3_C1_F972_V0541,An empty video.
-S3_C1_F981_V0557,An empty video.
-S3_C1_F967_V0532,An empty video.
+S3_C4_F967_V0532,An empty video.
+S3_C4_F981_V0557,An empty video.
+S3_C4_F976_V0547,An empty video.
+S3_C4_F722_V0092,An empty video.
+S3_C4_F972_V0541,An empty video.
 S3_C2_E500_V0081,An empty video.
 S3_C2_E734_V0343,An empty video.
 S3_C2_E493_V0078,An empty video.
 S3_C2_E509_V0084,An empty video.
-S1_C3_F177_V0103,An empty video.
-S1_C3_F298_V0260,An empty video.
-S1_C1_F178_V0138,An empty video.
-S1_C1_F281_V0298,An empty video.
-S1_C1_F144_V0123,An empty video.
+S1_C4_F178_V0138,An empty video.
+S1_C4_F144_V0123,An empty video.
+S1_C4_F281_V0298,An empty video.
+S1_C6_F298_V0260,An empty video.
+S1_C6_F177_V0103,An empty video.
 S2_C3_F497_V0072,An empty video.
 S2_C2_E297_V0048,An empty video.
 S2_C2_F572_V0086,An empty video.

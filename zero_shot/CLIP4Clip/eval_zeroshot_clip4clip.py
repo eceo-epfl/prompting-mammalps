@@ -8,7 +8,6 @@ import argparse
 import json
 import os
 import random
-import sys
 from pathlib import Path
 
 import numpy as np
@@ -16,13 +15,11 @@ import pandas as pd
 import torch
 import torch.utils.data as data_utils
 import tqdm
-
-sys.path.insert(0, str(Path(__file__).resolve().parents[2] / "models" / "CLIP4Clip"))
 from dataloaders.rawvideo_util import RawVideoExtractor
 from modules.file_utils import PYTORCH_PRETRAINED_BERT_CACHE
 from modules.modeling import CLIP4Clip
 from modules.tokenization_clip import SimpleTokenizer as ClipTokenizer
-from transformers import AutoTokenizer, SiglipTokenizer
+from transformers import SiglipTokenizer
 from util import get_logger
 
 torch.backends.cudnn.enabled = False
@@ -368,7 +365,7 @@ def get_args():
         help="Text file with one query per line",
     )
     parser.add_argument(
-        "--features_path",
+        "--videos_path",
         type=str,
         required=True,
         help="Root directory containing videos; files are discovered recursively via rglob",
@@ -421,6 +418,9 @@ def get_args():
         default="",
         help="Where to store the pre-trained models",
     )
+    parser.add_argument(
+        "--from_checkpoint", help="Evaluates a specific CLIP4Clip checkpoint."
+    )
 
     # Video parameters
     parser.add_argument(
@@ -451,7 +451,6 @@ def get_args():
     parser.add_argument(
         "--loose_type",
         action="store_true",
-        default=True,
         help="Use loose type for similarity (default: True for zero-shot)",
     )
     parser.add_argument(
@@ -497,10 +496,23 @@ def init_model(args, device):
         if args.cache_dir
         else os.path.join(str(PYTORCH_PRETRAINED_BERT_CACHE), "distributed")
     )
+    model_state_dict = None
+    if args.from_checkpoint is not None:
+        if Path(args.from_checkpoint).exists():
+            model_state_dict = torch.load(args.from_checkpoint, map_location="cpu")
+            logger.info(f"Model loaded from {args.from_checkpoint}")
+        else:
+            logger.info(
+                f"Could not load checkpoint weights from {args.from_checkpoint}"
+            )
 
     model = CLIP4Clip.from_pretrained(
-        args.cross_model, cache_dir=cache_dir, task_config=args
+        args.cross_model,
+        cache_dir=cache_dir,
+        state_dict=model_state_dict,
+        task_config=args,
     )
+
     model.to(device)
     model.eval()
 
@@ -732,8 +744,8 @@ def main():
     logger.info(f"Loaded {len(queries)} queries")
 
     # Discover video files via rglob
-    logger.info(f"Discovering videos in {args.features_path}")
-    video_ids, video_paths = discover_videos(args.features_path, args.max_videos)
+    logger.info(f"Discovering videos in {args.videos_path}")
+    video_ids, video_paths = discover_videos(args.videos_path, args.max_videos)
     logger.info(f"Discovered {len(video_ids)} videos")
 
     # ------------------------------------------------------------------ #
