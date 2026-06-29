@@ -1,0 +1,1269 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="keywords" content="Wildlife Dataset Deep Learning AI Computer Vision Benchmark Camera Trap Video Text-to-Video Retrieval TVR Wildlife Benchmark Alpine mammals">
+    <!-- Add missing headers for video playback -->
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <title>Prompting-MammAlps</title>
+    <!-- Add Font Awesome and Academicons dependencies -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="https://documentcloud.adobe.com/view-sdk/main.js"></script>
+    <!-- Adapted from flaticon deer-silhouette.png -->
+    <link rel="shortcut icon" href="static/images/deer-silhouette.ico" type="image/x-icon">
+    <link rel="stylesheet" href="static/css/fontawesome.all.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/jpswalsh/academicons@1/css/academicons.min.css">
+    <link rel="stylesheet" href="static/css/index.css">
+    <script defer src="static/js/fontawesome.all.min.js"></script>
+    <script src="static/js/index.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            text-align: center;
+        }
+        header {
+            color: white;
+            padding: 0;
+            position: relative;
+            background: #1a1a1a;
+            height: 60px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 20px;
+        }
+        .nav-container {
+            display: flex;
+            gap: 30px;
+            align-items: center;
+        }
+        .nav-item {
+            text-align: center;
+            position: relative;
+        }
+        .nav-item a {
+            color: rgb(0, 0, 0);
+            text-decoration: none;
+            font-size: 18px;
+            font-weight: bold;
+            padding: 10px 15px;
+        }
+        .nav-item div {
+            width: 0; 
+            height: 0; 
+            border-left: 10px solid transparent; 
+            border-right: 10px solid transparent; 
+            border-top: 10px solid rgb(0, 0, 0); 
+            margin: auto;
+        }
+        .hero {
+            position: relative;
+            text-align: center;
+            min-height: 400px; /* Further reduced from 450px */
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            background-color: #ffffff; /* Fallback color */
+            padding-top: 140px; /* Further reduced from 160px */
+            justify-content: center;
+            gap: 0;
+        }
+        
+        .hero-image-container {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            z-index: 0;
+        }
+        
+        .hero img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            object-position: center;
+            display: block;
+            background: rgba(255, 255, 255, 0.453)
+        }
+        .hero-caption {
+            position: relative;
+            color: white;
+            font-size: 32px;
+            font-weight: bold;
+            background: rgba(0, 0, 0, 0.5);
+            padding: 20px 30px;
+            width: 88%;
+            max-width: 1500px;
+            margin: 0px auto 30px; /* Reduced from 80px auto 40px */
+            border-radius: 10px;
+            box-sizing: border-box;
+            z-index: 2;
+        }
+
+        .hero-description {
+            font-family: 'Courier New', Courier, monospace;
+            position: relative;
+            font-weight: bold;
+            color: rgba(26, 26, 26, 1);
+            font-size: 18px;
+            background-color: rgba(232, 244, 248, 0.7);
+            padding: 15px 20px;
+            border-radius: 2px;
+            border: 3px solid rgba(179, 217, 224, 1);
+            display: inline-block;
+            text-align: center;
+            margin: 0px auto 0px; /* Reduced from 80px auto 40px */
+            box-sizing: border-box;
+            z-index: 2;
+        }
+
+        .hero-description a {
+            text-decoration: none;
+            color: inherit;
+        }
+
+        .hero-description:hover {
+            background-color: rgba(232, 244, 248, 0.7);
+            border: 3px solid rgb(179, 217, 224, 1);
+        }
+        
+        .hero-caption p {
+            font-size: 14px;
+            margin-top: 10px;
+            line-height: 1.4;
+        }
+
+        .hero-caption p a {
+            text-decoration: none;
+            color: #ffffff;
+        }
+
+        .hero-caption p a:hover {
+            text-decoration: underline;
+            color: #7fbcf9;
+        }
+
+        .content {
+            width: 90%;
+            max-width: 1600px;
+            margin: 20px auto;
+            text-align: left;
+            padding: 0 20px;
+            font-size: 17px;
+            line-height: 1.65;
+        }
+        footer {
+            background: #a2b8ed;
+            color: white;
+            padding: 10px;
+            margin-top: 10vh;
+        }
+        
+        /* Responsive styles */
+        .site-header {
+            position: absolute;
+            width: 100%;
+            top: 0;
+            left: 0;
+            z-index: 10;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            background: transparent;
+            box-sizing: border-box;
+        }
+        
+        .site-nav {
+            margin-right: 40px;
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 20px;
+        }
+        
+        .location-banner {
+            position: absolute;
+            top: 140px; /* Moved down from 120px */
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(255, 255, 255, 0.7);
+            color: #004d99;
+            padding: 12px 24px;
+            border-radius: 20px;
+            font-size: 20px;
+            font-weight: bold;
+            box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.2);
+            font-family: 'Arial', sans-serif;
+            width: max-content;
+            max-width: 90%;
+            z-index: 5;
+        }
+        
+        .action-buttons {
+            position: relative;
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            flex-wrap: wrap;
+            width: 90%;
+            max-width: 1300px;
+            padding: 15px;
+            box-sizing: border-box;
+            margin: auto auto 20px; /* Reduced bottom margin from 30px */
+            z-index: 2;
+        }
+        
+        .action-button {
+            display: flex;
+            align-items: center;
+            background: #333;
+            color: white;
+            padding: 10px 20px;
+            border-radius: 30px;
+            font-size: 16px;
+            margin-bottom: 10px;
+            cursor: pointer;
+            transition: background 0.3s;
+            text-decoration: none;
+            gap: 8px;
+        }
+        
+        .action-button:hover {
+            background: #555;
+            color: white;
+            text-decoration: none;
+        }
+        
+        @media (max-width: 1024px) {
+            .hero-caption {
+                width: 90%;
+                font-size: 28px;
+            }
+            
+            .hero-caption h1 {
+                font-size: 26px;
+            }
+            
+            .hero {
+                padding-top: 120px; /* Reduced from 130px */
+                min-height: 450px; /* Reduced from 500px */
+            }
+            
+            .hero-caption {
+                margin: 50px auto 40px; /* Reduced from 70px auto 50px */
+            }
+            
+            .location-banner {
+                top: 100px; /* Adjusted for medium screens */
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .site-header {
+                flex-direction: column;
+                padding-top: 10px;
+                padding-bottom: 10px;
+                background: rgba(0, 0, 0, 0.6);
+                position: relative;
+                height: auto;
+            }
+            
+            .site-title {
+                margin-left: 0;
+                margin-bottom: 10px;
+            }
+            
+            .site-nav {
+                margin-right: 0;
+                margin-bottom: 5px;
+            }
+            
+            .hero {
+                min-height: 500px; /* Reduced from 550px */
+                margin-top: 0;
+                justify-content: flex-start;
+                padding: 20px 0 30px;
+            }
+            
+            .hero-image-container {
+                position: absolute;
+                opacity: 0.7;
+            }
+            
+            .location-banner {
+                position: relative;
+                margin: 0 auto 20px;
+                transform: none;
+                left: auto;
+                top: auto;
+            }
+            
+            .hero-caption {
+                width: 90%;
+                margin: 20px auto; /* Reset margin for mobile */
+                padding: 15px;
+            }
+            
+            .hero-caption h1 {
+                font-size: 22px;
+                margin: 0;
+            }
+            
+            .action-buttons {
+                position: relative;
+                bottom: auto;
+                left: auto;
+                transform: none;
+                margin: 20px auto;
+                padding: 0 15px;
+                gap: 10px;
+                background: rgba(0, 0, 0, 0.5);
+                border-radius: 10px;
+                padding: 15px 10px;
+                width: 95%;
+                box-sizing: border-box;
+            }
+            
+            .action-button {
+                padding: 8px 16px;
+                font-size: 14px;
+            }
+            
+            .hero {
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                justify-content: space-between;
+                padding-bottom: 20px;
+            }
+            
+            .hero img {
+                position: absolute;
+                z-index: -1;
+                opacity: 0.7;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .nav-item a {
+                font-size: 16px;
+                padding: 6px;
+            }
+            
+            .nav-item div {
+                border-left: 8px solid transparent;
+                border-right: 8px solid transparent;
+                border-top: 8px solid white;
+            }
+            
+            .hero {
+                min-height: 520px; /* Reduced from 580px */
+                padding: 60px 0 20px;
+            }
+            
+            .hero-caption h1 {
+                font-size: 18px;
+            }
+            
+            .action-buttons {
+                padding: 10px 5px;
+            }
+            
+            .action-button {
+                padding: 6px 12px;
+                font-size: 13px;
+                margin-bottom: 5px;
+                flex-basis: calc(50% - 10px);
+                justify-content: center;
+            }
+            
+            .site-nav {
+                gap: 10px;
+            }
+        }
+        
+        /* Add video styles */
+        .video-container {
+            position: relative;
+            width: 100%;
+            padding-bottom: 56.25%;
+            height: 0;
+            overflow: hidden;
+        }
+
+        .video-container video {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        /* Query-video association showcase */
+        .query-example {
+            margin: 20px 0;
+            border: 1px solid #dde3ea;
+            border-radius: 10px;
+            overflow: hidden;
+            background: #fff;
+            box-shadow: 0 1px 4px rgba(0,0,0,0.06);
+        }
+
+        .query-example-header {
+            padding: 14px 20px;
+            background: #f4f6f9;
+            border-bottom: 1px solid #dde3ea;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            cursor: pointer;
+            user-select: none;
+        }
+
+        .query-example-header:hover {
+            background: #eaf0f6;
+        }
+
+        .query-chevron {
+            margin-left: auto;
+            font-size: 13px;
+            color: #888;
+            transition: transform 0.2s ease;
+            flex-shrink: 0;
+        }
+
+        .query-example.open .query-chevron {
+            transform: rotate(180deg);
+        }
+
+        .query-video-row {
+            display: none;
+        }
+
+        .query-example.open .query-video-row {
+            display: grid;
+        }
+
+        .query-example-label {
+            flex-shrink: 0;
+            font-size: 11px;
+            font-weight: bold;
+            color: #fff;
+            background: #1a6c9e;
+            padding: 3px 9px;
+            border-radius: 20px;
+            text-transform: uppercase;
+            letter-spacing: 0.07em;
+        }
+
+        .query-example-text {
+            font-size: 16px;
+            color: #1a1a1a;
+            font-style: italic;
+            line-height: 1.4;
+        }
+
+        .query-example-text::before { content: '\201C'; }
+        .query-example-text::after  { content: '\201D'; }
+
+        .query-video-row {
+            grid-template-columns: repeat(2, 1fr);
+            gap: 3px;
+            padding: 3px;
+            background: #dde3ea;
+        }
+
+        .query-video-row .video-container {
+            border-radius: 4px;
+            overflow: hidden;
+        }
+
+        @media (max-width: 640px) {
+            .query-video-row {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* Stats cards */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 15px;
+            margin: 25px 0;
+        }
+        .stat-card {
+            background: #f5f5f5;
+            border-radius: 10px;
+            padding: 20px 15px;
+            text-align: center;
+            border: 1px solid #e0e0e0;
+        }
+        .stat-card .stat-number {
+            font-size: 24px;
+            font-weight: bold;
+            color: #1a1a1a;
+        }
+        .stat-card .stat-label {
+            font-size: 14px;
+            color: #666;
+            margin-top: 4px;
+        }
+
+        /* TVR category badges */
+        .category-badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: bold;
+            color: white;
+            margin: 4px 3px;
+            font-family: 'Courier New', Courier, monospace;
+            letter-spacing: 0.03em;
+            cursor: pointer;
+            border: none;
+            transition: filter 0.15s, transform 0.1s;
+            white-space: nowrap;
+        }
+        .category-badge:hover { filter: brightness(1.15); transform: translateY(-1px); }
+        .category-badge.badge-active { filter: brightness(0.8); box-shadow: inset 0 2px 4px rgba(0,0,0,0.25); }
+        .badge-ecology { background: #2d6a4f; }
+        .badge-vision  { background: #1a6c9e; }
+
+        /* Category groups layout */
+        .category-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            margin: 20px 0 16px;
+        }
+        .category-group h4 {
+            font-size: 15px;
+            color: #333;
+            margin-bottom: 12px;
+            font-weight: bold;
+            border-bottom: 2px solid #e0e0e0;
+            padding-bottom: 6px;
+        }
+        .category-group > div {
+            display: flex;
+            align-items: baseline;
+            gap: 10px;
+            margin-bottom: 8px;
+        }
+        .category-desc {
+            font-size: 14px;
+            color: #555;
+            line-height: 1.4;
+        }
+
+        /* Query panel */
+        .query-panel {
+            margin: 8px 0 30px;
+            border-radius: 8px;
+            border: 1px solid #ddd;
+            background: #fafafa;
+            overflow: hidden;
+        }
+        .query-panel-header {
+            padding: 8px 16px;
+            font-size: 13px;
+            font-weight: bold;
+            color: #555;
+            background: #f0f0f0;
+            border-bottom: 1px solid #ddd;
+        }
+        .query-list {
+            max-height: 320px;
+            overflow-y: auto;
+            padding: 8px 16px 8px 36px;
+            margin: 0;
+        }
+        .query-list li {
+            font-size: 15px;
+            color: #333;
+            padding: 5px 0;
+            border-bottom: 1px solid #f0f0f0;
+            line-height: 1.5;
+        }
+        .query-list li:last-child { border-bottom: none; }
+        .vid-ref {
+            font-family: 'Courier New', monospace;
+            font-size: 12px;
+            background: #e8f0fe;
+            color: #1a6c9e;
+            padding: 1px 5px;
+            border-radius: 3px;
+        }
+
+        @media (max-width: 768px) {
+            .stats-grid { grid-template-columns: repeat(2, 1fr); }
+            .category-grid { grid-template-columns: 1fr; gap: 20px; }
+        }
+        @media (max-width: 480px) {
+            .stats-grid { grid-template-columns: 1fr; }
+        }
+
+    </style>
+</head>
+<body>
+    <header class="site-header">
+        <div class="site-nav">
+            <div class="nav-item">
+                <a href="#overview">Overview</a>
+                <div></div>
+            </div>
+            <div class="nav-item">
+                <a href="#benchmark">TVR Benchmark</a>
+                <div></div>
+            </div>
+            <div class="nav-item">
+                <a href="#getting-started">Getting started</a>
+                <div></div>
+            </div>
+        </div>
+    </header>
+    <div class="hero">
+
+
+        <div class="hero-caption">
+            <h1 style="font-size: 30px; max-width: 100%; margin: 0;">Prompting-MammAlps: Fine-Grained Text-to-Video Retrieval for Camera-Trap Data</h1>
+            <p>
+                <a href="https://people.epfl.ch/valentin.gabeff" target="_blank">Valentin Gabeff</a>,
+                <a href="https://www.linkedin.com/in/baptiste-maquignaz-694192252/" target="_blank">Baptiste Maquignaz</a>,
+                <a href="https://www.linkedin.com/in/jennifer-shan-658605267/" target="_blank">Jennifer Shan</a>,
+                <a href="https://smamooler.github.io" target="_blank">Sepideh Mamooler</a>,
+                <a href="https://people.epfl.ch/gencer.sumbul" target="_blank">Gencer Sumbul</a>,
+                <a href="https://blaircostelloe.com" target="_blank">Blair Costelloe</a>,
+                <a href="https://people.epfl.ch/devis.tuia" target="_blank">Devis Tuia</a>,
+                <a href="https://people.epfl.ch/alexander.mathis" target="_blank">Alexander Mathis</a>.
+            </p>
+        </div>
+
+        <div style="display: flex; flex-direction: column; align-items: center; gap: 12px; z-index: 2; margin-bottom: 20px;">
+        <div class="hero-description">
+            <a><strong>ECCV 2026</strong></a>
+        </div>
+
+        <div class="action-buttons" style="margin: 0;">
+            <!-- <a href="#TODO" target="_blank" class="action-button">
+                <i class="ai ai-arxiv"></i>
+                arXiv
+            </a> -->
+            <a href="#TODO" target="_blank" class="action-button">
+                <i class="fab fa-github"></i>
+                Github
+            </a>
+            <a href="https://huggingface.co/datasets/EPFL-ECEO/Prompting-MammAlps" target="_blank" class="action-button">
+                <i class="fas fa-download"></i>
+                Download
+            </a>
+            <!-- <a href="#TODO" target="_blank" class="action-button">
+                <i class="fas fa-image"></i>
+                Poster
+            </a> -->
+        </div>
+        </div>
+    </div>
+    <section class="content">
+        <h2 id="overview">Overview</h2>
+        <!-- <div style="text-align: center; margin: 20px 0;">
+            <img src="static/images/figure_1.png" alt="Dataset Overview (placeholder — replace with MammAlps-S2 figure)" style="max-width: 100%; height: auto;">
+        </div> -->
+        
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-number">2,865</div>
+                <div class="stat-label">video clips</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number">18.4 h</div>
+                <div class="stat-label">total duration</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number">15</div>
+                <div class="stat-label">unique camera views</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number">135</div>
+                <div class="stat-label">text queries</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number">2</div>
+                <div class="stat-label">field seasons (2023–2024)</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number">23 | 12 | 7 </div>
+                <div class="stat-label">actions | activities | species</div>
+            </div>
+        </div>
+
+        <div class="query-example open">
+            <div class="query-example-header">
+                <span class="query-example-label">Query</span>
+                <span class="query-example-text">A juvenile red deer scratching its body.</span>
+                <i class="fas fa-chevron-down query-chevron"></i>
+            </div>
+            <div class="query-video-row">
+                <div class="video-container">
+                    <video src="static/videos/S1_C4_F190_V0151.mp4" autoplay muted loop playsinline></video>
+                </div>
+                <div class="video-container">
+                    <video src="static/videos/S2_C2_E280_V0035.mp4" autoplay muted loop playsinline></video>
+                </div>
+            </div>
+        </div>
+
+        <div class="query-example">
+            <div class="query-example-header">
+                <span class="query-example-label">Query</span>
+                <span class="query-example-text">An adult male roe deer running while participating in courtship.</span>
+                <i class="fas fa-chevron-down query-chevron"></i>
+            </div>
+            <div class="query-video-row">
+                <div class="video-container">
+                    <video src="static/videos/S2_C2_F613_V0109.mp4" autoplay muted loop playsinline></video>
+                </div>
+                <div class="video-container">
+                    <video src="static/videos/S2_C1_F575_V0095.mp4" autoplay muted loop playsinline></video>
+                </div>
+            </div>
+        </div>
+
+        <div class="query-example">
+            <div class="query-example-header">
+                <span class="query-example-label">Query</span>
+                <span class="query-example-text">An animal foraging, then reacting to a camera, and then returning to foraging.</span>
+                <i class="fas fa-chevron-down query-chevron"></i>
+            </div>
+            <div class="query-video-row">
+                <div class="video-container">
+                    <video src="static/videos/S1_C2_E38_V0053.mp4" autoplay muted loop playsinline></video>
+                </div>
+                <div class="video-container">
+                    <video src="static/videos/S1_C6_F179_V0104.mp4" autoplay muted loop playsinline></video>
+                </div>
+            </div>
+        </div>
+        <p style="font-size: 13px; font-style: italic; color: #666; text-align: center; margin-top: 8px;">
+            Examples of query-video associations. Two matching videos with ground-truth associations are shown for each query.
+        </p>
+
+        <p>
+            <strong>MammAlps-S2</strong> extends <a href="https://eceo-epfl.github.io/MammAlps/" target="_blank" style="color: #007bff; text-decoration: none;">MammAlps</a> with a second field season (2024). It contains 2,865 video clips from camera traps deployed at three sites in the Swiss National Park, annotated with per-frame bounding boxes, individual tracks, and behavioural labels — species, action, activity, and for deer, age and sex. Compared to MammAlps, it adds two new species (chamois and marten), extends the label vocabulary to 23 actions and 12 activities, and covers an earlier season capturing different ecological dynamics (roe deer courtship, distinct species occurrences).
+        </p>
+        <p>
+            Built on these dense annotations, we introduce <strong>Prompting-MammAlps</strong> — a text-to-video retrieval (TVR) benchmark with 135 natural-language queries co-designed with behavioural ecologists. Each query is matched to the subset of train/test videos whose content <em>fully</em> satisfies the query; partial matches are excluded. The benchmark is designed to reflect realistic retrieval conditions, including queries with no matching video and queries spanning multiple individuals or temporal context.
+        </p>
+        <p>
+            The dataset is publicly released to encourage research in text-to-video retrieval, species and behaviour recognition, multi-animal tracking, action segmentation, and spatio-temporal action localisation.
+        </p>
+        
+        <h2 id="benchmark">Text-to-Video Retrieval Benchmark: Prompting-MammAlps</h2>
+        <p>
+            Prompting-MammAlps includes 135 natural-language queries manually defined in collaboration with behavioural ecologists. Each query is paired with the subset of train and test videos whose content <em>fully</em> satisfies the query — partial matches are excluded to enforce strict retrieval semantics. Some queries have no matching video (reflecting realistic field conditions where an event may never have been captured).
+        </p>
+
+        <h3>Queries</h3>
+
+        <div class="category-grid">
+            <div class="category-group">
+                <h4>Ecological Relevance</h4>
+                <div>
+                    <button class="category-badge badge-ecology" onclick="toggleCategory('ECOLOGY','RARE',this)">RARE</button>
+                    <span class="category-desc">Rare species, rare behaviours, or specific weather conditions</span>
+                </div>
+                <div>
+                    <button class="category-badge badge-ecology" onclick="toggleCategory('ECOLOGY','COURTSHIP',this)">COURTSHIP</button>
+                    <span class="category-desc">Courtship-related behaviours</span>
+                </div>
+                <div>
+                    <button class="category-badge badge-ecology" onclick="toggleCategory('ECOLOGY','SOCIAL',this)">SOCIAL</button>
+                    <span class="category-desc">Other social interactions (chasing, playing, nursing&hellip;)</span>
+                </div>
+                <div>
+                    <button class="category-badge badge-ecology" onclick="toggleCategory('ECOLOGY','CAMERA_REACTION',this)">CAMERA_REACTION</button>
+                    <span class="category-desc">Animals reacting to the camera trap</span>
+                </div>
+                <div>
+                    <button class="category-badge badge-ecology" onclick="toggleCategory('ECOLOGY','COMMON',this)">COMMON</button>
+                    <span class="category-desc">Frequent baseline events</span>
+                </div>
+            </div>
+
+            <div class="category-group">
+                <h4>Retrieval Complexity</h4>
+                <div>
+                    <button class="category-badge badge-vision" onclick="toggleCategory('VISION','SINGLE_ATTR',this)">SINGLE_ATTR</button>
+                    <span class="category-desc">A single attribute (e.g., species or action)</span>
+                </div>
+                <div>
+                    <button class="category-badge badge-vision" onclick="toggleCategory('VISION','MULTI_ATTR',this)">MULTI_ATTR</button>
+                    <span class="category-desc">Two or more attributes combined</span>
+                </div>
+                <div>
+                    <button class="category-badge badge-vision" onclick="toggleCategory('VISION','MULTI_INDIV',this)">MULTI_INDIV</button>
+                    <span class="category-desc">Two or more individuals simultaneously</span>
+                </div>
+                <div>
+                    <button class="category-badge badge-vision" onclick="toggleCategory('VISION','COMPLEX',this)">COMPLEX</button>
+                    <span class="category-desc">Temporal or relational reasoning beyond attribute presence</span>
+                </div>
+                <div>
+                    <button class="category-badge badge-vision" onclick="toggleCategory('VISION','VIDEO_COMPARISON',this)">VIDEO_COMPARISON</button>
+                    <span class="category-desc">Find clips with content similar to a reference video</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="query-panel" id="query-panel-main" style="display:none;"></div>
+
+        <h2 id="getting-started">Getting Started</h2>
+
+        <div style="background-color: #f9f9f9; padding: 20px; border-radius: 8px; border: 1px solid #ddd; font-family: Arial, sans-serif;">
+            <p style="font-size: 16px; line-height: 1.6; color: #333;">
+                Follow the steps below to get started:
+            </p>
+            <ol style="margin: 15px 0; padding-left: 20px; color: #333;">
+                <li style="margin-bottom: 10px;">
+                    <strong>Download the Dataset:</strong> Visit the
+                    <a href="https://huggingface.co/datasets/EPFL-ECEO/Prompting-MammAlps" target="_blank" style="color: #007bff; text-decoration: none;">Hugging Face repository</a>
+                    to download the dataset.
+                </li>
+                <li style="margin-bottom: 10px;">
+                    <strong>Documentation (Coming soon):</strong> Check out the
+                    <a href="#TODO" target="_blank" style="color: #007bff; text-decoration: none;">GitHub repository</a>
+                    for detailed instructions and examples.
+                </li>
+                <li style="margin-bottom: 10px;">
+                    <strong>Evaluation (Coming soon):</strong> Check out the evaluation instructions in the
+                    <a href="#TODO" target="_blank" style="color: #007bff; text-decoration: none;">GitHub repository</a>.
+                </li>
+            </ol>
+            <p style="font-size: 14px; color: #555;">
+                If you encounter any issues, feel free to open an issue on our
+                <a href="#TODO" target="_blank" style="color: #007bff; text-decoration: none;">GitHub Issues page</a>.
+            </p>
+        </div>
+
+        <h2 id="cite">Citation</h2>
+
+        <pre style="background-color: #fbfaf1; padding: 15px; border-radius: 5px; font-family: 'Courier New', Courier, monospace; font-size: 14px; overflow-x: auto; text-align: left;">
+        @article{gabeff2026mammalpss2,
+        title={MammAlps-S2 \& Prompting-MammAlps: TODO},
+        author={Gabeff, Valentin and Qi, Haozhe and Flaherty, Brendan and Sumb{\"u}l, Gencer and Mathis, Alexander and Tuia, Devis},
+        journal={TODO},
+        year={2026}
+        }
+        </pre>
+
+    </section>
+
+    <script>
+    const QUERY_DATA = {
+      "ECOLOGY": {
+        "RARE": [
+          "An animal engaged in any activity other than foraging.",
+          "An animal that is neither a red deer nor a roe deer.",
+          "An animal running.",
+          "An animal bathing.",
+          "A roe deer grazing.",
+          "An animal browsing.",
+          "An adult roe deer sniffing.",
+          "A juvenile red deer scratching its body.",
+          "A juvenile roe deer preparing to suckle.",
+          "A chamois trotting.",
+          "An adult male roe deer jumping.",
+          "An adult male red deer rubbing its antlers on the ground.",
+          "A fox sniffing.",
+          "A fox chasing prey.",
+          "A wolf chasing prey.",
+          "A hare.",
+          "A marten.",
+          "A juvenile red deer playing.",
+          "An adult red deer browsing.",
+          "A hare foraging.",
+          "A chamois.",
+          "A chamois being vigilant.",
+          "A fox foraging.",
+          "A wolf foraging.",
+          "A juvenile red deer shaking its head or body.",
+          "A juvenile roe deer.",
+          "A roe deer trotting while foraging.",
+          "A mountain hare being vigilant.",
+          "A mountain hare grazing.",
+          "An animal stretching its body.",
+          "An animal bathing while grooming.",
+          "An animal resting.",
+          "A red deer browsing.",
+          "An animal running while foraging.",
+          "A video of an animal drinking.",
+          "A video of an animal lying down while resting.",
+          "A red deer resting in rainy weather.",
+          "A red deer resting in clear weather.",
+          "Rainy weather.",
+          "A juvenile deer in clear or sunny weather.",
+          "A juvenile deer in rainy weather.",
+          "A roe deer foraging in sunny weather.",
+          "A roe deer foraging in rainy weather.",
+          "A red deer foraging in rainy weather.",
+          "A red deer foraging in sunny weather.",
+          "An individual sharing at least one activity with any individual of the same species from <vid>S1_C4_F136_V0115</vid> but in a different weather condition.",
+          "An individual sharing at least one activity with any individual from <vid>S1_C1_E66_V0152</vid> but of a different species.",
+          "An individual performing the same activities as any individual from <vid>S2_C2_E351_V0099</vid> but in a different weather condition."
+        ],
+        "COURTSHIP": [
+          "An animal participating in courtship.",
+          "An adult red deer standing with its head up while participating in courtship.",
+          "An adult red deer vocalizing while participating in courtship.",
+          "A video of two adult red deer vocalizing while participating in courtship.",
+          "An adult red deer lying down while participating in courtship.",
+          "An adult male red deer running while participating in courtship.",
+          "An adult female red deer running while participating in courtship.",
+          "A video of one adult male and one adult female red deer running while participating in courtship.",
+          "An adult male roe deer running while participating in courtship.",
+          "An adult female roe deer running while participating in courtship.",
+          "A video of one adult male and one adult female roe deer running while participating in courtship.",
+          "An adult male red deer pawing the ground while wallowing.",
+          "An adult male red deer pawing the ground and rubbing its antlers on the ground while wallowing.",
+          "An adult male red deer bathing while wallowing.",
+          "An adult male red deer urinating while wallowing.",
+          "An adult male red deer being vigilant after vocalizing.",
+          "A red deer vocalizing in rainy weather.",
+          "A roe deer participating in courtship in clear weather.",
+          "A roe deer participating in courtship in rainy weather.",
+          "A red deer participating in courtship in rainy weather.",
+          "An adult male red deer rubbing its antlers on the ground.",
+          "An adult male red deer doing the same sequence of actions while wallowing as any individual of <vid>S3_C2_E769_V0436</vid>.",
+          "An adult male red deer doing the same sequence of actions while wallowing as any individual of <vid>S3_C3_E524_V0327</vid>.",
+          "An adult male red deer doing the same unique actions while wallowing as any individual of <vid>S3_C3_E524_V0327</vid>.",
+          "An adult male red deer doing the same unique actions while wallowing as any individual of <vid>S3_C2_E524_V0087</vid>.",
+          "An adult male red deer performing at least one different action while wallowing than with any individual of <vid>S3_C3_E524_V0327</vid>.",
+          "An individual sharing at least one activity with any individual from <vid>S3_C2_E670_V0159</vid> but in a different weather condition."
+        ],
+        "SOCIAL": [
+          "A video of two or more animals.",
+          "A video of three or more red deer.",
+          "A video of two red deer.",
+          "A video of two or more red deer escaping.",
+          "A juvenile red deer walking while being vigilant.",
+          "A video of two adult female red deer walking while foraging.",
+          "A video of three or more adult male red deer walking while foraging.",
+          "A video of two or more wolves.",
+          "An adult female red deer foraging and a juvenile red deer foraging.",
+          "A video showing individuals from at least two different species.",
+          "A juvenile red deer nursing.",
+          "A juvenile red deer suckling.",
+          "A juvenile roe deer suckling.",
+          "An animal escaping from another animal of the same species that is chasing it.",
+          "An animal escaping from another animal of a different species that is chasing it.",
+          "A video of two or more juvenile red deer.",
+          "Two or more red deer foraging, with at least one also being vigilant at some point.",
+          "A juvenile red deer doing the exact same activities as an adult female red deer.",
+          "A juvenile red deer doing the exact same actions as an adult female red deer.",
+          "A juvenile red deer doing at least one different action than an adult female red deer.",
+          "An adult female red deer nursing.",
+          "A wolf chasing prey in clear or sunny weather.",
+          "A wolf chasing prey in overcast or rainy weather.",
+          "A fox chasing prey in clear weather.",
+          "An adult female red deer escaping in sunny weather.",
+          "An animal being vigilant while the weather is rainy or overcast.",
+          "An animal being vigilant while the weather is clear or sunny.",
+          "A juvenile roe deer preparing to suckle.",
+          "A fox chasing prey.",
+          "A wolf chasing prey.",
+          "Two or more animals reacting to a camera.",
+          "A video of three or more red deer reacting to a camera.",
+          "A juvenile red deer performing at least one action in common while nursing with any individual in <vid>S1_C6_F394_V0310</vid>.",
+          "A juvenile red deer performing at least one action in common while nursing with any individual in <vid>S1_C6_F404_V0330</vid>.",
+          "A juvenile red deer performing at least one different action while nursing than with any individual in <vid>S1_C6_F404_V0330</vid>.",
+          "An individual sharing at least one activity with any individual from <vid>S2_C1_F573_V0093</vid>."
+        ],
+        "CAMERA_REACTION": [
+          "An animal reacting to a camera.",
+          "Two or more animals reacting to a camera.",
+          "An adult roe deer reacting to a camera.",
+          "A video of three or more red deer reacting to a camera.",
+          "An adult red deer reacting to a camera.",
+          "A juvenile deer reacting to a camera.",
+          "An adult male red deer reacting to a camera.",
+          "A video of an individual sniffing while reacting to a camera.",
+          "An adult female red deer reacting to a camera.",
+          "An animal running while reacting to a camera.",
+          "An animal looking at a camera.",
+          "A fox reacting to a camera.",
+          "A wolf reacting to a camera.",
+          "An animal reacting to a camera and then foraging.",
+          "An animal foraging, then reacting to a camera, and then returning to foraging.",
+          "An animal reacting to a camera and then running away.",
+          "An animal foraging, then reacting to a camera, and then running away.",
+          "An animal reacting to a camera in rainy or overcast weather.",
+          "An animal reacting to a camera in clear or sunny weather.",
+          "An individual doing the same sequence of actions while reacting to a camera as any individual of <vid>S1_C4_F173_V0137</vid>.",
+          "An individual doing the same sequence of actions while reacting to a camera as any individual of <vid>S1_C3_E144_V0060</vid>.",
+          "An individual doing the same unique actions while reacting to a camera as any individual of <vid>S1_C4_F173_V0137</vid>.",
+          "An individual doing the same unique actions while reacting to a camera as any individual of <vid>S1_C3_E144_V0060</vid>.",
+          "An individual doing the same sequence of actions as the individual of <vid>S2_C1_E323_V0074</vid>.",
+          "An individual doing at least one different action while reacting to a camera than with any individual of <vid>S1_C4_F173_V0137</vid>.",
+          "An individual doing at least one different action while reacting to a camera than with any individual of <vid>S1_C3_E144_V0060</vid>.",
+          "An animal being vigilant in a different weather condition from that in <vid>S2_C2_F536_V0066</vid>.",
+          "A wolf chasing prey in a different weather condition from that in <vid>S2_C1_F573_V0093</vid>."
+        ],
+        "COMMON": [
+          "A single adult red deer foraging only.",
+          "An empty video."
+        ]
+      },
+      "VISION": {
+        "SINGLE_ATTR": [
+          "An animal running.",
+          "An animal bathing.",
+          "An animal browsing.",
+          "A hare.",
+          "A marten.",
+          "A chamois.",
+          "An animal stretching its body.",
+          "An animal resting.",
+          "A video of an animal drinking.",
+          "Rainy weather.",
+          "An animal participating in courtship.",
+          "A video of two or more animals.",
+          "An animal reacting to a camera.",
+          "An animal looking at a camera."
+        ],
+        "MULTI_ATTR": [
+          "A roe deer grazing.",
+          "An adult roe deer sniffing.",
+          "A juvenile red deer scratching its body.",
+          "A juvenile roe deer preparing to suckle.",
+          "A chamois trotting.",
+          "An adult male roe deer jumping.",
+          "An adult male red deer rubbing its antlers on the ground.",
+          "A fox sniffing.",
+          "A fox chasing prey.",
+          "A wolf chasing prey.",
+          "A juvenile red deer playing.",
+          "An adult red deer browsing.",
+          "A hare foraging.",
+          "A chamois being vigilant.",
+          "A fox foraging.",
+          "A wolf foraging.",
+          "A juvenile red deer shaking its head or body.",
+          "A juvenile roe deer.",
+          "A roe deer trotting while foraging.",
+          "A mountain hare being vigilant.",
+          "A mountain hare grazing.",
+          "An animal bathing while grooming.",
+          "A red deer browsing.",
+          "An animal running while foraging.",
+          "A video of an animal lying down while resting.",
+          "A red deer resting in rainy weather.",
+          "A red deer resting in clear weather.",
+          "A juvenile deer in clear or sunny weather.",
+          "A juvenile deer in rainy weather.",
+          "An adult red deer standing with its head up while participating in courtship.",
+          "An adult red deer vocalizing while participating in courtship.",
+          "A video of two adult red deer vocalizing while participating in courtship.",
+          "An adult red deer lying down while participating in courtship.",
+          "An adult male red deer running while participating in courtship.",
+          "An adult female red deer running while participating in courtship.",
+          "A video of one adult male and one adult female red deer running while participating in courtship.",
+          "An adult male roe deer running while participating in courtship.",
+          "An adult female roe deer running while participating in courtship.",
+          "A video of one adult male and one adult female roe deer running while participating in courtship.",
+          "An adult male red deer pawing the ground while wallowing.",
+          "An adult male red deer pawing the ground and rubbing its antlers on the ground while wallowing.",
+          "An adult male red deer bathing while wallowing.",
+          "An adult male red deer urinating while wallowing.",
+          "An adult male red deer being vigilant after vocalizing.",
+          "A red deer vocalizing in rainy weather.",
+          "A roe deer participating in courtship in clear weather.",
+          "A roe deer participating in courtship in rainy weather.",
+          "A red deer participating in courtship in rainy weather.",
+          "A video of three or more red deer.",
+          "A video of two red deer.",
+          "A video of two or more red deer escaping.",
+          "A juvenile red deer walking while being vigilant.",
+          "A video of two adult female red deer walking while foraging.",
+          "A video of three or more adult male red deer walking while foraging.",
+          "A video of two or more wolves.",
+          "An adult female red deer foraging and a juvenile red deer foraging.",
+          "A video showing individuals from at least two different species.",
+          "A juvenile red deer nursing.",
+          "A juvenile red deer suckling.",
+          "A juvenile roe deer suckling.",
+          "An animal escaping from another animal of the same species that is chasing it.",
+          "An animal escaping from another animal of a different species that is chasing it.",
+          "A video of two or more juvenile red deer.",
+          "Two or more red deer foraging, with at least one also being vigilant at some point.",
+          "A juvenile red deer doing the exact same activities as an adult female red deer.",
+          "A juvenile red deer doing the exact same actions as an adult female red deer.",
+          "A juvenile red deer doing at least one different action than an adult female red deer.",
+          "An adult female red deer nursing.",
+          "A wolf chasing prey in clear or sunny weather.",
+          "A wolf chasing prey in overcast or rainy weather.",
+          "A fox chasing prey in clear weather.",
+          "A roe deer foraging in sunny weather.",
+          "A red deer foraging in sunny weather.",
+          "A roe deer foraging in rainy weather.",
+          "A red deer foraging in rainy weather.",
+          "An adult female red deer escaping in sunny weather.",
+          "An animal being vigilant while the weather is rainy or overcast.",
+          "An animal being vigilant while the weather is clear or sunny.",
+          "Two or more animals reacting to a camera.",
+          "An adult roe deer reacting to a camera.",
+          "A video of three or more red deer reacting to a camera.",
+          "An adult red deer reacting to a camera.",
+          "A juvenile deer reacting to a camera.",
+          "An adult male red deer reacting to a camera.",
+          "A video of an individual sniffing while reacting to a camera.",
+          "An adult female red deer reacting to a camera.",
+          "An animal running while reacting to a camera.",
+          "A fox reacting to a camera.",
+          "A wolf reacting to a camera.",
+          "An animal reacting to a camera in rainy or overcast weather.",
+          "An animal reacting to a camera in clear or sunny weather.",
+          "A single adult red deer foraging only."
+        ],
+        "MULTI_INDIV": [
+          "A video of two adult red deer vocalizing while participating in courtship.",
+          "A video of one adult male and one adult female red deer running while participating in courtship.",
+          "A video of one adult male and one adult female roe deer running while participating in courtship.",
+          "A video of two or more animals.",
+          "A video of three or more red deer.",
+          "A video of two red deer.",
+          "A video of two or more red deer escaping.",
+          "A video of two adult female red deer walking while foraging.",
+          "A video of three or more adult male red deer walking while foraging.",
+          "A video of two or more wolves.",
+          "An adult female red deer foraging and a juvenile red deer foraging.",
+          "A video showing individuals from at least two different species.",
+          "An animal escaping from another animal of the same species that is chasing it.",
+          "An animal escaping from another animal of a different species that is chasing it.",
+          "A video of two or more juvenile red deer.",
+          "Two or more red deer foraging, with at least one also being vigilant at some point.",
+          "A juvenile red deer doing the exact same activities as an adult female red deer.",
+          "A juvenile red deer doing the exact same actions as an adult female red deer.",
+          "A juvenile red deer doing at least one different action than an adult female red deer.",
+          "Two or more animals reacting to a camera.",
+          "A video of three or more red deer reacting to a camera.",
+          "An animal reacting to a camera and then foraging.",
+          "An animal foraging, then reacting to a camera, and then returning to foraging.",
+          "An animal reacting to a camera and then running away.",
+          "An animal foraging, then reacting to a camera, and then running away."
+        ],
+        "COMPLEX": [
+          "A video showing individuals from at least two different species.",
+          "An animal engaged in any activity other than foraging.",
+          "An animal that is neither a red deer nor a roe deer.",
+          "An animal escaping from another animal of the same species that is chasing it.",
+          "An animal escaping from another animal of a different species that is chasing it.",
+          "Two or more red deer foraging, with at least one also being vigilant at some point.",
+          "A juvenile red deer doing the exact same activities as an adult female red deer.",
+          "A juvenile red deer doing the exact same actions as an adult female red deer.",
+          "A juvenile red deer doing at least one different action than an adult female red deer.",
+          "An animal reacting to a camera and then foraging.",
+          "An animal foraging, then reacting to a camera, and then returning to foraging.",
+          "An animal reacting to a camera and then running away.",
+          "An animal foraging, then reacting to a camera, and then running away.",
+          "A single adult red deer foraging only.",
+          "An empty video."
+        ],
+        "VIDEO_COMPARISON": [
+          "An adult male red deer doing the same sequence of actions while wallowing as any individual of <vid>S3_C2_E769_V0436</vid>.",
+          "An adult male red deer doing the same sequence of actions while wallowing as any individual of <vid>S3_C3_E524_V0327</vid>.",
+          "An adult male red deer doing the same unique actions while wallowing as any individual of <vid>S3_C3_E524_V0327</vid>.",
+          "An adult male red deer doing the same unique actions while wallowing as any individual of <vid>S3_C2_E524_V0087</vid>.",
+          "An adult male red deer performing at least one different action while wallowing than with any individual of <vid>S3_C3_E524_V0327</vid>.",
+          "A juvenile red deer performing at least one action in common while nursing with any individual in <vid>S1_C6_F394_V0310</vid>.",
+          "A juvenile red deer performing at least one action in common while nursing with any individual in <vid>S1_C6_F404_V0330</vid>.",
+          "A juvenile red deer performing at least one different action while nursing than with any individual in <vid>S1_C6_F404_V0330</vid>.",
+          "An individual doing the same sequence of actions while reacting to a camera as any individual of <vid>S1_C4_F173_V0137</vid>.",
+          "An individual doing the same sequence of actions while reacting to a camera as any individual of <vid>S1_C3_E144_V0060</vid>.",
+          "An individual doing the same unique actions while reacting to a camera as any individual of <vid>S1_C4_F173_V0137</vid>.",
+          "An individual doing the same unique actions while reacting to a camera as any individual of <vid>S1_C3_E144_V0060</vid>.",
+          "An individual doing the same sequence of actions as the individual of <vid>S2_C1_E323_V0074</vid>.",
+          "An individual doing at least one different action while reacting to a camera than with any individual of <vid>S1_C4_F173_V0137</vid>.",
+          "An individual doing at least one different action while reacting to a camera than with any individual of <vid>S1_C3_E144_V0060</vid>.",
+          "An animal being vigilant in a different weather condition from that in <vid>S2_C2_F536_V0066</vid>.",
+          "A wolf chasing prey in a different weather condition from that in <vid>S2_C1_F573_V0093</vid>.",
+          "An individual sharing at least one activity with any individual from <vid>S2_C1_F573_V0093</vid>.",
+          "An individual sharing at least one activity with any individual from <vid>S3_C2_E670_V0159</vid> but in a different weather condition.",
+          "An individual sharing at least one activity with any individual of the same species from <vid>S1_C4_F136_V0115</vid> but in a different weather condition.",
+          "An individual sharing at least one activity with any individual from <vid>S1_C1_E66_V0152</vid> but of a different species.",
+          "An individual performing the same activities as any individual from <vid>S2_C2_E351_V0099</vid> but in a different weather condition."
+        ]
+      }
+    };
+
+    document.querySelectorAll('.query-example-header').forEach(header => {
+        header.addEventListener('click', () => {
+            const card = header.closest('.query-example');
+            const isOpen = card.classList.toggle('open');
+            const videoRow = card.querySelector('.query-video-row');
+            if (isOpen) {
+                videoRow.querySelectorAll('video').forEach(v => v.play());
+            } else {
+                videoRow.querySelectorAll('video').forEach(v => { v.pause(); v.currentTime = 0; });
+            }
+        });
+    });
+
+    function renderQueryText(rawText) {
+        const escaped = rawText
+            .replace(/&/g, '&amp;')
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;');
+        return escaped.replace(/&lt;vid&gt;(.*?)&lt;\/vid&gt;/g,
+            '<span class="vid-ref">$1</span>');
+    }
+
+    function toggleCategory(axis, category, btn) {
+        const panel = document.getElementById('query-panel-main');
+        const wasActive = btn.classList.contains('badge-active');
+
+        document.querySelectorAll('.category-badge').forEach(b => b.classList.remove('badge-active'));
+
+        if (wasActive) {
+            panel.style.display = 'none';
+            return;
+        }
+
+        btn.classList.add('badge-active');
+
+        const queries = QUERY_DATA[axis][category];
+        const axisLabel = axis === 'ECOLOGY' ? 'Ecological Relevance' : 'Retrieval Complexity';
+        panel.innerHTML =
+            '<div class="query-panel-header"><strong>' + category + '</strong> &middot; ' +
+            axisLabel + ' &middot; ' + queries.length + ' quer' + (queries.length === 1 ? 'y' : 'ies') +
+            '</div>' +
+            '<ol class="query-list">' +
+            queries.map(q => '<li>' + renderQueryText(q) + '</li>').join('') +
+            '</ol>';
+        panel.style.display = 'block';
+    }
+    </script>
+
+    <footer>
+    <p>This page was built using the 
+        <a href="https://github.com/eliahuhorwitz/Academic-project-page-template" target="_blank" style="color: #007bff; text-decoration: none;">Academic Project Page Template</a> 
+        which was adopted from the 
+        <a href="https://nerfies.github.io/" target="_blank" style="color: #007bff; text-decoration: none;">Nerfies project page</a>.
+    </p>
+    <p>
+        This webpage is released under the 
+        <a href="https://creativecommons.org/licenses/by-nc/4.0/legalcode" target="_blank" style="color: #007bff; text-decoration: none;">CC BY-NC 4.0 license</a>.
+    </p>
+    </footer>
+</body>
+</html>
