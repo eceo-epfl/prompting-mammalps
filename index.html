@@ -114,10 +114,10 @@
             font-weight: bold;
             color: rgba(26, 26, 26, 1);
             font-size: 18px;
-            background-color: rgba(232, 244, 248, 0.7);
+            background-color: rgba(255, 255, 255, 0.7);
             padding: 15px 20px;
             border-radius: 2px;
-            border: 3px solid rgba(179, 217, 224, 1);
+            border: 3px solid rgb(255, 255, 255);
             display: inline-block;
             text-align: center;
             margin: 0px auto 0px; /* Reduced from 80px auto 40px */
@@ -131,8 +131,8 @@
         }
 
         .hero-description:hover {
-            background-color: rgba(232, 244, 248, 0.7);
-            border: 3px solid rgb(179, 217, 224, 1);
+            background-color: rgba(255, 255, 255, 0.7);
+            border: 3px solid rgb(255, 255, 255);
         }
         
         .hero-caption p {
@@ -660,7 +660,7 @@
                 <i class="ai ai-arxiv"></i>
                 arXiv
             </a> -->
-            <a href="#TODO" target="_blank" class="action-button">
+            <a href="https://github.com/eceo-epfl/prompting-mammalps" target="_blank" class="action-button">
                 <i class="fab fa-github"></i>
                 Github
             </a>
@@ -680,6 +680,16 @@
         <!-- <div style="text-align: center; margin: 20px 0;">
             <img src="static/images/figure_1.png" alt="Dataset Overview (placeholder — replace with MammAlps-S2 figure)" style="max-width: 100%; height: auto;">
         </div> -->
+
+        <p>
+            <strong>MammAlps-S2</strong> extends <a href="https://eceo-epfl.github.io/MammAlps/" target="_blank" style="color: #007bff; text-decoration: none;">MammAlps</a> with a second field season (2024). It contains 2,865 video clips from camera traps deployed at three sites in the Swiss National Park, annotated with per-frame bounding boxes, individual tracks, and behavioural labels — species, action, activity, and for deer, age and sex. Compared to MammAlps, it adds two new species (chamois and marten), extends the label vocabulary to 23 actions and 12 activities, and covers an earlier season capturing different ecological dynamics (roe deer courtship, distinct species occurrences).
+        </p>
+        <p>
+            Built on these dense annotations, we introduce <strong>Prompting-MammAlps</strong> — a text-to-video retrieval (TVR) benchmark with 135 natural-language queries. Each query is matched to the subset of train/test videos whose content <em>fully</em> satisfies the query; partial matches are excluded. The benchmark is designed to reflect realistic retrieval conditions, including queries with no matching video and queries spanning multiple individuals or temporal context.
+        </p>
+        <p>
+            The dataset is publicly released to encourage research in text-to-video retrieval, species and behaviour recognition, multi-animal tracking, action segmentation, and spatio-temporal action localisation.
+        </p>
         
         <div class="stats-grid">
             <div class="stat-card">
@@ -759,22 +769,10 @@
             Examples of query-video associations. Two matching videos with ground-truth associations are shown for each query.
         </p>
 
-        <p>
-            <strong>MammAlps-S2</strong> extends <a href="https://eceo-epfl.github.io/MammAlps/" target="_blank" style="color: #007bff; text-decoration: none;">MammAlps</a> with a second field season (2024). It contains 2,865 video clips from camera traps deployed at three sites in the Swiss National Park, annotated with per-frame bounding boxes, individual tracks, and behavioural labels — species, action, activity, and for deer, age and sex. Compared to MammAlps, it adds two new species (chamois and marten), extends the label vocabulary to 23 actions and 12 activities, and covers an earlier season capturing different ecological dynamics (roe deer courtship, distinct species occurrences).
-        </p>
-        <p>
-            Built on these dense annotations, we introduce <strong>Prompting-MammAlps</strong> — a text-to-video retrieval (TVR) benchmark with 135 natural-language queries co-designed with behavioural ecologists. Each query is matched to the subset of train/test videos whose content <em>fully</em> satisfies the query; partial matches are excluded. The benchmark is designed to reflect realistic retrieval conditions, including queries with no matching video and queries spanning multiple individuals or temporal context.
-        </p>
-        <p>
-            The dataset is publicly released to encourage research in text-to-video retrieval, species and behaviour recognition, multi-animal tracking, action segmentation, and spatio-temporal action localisation.
-        </p>
-        
         <h2 id="benchmark">Text-to-Video Retrieval Benchmark: Prompting-MammAlps</h2>
         <p>
             Prompting-MammAlps includes 135 natural-language queries manually defined in collaboration with behavioural ecologists. Each query is paired with the subset of train and test videos whose content <em>fully</em> satisfies the query — partial matches are excluded to enforce strict retrieval semantics. Some queries have no matching video (reflecting realistic field conditions where an event may never have been captured).
         </p>
-
-        <h3>Queries</h3>
 
         <div class="category-grid">
             <div class="category-group">
@@ -841,31 +839,16 @@
                     to download the dataset.
                 </li>
                 <li style="margin-bottom: 10px;">
-                    <strong>Documentation (Coming soon):</strong> Check out the
-                    <a href="#TODO" target="_blank" style="color: #007bff; text-decoration: none;">GitHub repository</a>
+                    <strong>Documentation:</strong> Check out the
+                    <a href="https://github.com/eceo-epfl/prompting-mammalps" target="_blank" style="color: #007bff; text-decoration: none;">GitHub repository</a>
                     for detailed instructions and examples.
-                </li>
-                <li style="margin-bottom: 10px;">
-                    <strong>Evaluation (Coming soon):</strong> Check out the evaluation instructions in the
-                    <a href="#TODO" target="_blank" style="color: #007bff; text-decoration: none;">GitHub repository</a>.
                 </li>
             </ol>
             <p style="font-size: 14px; color: #555;">
                 If you encounter any issues, feel free to open an issue on our
-                <a href="#TODO" target="_blank" style="color: #007bff; text-decoration: none;">GitHub Issues page</a>.
+                <a href="https://github.com/eceo-epfl/prompting-mammalps/issues" target="_blank" style="color: #007bff; text-decoration: none;">GitHub Issues page</a>.
             </p>
         </div>
-
-        <h2 id="cite">Citation</h2>
-
-        <pre style="background-color: #fbfaf1; padding: 15px; border-radius: 5px; font-family: 'Courier New', Courier, monospace; font-size: 14px; overflow-x: auto; text-align: left;">
-        @article{gabeff2026mammalpss2,
-        title={MammAlps-S2 \& Prompting-MammAlps: TODO},
-        author={Gabeff, Valentin and Qi, Haozhe and Flaherty, Brendan and Sumb{\"u}l, Gencer and Mathis, Alexander and Tuia, Devis},
-        journal={TODO},
-        year={2026}
-        }
-        </pre>
 
     </section>
 
