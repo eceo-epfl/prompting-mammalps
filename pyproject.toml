@@ -1,59 +1,30 @@
 [project]
 name = "prompting-mammalps"
 version = "0.1.0"
-description = "Code for the development of the text to video retrieval benchmark on MammAlps"
+description = "Text-to-video retrieval benchmark on MammAlps-S2"
 readme = "README.md"
-requires-python = ">=3.11,<3.12"
+requires-python = ">=3.12,<3.13"
 dependencies = [
-    "audioread>=3.1.0",
-    "boto3>=1.42.55",
-    "decord>=0.6.0",
-    "easydict>=1.13",
-    "einops>=0.8.2",
-    "ffmpeg-python>=0.2.0",
-    "ftfy>=6.3.1",
-    "h5py>=3.15.1",
-    "ipdb>=0.13.13",
-    "librosa>=0.11.0",
-    "matplotlib>=3.10.8",
-    "opencv-python>=4.13.0.92",
+    "numpy>=1.26",
     "pandas>=3.0.1",
-    "pillow>=12.1.1",
-    "pre-commit==4.5.1",
-    "regex>=2026.2.19",
-    "requests>=2.32.5",
-    "scikit-learn>=1.8.0",
-    "seaborn>=0.13.2",
-    "sentencepiece>=0.2.1",
-    "toolz>=1.1.0",
-    "torch>=2.10.0",
-    "torchaudio>=2.10.0",
-    "torchvision>=0.25.0",
     "tqdm>=4.67.1",
-    "transformers>=4.36.0",
-    "wandb>=0.25.0",
-    "webdataset>=1.0.2",
-    "xformers>=0.0.35",
-    "yacs>=0.1.8",
+    "huggingface-hub>=0.30",
+    "opencv-python>=4.13.0.92",
+    "ffmpeg-python>=0.2.0",
+    "supervision>=0.24",
 ]
 
 [tool.setuptools]
-packages = ["benchmark"]
+packages = []
 
 [project.optional-dependencies]
-dev = [
-    "black>=24.3",
-    "isort>=5.13",
-    "pre-commit>=3.7"
+# LLM-based parsing agent (models/llm)
+smolagents = [
+    "smolagents>=1.0",
+    "transformers>=4.36.0",
+    "torch>=2.10.0",
+    "pyyaml>=6.0",
 ]
-
-[tool.black]
-line-length = 88
-
-[tool.isort]
-profile = "black"
-line_length = 88
-
 
 [build-system]
 requires = ["setuptools>=61"]

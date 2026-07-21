@@ -4,42 +4,37 @@ import os
 from argparse import ArgumentParser
 from pathlib import Path
 
+import parse_json_tools
 import yaml
-from parse_json_tools import (
-    Action,
-    Activity,
-    DAge,
-    DSex,
-    Meteo,
-    Species,
-    get_weather_condition_from_file_id,
-    check_contains_weather_condition,
-    check_track_contains_continuous_sequence,
-    get_action_sequences_from_tracks,
-    get_adult_deer_tracks_from_sex,
-    get_deer_tracks_from_age,
-    get_nb_adult_deer_tracks_sex_in_video,
-    get_nb_deer_tracks_age_in_video,
-    get_nb_tracks_action_in_video,
-    get_nb_tracks_activity_in_video,
-    get_nb_tracks_species_in_video,
-    get_tracks_from_action,
-    get_tracks_from_activity,
-    get_tracks_from_file_id,
-    get_tracks_from_species,
-    get_unique_actions_from_tracks,
-    get_unique_activities_from_tracks,
-    get_unique_species_from_tracks,
-    check_tracks_contain_action,
-    check_tracks_contain_activity,
-    check_tracks_contain_adult_deer_sex,
-    check_tracks_contain_deer_age,
-    check_tracks_contain_species,
-)
+from parse_json_tools import (Action, Activity, DAge, DSex, Meteo, Species,
+                              check_contains_weather_condition,
+                              check_track_contains_continuous_sequence,
+                              check_tracks_contain_action,
+                              check_tracks_contain_activity,
+                              check_tracks_contain_adult_deer_sex,
+                              check_tracks_contain_deer_age,
+                              check_tracks_contain_species,
+                              get_action_sequences_from_tracks,
+                              get_adult_deer_tracks_from_sex,
+                              get_deer_tracks_from_age,
+                              get_nb_adult_deer_tracks_sex_in_video,
+                              get_nb_deer_tracks_age_in_video,
+                              get_nb_tracks_action_in_video,
+                              get_nb_tracks_activity_in_video,
+                              get_nb_tracks_species_in_video,
+                              get_tracks_from_action, get_tracks_from_activity,
+                              get_tracks_from_file_id, get_tracks_from_species,
+                              get_unique_actions_from_tracks,
+                              get_unique_activities_from_tracks,
+                              get_unique_species_from_tracks,
+                              get_weather_condition_from_file_id)
 from smolagents import CodeAgent, PromptTemplates, TransformersModel
 
 
 def main(args):
+    if args.data_root:
+        parse_json_tools.JSON_FOLDER = Path(args.data_root) / "annotations"
+
     tools = [
         get_tracks_from_file_id,
         get_weather_condition_from_file_id,
@@ -82,7 +77,9 @@ def main(args):
         model_id = "swiss-ai/Apertus-8B-Instruct-2509"
     else:
         raise NotImplementedError()
-    model = TransformersModel(model_id, device_map="cuda", max_new_tokens=8096, do_sample=False)
+    model = TransformersModel(
+        model_id, device_map="cuda", max_new_tokens=8096, do_sample=False
+    )
     agent = CodeAgent(
         tools=tools,
         model=model,
@@ -124,7 +121,7 @@ def main(args):
 
     # For every query
     output_json_file = Path(args.output_folder) / (
-            model_id.split("/")[1] + "_generated_functions.json"
+        model_id.split("/")[1] + "_generated_functions.json"
     )
     if os.path.exists(output_json_file):
         with open(output_json_file, "r") as f:
@@ -148,8 +145,8 @@ def main(args):
                 additional_args={"file_id": test_file_id},
             )
 
-        # Get the function that was created and apply it to all files
-        
+            # Get the function that was created and apply it to all files
+
             check_file = agent.python_executor.custom_tools["check_file"]
             check_file_str = check_file.__source__
             logging.info(
@@ -173,11 +170,20 @@ if __name__ == "__main__":
         "--input_queries_videos",
         help="JSON file containing the queries of interest and associated ground truth videos",
     )
-    parser.add_argument("--llm", choices=["qwen", "llama", "mistral", "apertus"], default="llama")
+    parser.add_argument(
+        "--llm", choices=["qwen", "llama", "mistral", "apertus"], default="qwen"
+    )
     parser.add_argument(
         "-O",
         "--output_folder",
         help="output folder containing logs, intermediary results and output files",
+    )
+    parser.add_argument(
+        "-D",
+        "--data_root",
+        default=os.environ.get("MAMMALPS_DATA_ROOT", "./data"),
+        help="Root folder of the downloaded HF dataset (expects a `<data_root>/annotations` "
+        "subfolder). Defaults to the MAMMALPS_DATA_ROOT env var, or ./data.",
     )
 
     parser.add_argument("--yaml", default="prompt.yaml", help="Instruction file")

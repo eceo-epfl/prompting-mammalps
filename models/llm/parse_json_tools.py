@@ -1,4 +1,5 @@
 import json
+import os
 
 try:
     from enum import StrEnum
@@ -7,7 +8,7 @@ except ImportError:
 
     StrEnum = Enum
 from pathlib import Path
-from typing import Dict, List, Literal, Optional, Set, Union
+from typing import Dict, List, Literal, Optional, Union
 
 from smolagents import tool
 
@@ -98,14 +99,9 @@ class Meteo(StrEnum):
 # Global variable for JSON annotations folder
 # Necessary to avoid passing this as parameter to functions
 # which could be changed by the code agent
-if Path("/home/eceo_scratch/datasets/prompting-mammalps-v2/annotations").exists():
-    JSON_FOLDER = Path(
-        "/home/eceo_scratch/datasets/prompting-mammalps-v2/annotations"
-    )  # ECEO Machine
-else:
-    JSON_FOLDER = Path(
-        "/media/EVO870/datasets/prompting-mammalps-v2/annotations"
-    )  # RCP
+# Set via --data-root in run.py, or the MAMMALPS_DATA_ROOT env var; defaults to
+# ./data/annotations (populate with `huggingface_hub.snapshot_download`, see README).
+JSON_FOLDER = Path(os.environ.get("MAMMALPS_DATA_ROOT", "./data")) / "annotations"
 
 
 ### Basic functions
