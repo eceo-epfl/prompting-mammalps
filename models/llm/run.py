@@ -114,8 +114,7 @@ def main(args):
     with open(args.input_queries_videos, "r") as f:
         queries_dict = json.load(f)
 
-    # queries_list = [q for q_cat in queries_dict.values() for q in q_cat]
-    queries_list = [q for (cat, q_cat) in queries_dict.items() for q in q_cat]
+    queries_list = list(queries_dict.keys())
     output_queries_functions = {}
     test_file_id = "S1_C1_E57_V0141"
 
@@ -127,7 +126,7 @@ def main(args):
         with open(output_json_file, "r") as f:
             output_queries_functions = json.load(f)
 
-    for query in queries_list:  # [31:]:
+    for query in queries_list:
         if query in output_queries_functions:
             print("Skipping already processed query:", query)
             continue
