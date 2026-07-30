@@ -78,7 +78,14 @@ def main(args):
     else:
         raise NotImplementedError()
     model = TransformersModel(
-        model_id, device_map="cuda", max_new_tokens=8096, do_sample=False
+        model_id,
+        device_map="cuda",
+        max_new_tokens=8096,
+        do_sample=True,
+        temperature=0.6,
+        top_p=0.95,
+        top_k=20,
+        min_p=0,
     )
     agent = CodeAgent(
         tools=tools,
