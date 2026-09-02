@@ -1,4 +1,7 @@
 # Prompting MammAlps: Text-to-video retrieval on the MammAlps-S2 dataset
+[![ECCV 2026](https://img.shields.io/badge/ECCV-2026-4b44ce)](https://eccv.ecva.net/virtual/2026/poster/5474)
+[![HuggingFace Dataset](https://img.shields.io/badge/🤗%20Dataset-Prompting--MammAlps-FFD21E)](https://huggingface.co/datasets/EPFL-ECEO/Prompting-MammAlps)
+[![License: CC BY-NC 4.0](https://img.shields.io/badge/License-CC%20BY--NC%204.0-lightgrey)](https://creativecommons.org/licenses/by-nc/4.0/)
 
 This repository contains the **official code to evaluate your method on the prompting-mammalps benchmark**.
 
@@ -6,7 +9,7 @@ We also include:
 - the agent parsing framework used in the proposed baseline (`models/llm`)
 - a tutorial notebook to visualize labels on the raw videos (`tutorials/visualize_predictions.ipynb`)
 - intermediary result files to reproduce our baseline performance (`baseline`)
-- SALMA architecture, training and inference scripts (`TBD`)
+- SALMA architecture, training and inference scripts (TBC `models/salma`)
 
 To keep a simple repository, we did not include the code to run SOTA comparisons and the ablation experiments.
 
@@ -96,10 +99,12 @@ uv pip install -e ".[smolagents]"   # from the repo root
 cd models/llm
 bash scripts/run_llm_agent.sh   # edit --llm / paths as needed, or run.py directly
 ```
-*Note: Some LLM models require setting up a huggingface authentification key.*
 
-The output from `run.py` is a `.json` file that has the text queries as keys and the generated `check_file` functions as values; apply them to a folder of prediction/annotation JSONs with `evaluate_llm_functions.py` to get a
-`{query: [video_id, ...]}` retrieval result, which is the input to `evaluate.py retrieval`.
+  * Some LLM models require setting up a huggingface authentification key.
+  * We ran the models with their recommended parameters that lead to non-deterministic behaviors. Repeating this stage of the pipeline yields slightly different results.
+
+The output from `models/llm/run.py` is a `.json` file that has the text queries as keys and the generated `check_file` functions as values; apply them to a folder of prediction/annotation JSONs with `evaluate_llm_functions.py` to get a
+`{query: [video_id, ...]}` retrieval result, which is the input to `evaluate.py retrieval` above.
 
 Generated functions can then be applied against the candidate videos JSON file representation. For example, to obtain the set of retrieved videos when using the ground-truth annotations (oracle):  
 ```bash
@@ -116,7 +121,14 @@ demographics) on a video, from either the ground-truth annotations or a SALMA pr
 
 ## Citation
 
-TBD
+```bibtext
+@article{gabeff2026prompting,
+  title={Prompting-MammAlps: Fine-Grained Text-to-Video Retrieval for Camera-Trap Data},
+  author={Gabeff, Valentin and Maquignaz, Baptiste and Shan, Jennifer and Mamooler, Sepideh and Sumbul, Gencer and Costelloe, Blair and Tuia, Devis and Mathis, Alexander},
+  journal={arXiv preprint arXiv:2607.09876},
+  year={2026}
+}
+```
 
 ## Code attributions
 
